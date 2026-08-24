@@ -1,0 +1,1247 @@
+{
+  "11101": {
+    "slug": "dull-blade",
+    "rarity": 1,
+    "wt": "1"
+  },
+  "11201": {
+    "slug": "silver-sword",
+    "rarity": 2,
+    "wt": "1"
+  },
+  "11301": {
+    "slug": "cool-steel",
+    "rarity": 3,
+    "wt": "1"
+  },
+  "11302": {
+    "slug": "harbinger-of-dawn",
+    "rarity": 3,
+    "wt": "1"
+  },
+  "11303": {
+    "slug": "traveler-s-handy-sword",
+    "rarity": 3,
+    "wt": "1"
+  },
+  "11304": {
+    "slug": "dark-iron-sword",
+    "rarity": 3,
+    "wt": "1"
+  },
+  "11305": {
+    "slug": "fillet-blade",
+    "rarity": 3,
+    "wt": "1"
+  },
+  "11306": {
+    "slug": "skyrider-sword",
+    "rarity": 3,
+    "wt": "1"
+  },
+  "11401": {
+    "slug": "favonius-sword",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11402": {
+    "slug": "the-flute",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11403": {
+    "slug": "sacrificial-sword",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11404": {
+    "slug": "royal-longsword",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11405": {
+    "slug": "lion-s-roar",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11406": {
+    "slug": "prototype-rancour",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11407": {
+    "slug": "iron-sting",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11408": {
+    "slug": "blackcliff-longsword",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11409": {
+    "slug": "the-black-sword",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11410": {
+    "slug": "the-alley-flash",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11412": {
+    "slug": "sword-of-descension",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11413": {
+    "slug": "festering-desire",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11414": {
+    "slug": "amenoma-kageuchi",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11415": {
+    "slug": "cinnabar-spindle",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11416": {
+    "slug": "kagotsurube-isshin",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11417": {
+    "slug": "sapwood-blade",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11418": {
+    "slug": "xiphos-moonlight",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11422": {
+    "slug": "toukabou-shigure",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11424": {
+    "slug": "wolf-fang",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11425": {
+    "slug": "finale-of-the-deep",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11426": {
+    "slug": "fleuve-cendre-ferryman",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11427": {
+    "slug": "the-dockhand-s-assistant",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11428": {
+    "slug": "sword-of-narzissenkreuz",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11430": {
+    "slug": "sturdy-bone",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11431": {
+    "slug": "flute-of-ezpitzal",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11432": {
+    "slug": "calamity-of-eshu",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11433": {
+    "slug": "serenity-s-call",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11434": {
+    "slug": "moonweaver-s-dawn",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11435": {
+    "slug": "heretic-s-molten-blade",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11436": {
+    "slug": "emberwell",
+    "rarity": 4,
+    "wt": "1"
+  },
+  "11501": {
+    "slug": "aquila-favonia",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11502": {
+    "slug": "skyward-blade",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11503": {
+    "slug": "freedom-sworn",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11504": {
+    "slug": "summit-shaper",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11505": {
+    "slug": "primordial-jade-cutter",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11509": {
+    "slug": "mistsplitter-reforged",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11510": {
+    "slug": "haran-geppaku-futsu",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11511": {
+    "slug": "key-of-khaj-nisut",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11512": {
+    "slug": "light-of-foliar-incision",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11513": {
+    "slug": "splendor-of-tranquil-waters",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11514": {
+    "slug": "uraku-misugiri",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11515": {
+    "slug": "absolution",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11516": {
+    "slug": "peak-patrol-song",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11517": {
+    "slug": "azurelight",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11518": {
+    "slug": "athame-artis",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11519": {
+    "slug": "lightbearing-moonshard",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11520": {
+    "slug": "whitelake-frostfeather",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "11521": {
+    "slug": "exaiphanes-blade",
+    "rarity": 5,
+    "wt": "1"
+  },
+  "12101": {
+    "slug": "waster-greatsword",
+    "rarity": 1,
+    "wt": "2"
+  },
+  "12201": {
+    "slug": "old-merc-s-pal",
+    "rarity": 2,
+    "wt": "2"
+  },
+  "12301": {
+    "slug": "ferrous-shadow",
+    "rarity": 3,
+    "wt": "2"
+  },
+  "12302": {
+    "slug": "bloodtainted-greatsword",
+    "rarity": 3,
+    "wt": "2"
+  },
+  "12303": {
+    "slug": "white-iron-greatsword",
+    "rarity": 3,
+    "wt": "2"
+  },
+  "12305": {
+    "slug": "debate-club",
+    "rarity": 3,
+    "wt": "2"
+  },
+  "12306": {
+    "slug": "skyrider-greatsword",
+    "rarity": 3,
+    "wt": "2"
+  },
+  "12401": {
+    "slug": "favonius-greatsword",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12402": {
+    "slug": "the-bell",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12403": {
+    "slug": "sacrificial-greatsword",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12404": {
+    "slug": "royal-greatsword",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12405": {
+    "slug": "rainslasher",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12406": {
+    "slug": "prototype-archaic",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12407": {
+    "slug": "whiteblind",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12408": {
+    "slug": "blackcliff-slasher",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12409": {
+    "slug": "serpent-spine",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12410": {
+    "slug": "lithic-blade",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12411": {
+    "slug": "snow-tombed-starsilver",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12412": {
+    "slug": "luxurious-sea-lord",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12414": {
+    "slug": "katsuragikiri-nagamasa",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12415": {
+    "slug": "makhaira-aquamarine",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12416": {
+    "slug": "akuoumaru",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12417": {
+    "slug": "forest-regalia",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12418": {
+    "slug": "mailed-flower",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12424": {
+    "slug": "talking-stick",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12425": {
+    "slug": "tidal-shadow",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12426": {
+    "slug": "ultimate-overlord-s-mega-magic-sword",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12427": {
+    "slug": "portable-power-saw",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12430": {
+    "slug": "fruitful-hook",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12431": {
+    "slug": "earth-shaker",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12432": {
+    "slug": "flame-forged-insight",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12433": {
+    "slug": "master-key",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12435": {
+    "slug": "forged-by-the-golden-melody",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12436": {
+    "slug": "blade-of-atonement",
+    "rarity": 4,
+    "wt": "2"
+  },
+  "12501": {
+    "slug": "skyward-pride",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12502": {
+    "slug": "wolf-s-gravestone",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12503": {
+    "slug": "song-of-broken-pines",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12504": {
+    "slug": "the-unforged",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12505": {
+    "slug": "primordial-jade-greatsword",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12510": {
+    "slug": "redhorn-stonethresher",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12511": {
+    "slug": "beacon-of-the-reed-sea",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12512": {
+    "slug": "verdict",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12513": {
+    "slug": "fang-of-the-mountain-king",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12514": {
+    "slug": "a-thousand-blazing-suns",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12515": {
+    "slug": "gest-of-the-mighty-wolf",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "12516": {
+    "slug": "a-teaspoon-of-transcendence",
+    "rarity": 5,
+    "wt": "2"
+  },
+  "13101": {
+    "slug": "beginner-s-protector",
+    "rarity": 1,
+    "wt": "4"
+  },
+  "13201": {
+    "slug": "iron-point",
+    "rarity": 2,
+    "wt": "4"
+  },
+  "13301": {
+    "slug": "white-tassel",
+    "rarity": 3,
+    "wt": "4"
+  },
+  "13302": {
+    "slug": "halberd",
+    "rarity": 3,
+    "wt": "4"
+  },
+  "13303": {
+    "slug": "black-tassel",
+    "rarity": 3,
+    "wt": "4"
+  },
+  "13401": {
+    "slug": "dragon-s-bane",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13402": {
+    "slug": "prototype-starglitter",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13403": {
+    "slug": "crescent-pike",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13404": {
+    "slug": "blackcliff-pole",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13405": {
+    "slug": "deathmatch",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13406": {
+    "slug": "lithic-spear",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13407": {
+    "slug": "favonius-lance",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13408": {
+    "slug": "royal-spear",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13409": {
+    "slug": "dragonspine-spear",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13414": {
+    "slug": "kitain-cross-spear",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13415": {
+    "slug": "the-catch",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13416": {
+    "slug": "wavebreaker-s-fin",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13417": {
+    "slug": "moonpiercer",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13419": {
+    "slug": "missive-windspear",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13424": {
+    "slug": "ballad-of-the-fjords",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13425": {
+    "slug": "rightful-reward",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13426": {
+    "slug": "dialogues-of-the-desert-sages",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13427": {
+    "slug": "prospector-s-drill",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13430": {
+    "slug": "mountain-bracing-bolt",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13431": {
+    "slug": "footprint-of-the-rainbow",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13432": {
+    "slug": "tamayuratei-no-ohanashi",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13433": {
+    "slug": "prospector-s-shovel",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13434": {
+    "slug": "sacrificer-s-staff",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13435": {
+    "slug": "frostbreath",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13436": {
+    "slug": "song-of-the-vigil",
+    "rarity": 4,
+    "wt": "4"
+  },
+  "13501": {
+    "slug": "staff-of-homa",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13502": {
+    "slug": "skyward-spine",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13504": {
+    "slug": "vortex-vanquisher",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13505": {
+    "slug": "primordial-jade-winged-spear",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13507": {
+    "slug": "calamity-queller",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13509": {
+    "slug": "engulfing-lightning",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13511": {
+    "slug": "staff-of-the-scarlet-sands",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13512": {
+    "slug": "crimson-moon-s-semblance",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13513": {
+    "slug": "lumidouce-elegy",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13514": {
+    "slug": "symphonist-of-scents",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13515": {
+    "slug": "fractured-halo",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13516": {
+    "slug": "bloodsoaked-ruins",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "13517": {
+    "slug": "disaster-and-remorse",
+    "rarity": 5,
+    "wt": "4"
+  },
+  "14101": {
+    "slug": "apprentice-s-notes",
+    "rarity": 1,
+    "wt": "5"
+  },
+  "14201": {
+    "slug": "pocket-grimoire",
+    "rarity": 2,
+    "wt": "5"
+  },
+  "14301": {
+    "slug": "magic-guide",
+    "rarity": 3,
+    "wt": "5"
+  },
+  "14302": {
+    "slug": "thrilling-tales-of-dragon-slayers",
+    "rarity": 3,
+    "wt": "5"
+  },
+  "14303": {
+    "slug": "otherworldly-story",
+    "rarity": 3,
+    "wt": "5"
+  },
+  "14304": {
+    "slug": "emerald-orb",
+    "rarity": 3,
+    "wt": "5"
+  },
+  "14305": {
+    "slug": "twin-nephrite",
+    "rarity": 3,
+    "wt": "5"
+  },
+  "14401": {
+    "slug": "favonius-codex",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14402": {
+    "slug": "the-widsith",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14403": {
+    "slug": "sacrificial-fragments",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14404": {
+    "slug": "royal-grimoire",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14405": {
+    "slug": "solar-pearl",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14406": {
+    "slug": "prototype-amber",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14407": {
+    "slug": "mappa-mare",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14408": {
+    "slug": "blackcliff-agate",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14409": {
+    "slug": "eye-of-perception",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14410": {
+    "slug": "wine-and-song",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14412": {
+    "slug": "frostbearer",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14413": {
+    "slug": "dodoco-tales",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14414": {
+    "slug": "hakushin-ring",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14415": {
+    "slug": "oathsworn-eye",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14416": {
+    "slug": "wandering-evenstar",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14417": {
+    "slug": "fruit-of-fulfillment",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14424": {
+    "slug": "sacrificial-jade",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14425": {
+    "slug": "flowing-purity",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14426": {
+    "slug": "ballad-of-the-boundless-blue",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14427": {
+    "slug": "ash-graven-drinking-horn",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14430": {
+    "slug": "waveriding-whirl",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14431": {
+    "slug": "ring-of-yaxche",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14432": {
+    "slug": "etherlight-spindlelute",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14433": {
+    "slug": "blackmarrow-lantern",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14434": {
+    "slug": "dawning-frost",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14435": {
+    "slug": "clash-of-kings",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14436": {
+    "slug": "echoes-of-the-heart",
+    "rarity": 4,
+    "wt": "5"
+  },
+  "14501": {
+    "slug": "skyward-atlas",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14502": {
+    "slug": "lost-prayer-to-the-sacred-winds",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14504": {
+    "slug": "memory-of-dust",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14505": {
+    "slug": "jadefall-s-splendor",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14506": {
+    "slug": "everlasting-moonglow",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14509": {
+    "slug": "kagura-s-verity",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14511": {
+    "slug": "a-thousand-floating-dreams",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14512": {
+    "slug": "tulaytullah-s-remembrance",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14513": {
+    "slug": "cashflow-supervision",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14514": {
+    "slug": "tome-of-the-eternal-flow",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14515": {
+    "slug": "crane-s-echoing-call",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14516": {
+    "slug": "surf-s-up",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14517": {
+    "slug": "starcaller-s-watch",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14518": {
+    "slug": "sunny-morning-sleep-in",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14519": {
+    "slug": "vivid-notions",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14520": {
+    "slug": "nightweaver-s-looking-glass",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14521": {
+    "slug": "reliquary-of-truth",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14522": {
+    "slug": "nocturne-s-curtain-call",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "14523": {
+    "slug": "angelos-heptades",
+    "rarity": 5,
+    "wt": "5"
+  },
+  "15101": {
+    "slug": "hunter-s-bow",
+    "rarity": 1,
+    "wt": "3"
+  },
+  "15201": {
+    "slug": "seasoned-hunter-s-bow",
+    "rarity": 2,
+    "wt": "3"
+  },
+  "15301": {
+    "slug": "raven-bow",
+    "rarity": 3,
+    "wt": "3"
+  },
+  "15302": {
+    "slug": "sharpshooter-s-oath",
+    "rarity": 3,
+    "wt": "3"
+  },
+  "15303": {
+    "slug": "recurve-bow",
+    "rarity": 3,
+    "wt": "3"
+  },
+  "15304": {
+    "slug": "slingshot",
+    "rarity": 3,
+    "wt": "3"
+  },
+  "15305": {
+    "slug": "messenger",
+    "rarity": 3,
+    "wt": "3"
+  },
+  "15401": {
+    "slug": "favonius-warbow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15402": {
+    "slug": "the-stringless",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15403": {
+    "slug": "sacrificial-bow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15404": {
+    "slug": "royal-bow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15405": {
+    "slug": "rust",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15406": {
+    "slug": "prototype-crescent",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15407": {
+    "slug": "compound-bow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15408": {
+    "slug": "blackcliff-warbow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15409": {
+    "slug": "the-viridescent-hunt",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15410": {
+    "slug": "alley-hunter",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15411": {
+    "slug": "fading-twilight",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15412": {
+    "slug": "mitternachts-waltz",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15413": {
+    "slug": "windblume-ode",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15414": {
+    "slug": "hamayumi",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15415": {
+    "slug": "predator",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15416": {
+    "slug": "mouun-s-moon",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15417": {
+    "slug": "king-s-squire",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15418": {
+    "slug": "end-of-the-line",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15419": {
+    "slug": "ibis-piercer",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15424": {
+    "slug": "scion-of-the-blazing-sun",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15425": {
+    "slug": "song-of-stillness",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15426": {
+    "slug": "cloudforged",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15427": {
+    "slug": "range-gauge",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15430": {
+    "slug": "flower-wreathed-feathers",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15431": {
+    "slug": "chain-breaker",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15432": {
+    "slug": "sequence-of-solitude",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15433": {
+    "slug": "snare-hook",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15434": {
+    "slug": "rainbow-serpent-s-rain-bow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15435": {
+    "slug": "jade-vista",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15436": {
+    "slug": "covenant-of-frost-and-snow",
+    "rarity": 4,
+    "wt": "3"
+  },
+  "15501": {
+    "slug": "skyward-harp",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15502": {
+    "slug": "amos-bow",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15503": {
+    "slug": "elegy-for-the-end",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15504": {
+    "slug": "kunwu-s-wyrmbane",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15505": {
+    "slug": "primordial-jade-vista",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15507": {
+    "slug": "polar-star",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15508": {
+    "slug": "aqua-simulacra",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15509": {
+    "slug": "thundering-pulse",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15511": {
+    "slug": "hunter-s-path",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15512": {
+    "slug": "the-first-great-magic",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15513": {
+    "slug": "silvershower-heartstrings",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15514": {
+    "slug": "astral-vulture-s-crimson-plumage",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15515": {
+    "slug": "the-daybreak-chronicles",
+    "rarity": 5,
+    "wt": "3"
+  },
+  "15516": {
+    "slug": "golden-frostbound-oath",
+    "rarity": 5,
+    "wt": "3"
+  }
+}
