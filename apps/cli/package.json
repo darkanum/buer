@@ -1,0 +1,27 @@
+{
+  "name": "@onewash/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": {
+    "onewash": "./dist/index.js"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@onewash/cookies": "workspace:*",
+    "@onewash/core": "workspace:*",
+    "@onewash/hoyolab": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "typescript": "^5.6",
+    "vitest": "^2"
+  }
+}

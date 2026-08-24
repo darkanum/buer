@@ -24,6 +24,28 @@ importers:
         specifier: ^2
         version: 2.1.9(@types/node@22.20.1)
 
+  apps/cli:
+    dependencies:
+      '@onewash/cookies':
+        specifier: workspace:*
+        version: link:../../packages/cookies
+      '@onewash/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@onewash/hoyolab':
+        specifier: workspace:*
+        version: link:../../packages/hoyolab
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.1
+        version: 22.20.1
+      typescript:
+        specifier: ^5.6
+        version: 5.9.3
+      vitest:
+        specifier: ^2
+        version: 2.1.9(@types/node@22.20.1)
+
   packages/cookies:
     dependencies:
       better-sqlite3:
