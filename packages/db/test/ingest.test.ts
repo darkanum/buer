@@ -42,32 +42,48 @@ function makeDoc(overrides: Partial<CharacterDoc> = {}): CharacterDoc {
   };
 }
 
-/** Builds a NormalizedSnapshot the same way @onewash/core's normalize() would: contentHash/accountHash computed from the real doc, not asserted by hand. */
-function normalizedFor(doc: CharacterDoc): NormalizedSnapshot {
-  const characters = [
-    {
-      charKey: doc.char,
-      doc,
-      contentHash: contentHash(doc),
-      promoted: {
-        charLevel: doc.lvl,
-        ascension: doc.asc,
-        constellation: doc.cons,
-        weaponId: doc.weapon.id,
-        weaponRefine: doc.weapon.refine,
-      },
+/**
+ * Builds a NormalizedSnapshot the same way @onewash/core's normalize() would
+ * for MULTIPLE characters: contentHash per character + accountHash over the
+ * whole set, both computed from the real docs, never asserted by hand. This
+ * is what a realistic production snapshot looks like — one writeSnapshot()
+ * call, several characters processed by the same per-character loop.
+ */
+function normalizedForMany(docs: CharacterDoc[]): NormalizedSnapshot {
+  const characters = docs.map((doc) => ({
+    charKey: doc.char,
+    doc,
+    contentHash: contentHash(doc),
+    promoted: {
+      charLevel: doc.lvl,
+      ascension: doc.asc,
+      constellation: doc.cons,
+      weaponId: doc.weapon.id,
+      weaponRefine: doc.weapon.refine,
     },
-  ];
+  }));
   return {
     characters,
     accountHash: accountHash(characters.map((c) => ({ charKey: c.charKey, contentHash: c.contentHash }))),
   };
 }
 
+/** Single-character convenience wrapper around normalizedForMany. */
+function normalizedFor(doc: CharacterDoc): NormalizedSnapshot {
+  return normalizedForMany([doc]);
+}
+
 /** catalog.{character,weapon} rows required by character_state's FKs. */
 async function seedCatalog(db: IngestDb): Promise<void> {
   await db.execute(sql`INSERT INTO catalog.character (char_key, avatar_id, slug) VALUES ('10000089', 10000089, 'hu-tao')`);
   await db.execute(sql`INSERT INTO catalog.weapon (weapon_id, slug, promote_len) VALUES (13509, 'staff-of-homa', 5)`);
+}
+
+/** Seeds one extra catalog.character row (e.g. for multi-character tests that need more than the default '10000089'). */
+async function seedCharacter(db: IngestDb, charKey: string, avatarId: number, slug: string): Promise<void> {
+  await db.execute(
+    sql`INSERT INTO catalog.character (char_key, avatar_id, slug) VALUES (${charKey}, ${avatarId}, ${slug})`,
+  );
 }
 
 async function countRows(db: IngestDb, query: ReturnType<typeof sql>): Promise<number> {
@@ -210,5 +226,117 @@ describe('writeSnapshot', () => {
     expect(b.snapshotId).toBe(a.snapshotId);
     expect(b.deduped).toBe(true);
     expect(await countRows(db, sql`SELECT count(*)::int n FROM app.snapshot`)).toBe(1);
+  });
+
+  it('processa 3 personagens na mesma transação sem misturar estado entre iterações (A inalterado, B mudou, C novo)', async () => {
+    const { db, accountId } = await makeTestDb();
+    await seedCatalog(db);
+    await seedCharacter(db, '11000001', 11000001, 'char-a');
+    await seedCharacter(db, '11000002', 11000002, 'char-b');
+    await seedCharacter(db, '11000003', 11000003, 'char-c');
+
+    // Run 1: só A e B existem ainda (C é "novo" só na run 2).
+    const docA = makeDoc({ char: '11000001', lvl: 80 });
+    const docB1 = makeDoc({ char: '11000002', lvl: 90 });
+    const run1 = await writeSnapshot(db, {
+      accountId,
+      takenAt: new Date('2026-08-24T00:00:00Z'),
+      parserVersion: 1,
+      docSchema: 1,
+      lang: 'pt-pt',
+      normalized: normalizedForMany([docA, docB1]),
+    });
+    expect(run1.changedChars).toBe(2); // ambos observados pela 1ª vez
+
+    // Run 2, UMA transação, TRÊS personagens no mesmo loop:
+    //  - A: doc idêntico (docA reaproveitado) -> inalterado
+    //  - B: doc mudou (lvl 90 -> 89) -> muda de estado
+    //  - C: nunca visto por essa conta -> novo
+    const docB2 = makeDoc({ char: '11000002', lvl: 89 });
+    const docC = makeDoc({ char: '11000003', lvl: 1 });
+    const run2 = await writeSnapshot(db, {
+      accountId,
+      takenAt: new Date('2026-08-31T00:00:00Z'),
+      parserVersion: 1,
+      docSchema: 1,
+      lang: 'pt-pt',
+      normalized: normalizedForMany([docA, docB2, docC]),
+    });
+
+    // changedChars conta só B (mudou) e C (novo) — A não conta.
+    expect(run2.changedChars).toBe(2);
+    expect(run2.deduped).toBe(false);
+
+    // character_state: A tem 1 linha (dedupe), B tem 2 (lvl 90 e lvl 89), C tem 1 -> 4 no total.
+    // Isso prova que os locals por-iteração (docCanon/stateId/openRow etc.) não vazam entre
+    // personagens: se vazassem, ou A ganharia uma 2ª linha por engano, ou B/C perderiam a sua.
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.character_state`)).toBe(4);
+
+    // Exatamente um intervalo aberto por personagem -> 3 linhas abertas no total.
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.character_timeline WHERE valid_to IS NULL`)).toBe(3);
+
+    // O intervalo antigo de B (e só o de B) fechou por 'change'.
+    expect(
+      await countRows(
+        db,
+        sql`SELECT count(*)::int n FROM app.character_timeline WHERE valid_to IS NOT NULL AND closed_by = 'change'`,
+      ),
+    ).toBe(1);
+    expect(
+      await countRows(
+        db,
+        sql`SELECT count(*)::int n FROM app.character_timeline WHERE char_key = '11000002' AND valid_to IS NOT NULL AND closed_by = 'change'`,
+      ),
+    ).toBe(1);
+
+    // A ainda tem seu único intervalo aberto, com last_seen_at avançado pela run2 (não um novo estado).
+    const aOpen = (await db.execute(
+      sql`SELECT last_seen_at FROM app.character_timeline WHERE char_key = '11000001' AND valid_to IS NULL`,
+    )) as { rows: { last_seen_at: string | Date }[] };
+    expect(aOpen.rows).toHaveLength(1);
+    expect(new Date(aOpen.rows[0]!.last_seen_at).toISOString()).toBe(new Date('2026-08-31T00:00:00Z').toISOString());
+
+    // change_event: só B dispara um (o caminho de personagem NOVO — C — não emite change_event
+    // na implementação atual; só o caminho de MUDANÇA emite). Consistente com ingest.ts.
+    expect(
+      await countRows(
+        db,
+        sql`SELECT count(*)::int n FROM app.change_event WHERE detected_in = ${run2.snapshotId.toString()}::bigint`,
+      ),
+    ).toBe(1);
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.change_event WHERE char_key = '11000002'`)).toBe(1);
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.change_event WHERE char_key = '11000003'`)).toBe(0);
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.change_event WHERE char_key = '11000001'`)).toBe(0);
+  });
+
+  it('reverte a transação inteira quando um personagem no meio do array viola uma FK de catálogo (atomicidade)', async () => {
+    const { db, accountId } = await makeTestDb();
+    await seedCatalog(db); // só '10000089' está cadastrado em catalog.character
+
+    // Personagem VÁLIDO primeiro (seedado) — deve ser processado com sucesso pelo loop antes
+    // do que falha. Personagem INVÁLIDO depois — char_key nunca inserido em catalog.character,
+    // então o INSERT em character_state viola a FK character_state_char_key_fkey e lança.
+    const validDoc = makeDoc({ char: '10000089', lvl: 90 });
+    const invalidDoc = makeDoc({ char: '99999999', lvl: 1 });
+    const normalized = normalizedForMany([validDoc, invalidDoc]);
+
+    await expect(
+      writeSnapshot(db, {
+        accountId,
+        takenAt: new Date('2026-08-24T00:00:00Z'),
+        parserVersion: 1,
+        docSchema: 1,
+        lang: 'pt-pt',
+        normalized,
+      }),
+    ).rejects.toThrow();
+
+    // Nada foi comitado: nem o snapshot (inserido ANTES do loop de personagens), nem o
+    // character_state do personagem válido (processado ANTES do que falhou), nem timeline,
+    // nem change_event — a transação inteira reverteu.
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.snapshot`)).toBe(0);
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.character_state`)).toBe(0);
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.character_timeline`)).toBe(0);
+    expect(await countRows(db, sql`SELECT count(*)::int n FROM app.change_event`)).toBe(0);
   });
 });
