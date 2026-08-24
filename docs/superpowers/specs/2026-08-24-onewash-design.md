@@ -66,6 +66,7 @@ força externa fica isolada atrás de uma interface, para que sua quebra não se
 ```
 packages/
   core/       tipos + schemas Zod (protocolo), normalizador puro, interfaces do motor
+  hoyolab/    cliente da API do Battle Chronicle (DS, endpoints, tipos crus) ← API de terceiro
   gi-data/    catálogo estático do jogo (gerado por script; ~2,5 MB embarcado)
   cookies/    provider de sessão do navegador     ← frágil, específico de plataforma
   db/         schema Drizzle + migrations
