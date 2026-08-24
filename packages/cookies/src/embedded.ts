@@ -1,8 +1,9 @@
 // @spike — this provider's end-to-end behaviour (real Chromium launch,
 // real HoYoLAB login, real cookie capture) is only verified manually,
 // per spike 2's checklist. Automated coverage here is limited to the
-// pure `sessionFromStorageState` helper below; launching a real browser
-// in CI is out of scope.
+// pure `sessionFromStorageState` helper below (plus the launch-failure
+// fallback, exercised via the `loadChromium` test seam); launching a
+// real browser in CI is out of scope.
 
 import type { HoyolabSession, SessionProvider } from './provider.js';
 
@@ -39,9 +40,9 @@ export function sessionFromStorageState(state: StorageStateLike): HoyolabSession
 }
 
 // Deliberately *not* a string literal in the `import()` call inside
-// `tryGet()` below. With a literal specifier, `tsc` tries to resolve
-// `playwright`'s module/type declarations at type-check time and fails
-// outright (TS2307) whenever the optional package isn't installed.
+// `loadChromium()` below. With a literal specifier, `tsc` tries to
+// resolve `playwright`'s module/type declarations at type-check time and
+// fails outright (TS2307) whenever the optional package isn't installed.
 // Reading the specifier out of a plain (non-const-literal) variable makes
 // TypeScript treat the whole `import()` expression as untyped (`any`) and
 // skip module resolution for it entirely — verified directly against this
@@ -56,6 +57,56 @@ const DEFAULT_POLL_INTERVAL_MS = 1000;
 const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000;
 const HOYOLAB_URL = 'https://www.hoyolab.com';
 
+interface PageLike {
+  goto(url: string): Promise<unknown>;
+}
+
+interface BrowserContextLike {
+  newPage(): Promise<PageLike>;
+  storageState(): Promise<StorageStateLike>;
+  close(): Promise<void>;
+}
+
+interface BrowserLike {
+  newContext(): Promise<BrowserContextLike>;
+  close(): Promise<void>;
+}
+
+interface ChromiumLike {
+  launch(options: { headless: boolean }): Promise<BrowserLike>;
+}
+
+export interface EmbeddedProviderOptions {
+  pollIntervalMs?: number;
+  timeoutMs?: number;
+  /**
+   * Test seam: overrides how the `chromium` launcher namespace is
+   * obtained, bypassing the dynamic `import('playwright')` entirely.
+   * Defaults to importing `playwright` for real and returning its
+   * `chromium` export. Inject a fake here (e.g. one whose `launch()`
+   * rejects) to unit-test `tryGet()`'s "browser could not be launched
+   * (Chromium binary not downloaded, etc.) → resolve null, never throw"
+   * behavior without installing `playwright` or spawning a real browser.
+   */
+  loadChromium?: () => Promise<ChromiumLike>;
+}
+
+/** Best-effort close: a failed `close()` must never mask `tryGet()`'s real result (or the fallback already chosen by the catch that's cleaning up). */
+async function safeClose(closable: { close(): Promise<void> } | undefined): Promise<void> {
+  if (!closable) return;
+  try {
+    await closable.close();
+  } catch {
+    // Cleanup failure is not worth surfacing — see comment above.
+  }
+}
+
+/** Real (non-test) implementation of the `loadChromium` seam: dynamically imports `playwright` and returns its `chromium` launcher. Rejects if `playwright` isn't installed. */
+async function loadChromiumFromPlaywright(): Promise<ChromiumLike> {
+  const playwright = (await import(playwrightModuleSpecifier)) as { chromium: ChromiumLike };
+  return playwright.chromium;
+}
+
 /**
  * Opens an embedded Chromium window on hoyolab.com via Playwright and
  * waits for the user to log in by hand, polling the browser context's
@@ -64,22 +115,31 @@ const HOYOLAB_URL = 'https://www.hoyolab.com';
  *
  * `playwright` is an *optional* dependency (see package.json
  * `optionalDependencies`) so installing this package — or the CLI that
- * depends on it — never forces a Chromium download. If `playwright` isn't
- * installed, `tryGet()` logs a note on stderr and resolves to `null` —
- * the same "not found" contract every other {@link SessionProvider} in
- * this package follows — instead of throwing.
+ * depends on it — never forces a Chromium download. `tryGet()` never
+ * throws, in either of two distinct failure modes:
+ *
+ * 1. `playwright` isn't installed at all (the dynamic import rejects).
+ * 2. `playwright` *is* installed but `chromium.launch()` (or any
+ *    automation step after it — new context/page, navigation, polling)
+ *    fails — the common real-world case, since the Chromium binary is
+ *    only ever fetched by a separate, manual `playwright install` step
+ *    that nothing runs automatically.
+ *
+ * Either way it logs a note on stderr and resolves to `null` — the same
+ * "not found" contract every other {@link SessionProvider} in this
+ * package follows — so `getSession()`'s fallback chain can move on to
+ * the next provider (or its own `NoSessionError`) instead of the whole
+ * chain dying with a raw Playwright stack trace.
  */
 export class EmbeddedProvider implements SessionProvider {
   readonly id = 'embedded';
 
-  constructor(
-    private readonly opts: { pollIntervalMs?: number; timeoutMs?: number } = {},
-  ) {}
+  constructor(private readonly opts: EmbeddedProviderOptions = {}) {}
 
   async tryGet(): Promise<HoyolabSession | null> {
-    let playwright: unknown;
+    let chromium: ChromiumLike;
     try {
-      playwright = await import(playwrightModuleSpecifier);
+      chromium = await (this.opts.loadChromium ?? loadChromiumFromPlaywright)();
     } catch {
       console.warn(
         '[cookies] playwright não está instalado; provider "embedded" indisponível. ' +
@@ -89,21 +149,9 @@ export class EmbeddedProvider implements SessionProvider {
       return null;
     }
 
-    const { chromium } = playwright as {
-      chromium: {
-        launch(options: { headless: boolean }): Promise<{
-          newContext(): Promise<{
-            newPage(): Promise<{ goto(url: string): Promise<unknown> }>;
-            storageState(): Promise<StorageStateLike>;
-            close(): Promise<void>;
-          }>;
-          close(): Promise<void>;
-        }>;
-      };
-    };
-
-    const browser = await chromium.launch({ headless: false });
+    let browser: BrowserLike | undefined;
     try {
+      browser = await chromium.launch({ headless: false });
       const context = await browser.newContext();
       try {
         const page = await context.newPage();
@@ -119,10 +167,23 @@ export class EmbeddedProvider implements SessionProvider {
         }
         return null;
       } finally {
-        await context.close();
+        await safeClose(context);
       }
+    } catch {
+      // Covers `chromium.launch()` itself failing — most commonly because
+      // `playwright` the npm package is present (it's an
+      // optionalDependency) but its Chromium binary was never downloaded
+      // — plus any automation failure after a successful launch
+      // (newContext/newPage/goto/storageState throwing, browser crashing
+      // mid-session, etc.). Same contract either way: resolve null, never
+      // throw, so the fallback chain keeps moving.
+      console.warn(
+        '[cookies] falha ao abrir/usar o navegador embutido (o Chromium do Playwright está ' +
+          'instalado? rode `npx playwright install chromium`). Provider "embedded" indisponível.',
+      );
+      return null;
     } finally {
-      await browser.close();
+      await safeClose(browser);
     }
   }
 }
