@@ -123,4 +123,35 @@ describe('HoyolabClient', () => {
     });
     await expect(c.getGameRole()).rejects.toThrow(HoyolabError);
   });
+
+  it('envia os bodies corretos (role_id/server/sort_type e role_id/server/character_ids) e encadeia os ids de listCharacters até characterDetail via fetchAll', async () => {
+    const calls: { url: string; body: string | undefined }[] = [];
+    const responses: Record<string, unknown> = {
+      getUserGameRolesByCookie: fx('roles'),
+      'character/list': fx('list'),
+      'character/detail': fx('detail'),
+    };
+    const recordingFetch = (async (url: any, init: any) => {
+      calls.push({ url: String(url), body: init?.body });
+      const key = Object.keys(responses).find((k) => String(url).includes(k))!;
+      return new Response(JSON.stringify(responses[key]), { status: 200 });
+    }) as any;
+
+    const c = new HoyolabClient({ cookies: { ltoken_v2: 'x', ltuid_v2: '1' }, fetch: recordingFetch });
+    await c.fetchAll();
+
+    const listCall = calls.find((call) => call.url.includes('character/list'));
+    const detailCall = calls.find((call) => call.url.includes('character/detail'));
+    expect(listCall).toBeDefined();
+    expect(detailCall).toBeDefined();
+
+    const listBody = JSON.parse(listCall!.body as string);
+    expect(listBody).toEqual({ role_id: '800000000', server: 'os_asia', sort_type: 1 });
+
+    // Prova o encadeamento: os ids vêm exatamente do fixture list.json (10000089, 10000046),
+    // via listCharacters(), e são os mesmos enviados no body de character/detail — não um
+    // subconjunto, não reordenados, não hardcoded no cliente.
+    const detailBody = JSON.parse(detailCall!.body as string);
+    expect(detailBody).toEqual({ role_id: '800000000', server: 'os_asia', character_ids: [10000089, 10000046] });
+  });
 });
