@@ -153,4 +153,25 @@ describe('GET /api/img/[hash]', () => {
     expect(res.headers.get('cache-control')).toContain('immutable');
     expect(new Uint8Array(await res.arrayBuffer())).toEqual(BYTES);
   });
+
+  it('502 quando a leitura do corpo da resposta falha após um 200 ok (stream abortado/truncado)', async () => {
+    // A REAL Response body can only be read once — reading it here up front
+    // (deliberately, before handleImg ever sees it) makes fetched.arrayBuffer()
+    // inside handleImg reject for real (a genuine "body stream already
+    // used/aborted" failure), rather than simulating one with a fake object.
+    // ok stays true: this is exactly the "`fetchImpl` resolved fine, the
+    // BODY read is what fails" case — distinct from both the reject and
+    // !ok branches already covered above.
+    const alreadyConsumedResponse = fakeFetchResponse(BYTES, true, CONTENT_TYPE);
+    await alreadyConsumedResponse.arrayBuffer();
+
+    const deps = makeDeps({
+      resolveSourceUrl: vi.fn(() => SOURCE_URL),
+      getObject: vi.fn(async () => null),
+      fetchImpl: vi.fn(async () => alreadyConsumedResponse),
+    });
+
+    const res = await handleImg(deps, KNOWN_HASH);
+    expect(res.status).toBe(502);
+  });
 });

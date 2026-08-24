@@ -93,11 +93,14 @@ export interface ImgDeps {
  * 2. Known hash already in R2 -> served immediately with immutable caching.
  * 3. Known hash NOT yet in R2 -> lazy mirror: fetch from the source URL, PUT
  *    to R2, then serve (also immutable).
- * 4. A genuine R2 read failure or upstream fetch failure is reported as 502
- *    — never an uncaught throw. A failed MIRROR WRITE (putObject, step 3)
- *    is logged but does not fail the response: the bytes were already
- *    fetched successfully, so the user gets them; the next request for the
- *    same hash just retries the (idempotent, content-addressed) mirror.
+ * 4. A genuine R2 read failure, upstream fetch rejection/non-ok response, OR
+ *    a failure while reading the fetch response's body (aborted/truncated/
+ *    decode-error mid-stream, even after a 200 `ok` response) is reported
+ *    as 502 — never an uncaught throw. A failed MIRROR WRITE (putObject,
+ *    step 3) is logged but does not fail the response: the bytes were
+ *    already fetched successfully, so the user gets them; the next request
+ *    for the same hash just retries the (idempotent, content-addressed)
+ *    mirror.
  */
 export async function handleImg(deps: ImgDeps, hash: string): Promise<Response> {
   const sourceUrl = deps.resolveSourceUrl(hash);
@@ -129,8 +132,19 @@ export async function handleImg(deps: ImgDeps, hash: string): Promise<Response> 
     return new Response('bad gateway', { status: 502 });
   }
 
-  const body = new Uint8Array(await fetched.arrayBuffer());
-  const contentType = fetched.headers.get('content-type') ?? undefined;
+  // A response that resolved with `ok: true` can still fail while its body
+  // is actually read (aborted/truncated/decode-error mid-stream) — a real
+  // fetch failure mode distinct from the reject/`!ok` cases above, and one
+  // that must NOT be allowed to throw out of handleImg either.
+  let body: Uint8Array;
+  let contentType: string | undefined;
+  try {
+    body = new Uint8Array(await fetched.arrayBuffer());
+    contentType = fetched.headers.get('content-type') ?? undefined;
+  } catch (err) {
+    console.error(`GET /api/img/${hash}: falha ao ler o corpo da resposta de ${sourceUrl}`, err);
+    return new Response('bad gateway', { status: 502 });
+  }
 
   try {
     await deps.putObject(hash, body, contentType);
