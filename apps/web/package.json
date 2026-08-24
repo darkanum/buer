@@ -16,6 +16,7 @@
     "@onewash/core": "workspace:*",
     "@onewash/db": "workspace:*",
     "@onewash/gi-data": "workspace:*",
+    "@aws-sdk/client-s3": "^3",
     "@better-auth/api-key": "^1.7.1",
     "@better-auth/core": "1.7.1",
     "@better-auth/utils": "0.4.2",
