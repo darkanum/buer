@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { writeSnapshot } from '@onewash/db';
 import { PROTOCOL_VERSION } from '@onewash/core';
-import { handleIngest, inlinePutRaw, type IngestDeps } from '../app/api/ingest/route.js';
+import { handleIngest, inlinePutRaw, type IngestDeps } from '../app/api/ingest/handler.js';
 import { makeIngestTestDb, type IngestTestDb } from './ingest-helpers.js';
 
 // Two REAL characters known to @onewash/gi-data's bundled data (Furina

@@ -15,8 +15,7 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { auth } from '../../lib/auth.js';
-
-export const ONBOARDING_TOKEN_COOKIE = 'ow_onboarding_token';
+import { ONBOARDING_TOKEN_COOKIE } from './constants.js';
 
 export async function generateOnboardingToken(): Promise<void> {
   const session = await auth.api.getSession({ headers: await headers() });

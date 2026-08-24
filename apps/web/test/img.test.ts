@@ -7,7 +7,8 @@
 // therefore also runnable with zero R2 env vars set.
 
 import { describe, expect, it, vi } from 'vitest';
-import { GET, handleImg, type ImgDeps, type ImgObject } from '../app/api/img/[hash]/route.js';
+import { GET } from '../app/api/img/[hash]/route.js';
+import { handleImg, type ImgDeps, type ImgObject } from '../app/api/img/[hash]/handler.js';
 
 const KNOWN_HASH = 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef.png';
 const SOURCE_URL = 'https://act-webstatic.hoyoverse.com/x/UI_AvatarIcon_Furina.png';

@@ -9,7 +9,8 @@ import { redirect } from 'next/navigation';
 import { db } from '../../lib/db.js';
 import { getAccountByOwner } from '../../lib/render.js';
 import { getCurrentUser } from '../../lib/session.js';
-import { generateOnboardingToken, ONBOARDING_TOKEN_COOKIE } from './actions.js';
+import { generateOnboardingToken } from './actions.js';
+import { ONBOARDING_TOKEN_COOKIE } from './constants.js';
 
 export default async function OnboardingPage() {
   const user = await getCurrentUser();
