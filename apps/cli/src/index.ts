@@ -2,6 +2,15 @@
 import { runLogin } from './commands/login.js';
 import { runLogout } from './commands/logout.js';
 import { runWhoami } from './commands/whoami.js';
+// `sync`/`doctor` are loaded lazily (dynamic `import()`, below) rather than
+// with a static import: they're the only two commands that reach into
+// `@onewash/cookies`/`@onewash/hoyolab`, and keeping that out of this
+// module's top-level import graph means `login`/`logout`/`whoami` keep
+// working standalone even in an environment where those packages can't be
+// loaded (e.g. no compiled output for a `noEmit` workspace dependency).
+// `SyncFlags` is a type-only import — erased at compile time, so it adds
+// no runtime import.
+import type { SyncFlags } from './commands/sync.js';
 
 export interface ParsedArgs {
   command: string;
@@ -70,6 +79,32 @@ export async function main(argv: string[]): Promise<void> {
     }
     case 'whoami': {
       console.log(JSON.stringify(runWhoami(), null, 2));
+      return;
+    }
+    case 'sync': {
+      const { runSync, createSyncDeps } = await import('./commands/sync.js');
+      const syncFlags: SyncFlags = {
+        out: flagString(flags, 'out'),
+        dryRun: flagBoolean(flags, 'dry-run'),
+        browser: flagString(flags, 'browser'),
+        login: flagBoolean(flags, 'login'),
+        cookie: flagString(flags, 'cookie'),
+        json: flagBoolean(flags, 'json'),
+      };
+      const result = await runSync(createSyncDeps(), syncFlags);
+      if (syncFlags.json) {
+        console.log(JSON.stringify(result));
+      } else {
+        console.log(
+          `Sincronizado: ${result.characters} personagens, ${result.changed} com mudanças, enviado=${result.sent}.`,
+        );
+      }
+      return;
+    }
+    case 'doctor': {
+      const { runDoctor, createDoctorDeps } = await import('./commands/doctor.js');
+      const report = await runDoctor(createDoctorDeps());
+      console.log(JSON.stringify(report, null, 2));
       return;
     }
     default:
