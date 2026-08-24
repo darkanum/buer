@@ -161,6 +161,71 @@ async function upsertProvisionalCatalog(db: IngestDb, normalized: NormalizedSnap
   }
 }
 
+// --- Postgres error classification (review round 1, finding 1) -------------
+//
+// normalize() and writeSnapshot() both run against data derived from
+// envelope.raw — untrusted CLI input that only IngestEnvelope validates at
+// the top level (raw: { list: unknown, detail: unknown } deliberately says
+// nothing about the HoYoLAB shape inside). A syntactically valid envelope
+// can still carry a raw that normalize() chokes on (unmapped property_type,
+// missing base/weapon/relics fields, a Traveler id with no element, an
+// unreconstructable sub-stat roll) — all synchronous throws from
+// @onewash/core, never something IngestEnvelope.safeParse catches. Left
+// unhandled, any of those becomes an uncaught 500 instead of a
+// client-actionable 400.
+
+/** Node-postgres/pglite's DatabaseError shape (duck-typed — neither driver
+ * exports a class we can instanceof-check across both prod and PGlite). */
+interface PgErrorLike {
+  code?: unknown;
+  constraint?: unknown;
+  message?: unknown;
+}
+
+function isPgError(err: unknown): err is PgErrorLike {
+  return typeof err === 'object' && err !== null && 'code' in err;
+}
+
+/**
+ * drizzle-orm wraps every driver error in its own `DrizzleQueryError` before
+ * it reaches our `catch` — the real node-postgres/pglite `DatabaseError`
+ * (with `.code`/`.constraint`) sits underneath as `.cause`, not on the
+ * caught error itself (confirmed empirically: the caught object exposes
+ * `query`/`params`/`cause`, no `code`). Walks the `.cause` chain (bounded,
+ * in case something ever causes a cycle) to find it.
+ */
+function unwrapPgError(err: unknown): PgErrorLike | null {
+  let current: unknown = err;
+  for (let i = 0; i < 5 && current != null; i++) {
+    if (isPgError(current)) return current;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return null;
+}
+
+/**
+ * True for a unique-violation (23505) on app.snapshot's UNIQUE (account_id,
+ * taken_at) constraint — hit when the SAME account reports a DIFFERENT raw
+ * payload (different content hash, so a different idempotency_key) for a
+ * taken_at already used by an earlier snapshot. writeSnapshot's own
+ * ON CONFLICT (account_id, idempotency_key) arbiter only suppresses a
+ * conflict on THAT index — a conflict on the OTHER unique index during the
+ * same INSERT still raises a raw, uncaught Postgres error (confirmed
+ * empirically against PGlite: INSERT ... ON CONFLICT (account_id,
+ * idempotency_key) DO NOTHING with a fresh idempotency_key but a colliding
+ * (account_id, taken_at) throws 23505 on snapshot_account_id_taken_at_key,
+ * it does not silently no-op). Matched by constraint-name substring rather
+ * than the exact auto-generated name alone, so this stays correct if the
+ * hand-authored migration ever renames the constraint explicitly.
+ */
+function isTakenAtUniqueViolation(err: unknown): boolean {
+  const pgErr = unwrapPgError(err);
+  if (!pgErr || pgErr.code !== '23505') return false;
+  const constraint = typeof pgErr.constraint === 'string' ? pgErr.constraint : '';
+  const message = typeof pgErr.message === 'string' ? pgErr.message : '';
+  return constraint.includes('taken_at') || message.includes('taken_at');
+}
+
 // --- The handler ------------------------------------------------------------
 
 export async function handleIngest(deps: IngestDeps, req: Request): Promise<Response> {
@@ -191,6 +256,17 @@ export async function handleIngest(deps: IngestDeps, req: Request): Promise<Resp
   // comes ONLY from `userId` (the verified key's referenceId), never from
   // `envelope.account` or any other part of the body: a spoofed owner field
   // in the request simply has no column to land in.
+  //
+  // Uses ON CONFLICT ... DO UPDATE (not DO NOTHING) so a later ingest's
+  // nickname/lang refresh the stored row instead of freezing at whatever
+  // the first-ever ingest happened to send (review round 1, finding 2).
+  // Identity columns (game_uid, region, owner_id) are never in the `set`
+  // list — only nickname/lang can change on conflict. The ownership check
+  // below still runs unconditionally: `setWhere` restricts the UPDATE
+  // itself to rows already owned by this userId, so a conflict against a
+  // DIFFERENT owner's account updates nothing and falls through to the same
+  // 403 path as before, rather than silently taking over their row (or
+  // silently refreshing their nickname/lang with this request's data).
   const insertedAccounts = await db
     .insert(schema.account)
     .values({
@@ -201,11 +277,21 @@ export async function handleIngest(deps: IngestDeps, req: Request): Promise<Resp
       lang: envelope.account.lang,
       activeDocSchema: DOC_SCHEMA_VERSION,
     })
-    .onConflictDoNothing({ target: [schema.account.gameUid, schema.account.region] })
+    .onConflictDoUpdate({
+      target: [schema.account.gameUid, schema.account.region],
+      set: {
+        nickname: envelope.account.nickname ?? null,
+        lang: envelope.account.lang,
+      },
+      setWhere: eq(schema.account.ownerId, userId),
+    })
     .returning();
 
   let accountRow = insertedAccounts[0];
   if (!accountRow) {
+    // Either the conflicting row belongs to a different user (setWhere
+    // false, so the UPDATE — and thus RETURNING — produced nothing), or a
+    // benign race with another insert. Either way, re-fetch to find out.
     const existing = await db
       .select()
       .from(schema.account)
@@ -221,71 +307,101 @@ export async function handleIngest(deps: IngestDeps, req: Request): Promise<Resp
   if (accountRow.ownerId !== userId) {
     // This game_uid+region is already claimed by a different Better Auth
     // user — refuse rather than silently attributing writes to them or
-    // hijacking their account.
+    // hijacking (or even just refreshing metadata on) their account.
     return Response.json({ error: 'account belongs to a different user' }, { status: 403 });
   }
 
   // 4. normalize() the raw payload into content-addressed character docs.
-  const normalized = normalize(envelope.raw);
+  // envelope.raw is untrusted beyond its top-level { list, detail } shape —
+  // @onewash/core's normalize()/propKey/charKey/reconstructTiers all throw
+  // synchronously on a shape or value they don't recognize. Isolated in its
+  // own try/catch (review round 1, finding 1) so that throw becomes a 400
+  // with a short, non-leaking reason, not an uncaught 500 — the message is
+  // core's own short diagnostic string (e.g. "property_type desconhecido:
+  // 9999"), never the raw payload, headers, or token.
+  let normalized: NormalizedSnapshot;
+  try {
+    normalized = normalize(envelope.raw);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : 'formato de raw inesperado';
+    return Response.json({ error: `payload inválido: ${reason}` }, { status: 400 });
+  }
 
-  // 5. Provisional catalog upsert — must happen before writeSnapshot, whose
-  // character_state INSERT has hard FKs into catalog.character/catalog.weapon.
-  await upsertProvisionalCatalog(db, normalized);
+  try {
+    // 5. Provisional catalog upsert — must happen before writeSnapshot,
+    // whose character_state INSERT has hard FKs into
+    // catalog.character/catalog.weapon.
+    await upsertProvisionalCatalog(db, normalized);
 
-  // 6. Raw storage: content-addressed by sha256 of the canonical (JSON)
-  // bytes of `envelope.raw` — NOT the whole envelope, so byte-identical raw
-  // payloads dedupe regardless of takenAt/cliVersion/account metadata.
-  const rawBytes = Buffer.from(JSON.stringify(envelope.raw), 'utf8');
-  const rawSha256 = createHash('sha256').update(rawBytes).digest();
-  const rawSha256Hex = rawSha256.toString('hex');
-  const takenAt = new Date(envelope.takenAt);
+    // 6. Raw storage: content-addressed by sha256 of the canonical (JSON)
+    // bytes of envelope.raw — NOT the whole envelope, so byte-identical raw
+    // payloads dedupe regardless of takenAt/cliVersion/account metadata.
+    const rawBytes = Buffer.from(JSON.stringify(envelope.raw), 'utf8');
+    const rawSha256 = createHash('sha256').update(rawBytes).digest();
+    const rawSha256Hex = rawSha256.toString('hex');
+    const takenAt = new Date(envelope.takenAt);
 
-  const { objectKey, inlineBytes, codec } = await deps.putRaw(rawBytes, rawSha256Hex);
+    const { objectKey, inlineBytes, codec } = await deps.putRaw(rawBytes, rawSha256Hex);
 
-  await db
-    .insert(schema.rawObject)
-    .values({ rawSha256, byteLen: rawBytes.byteLength, codec, objectKey })
-    .onConflictDoNothing({ target: schema.rawObject.rawSha256 });
+    await db
+      .insert(schema.rawObject)
+      .values({ rawSha256, byteLen: rawBytes.byteLength, codec, objectKey })
+      .onConflictDoNothing({ target: schema.rawObject.rawSha256 });
 
-  await db
-    .insert(schema.rawObservation)
-    .values({
-      rawSha256,
+    await db
+      .insert(schema.rawObservation)
+      .values({
+        rawSha256,
+        accountId: accountRow.accountId,
+        endpoint: 'genshin/api/character/list+detail',
+        capturedAt: takenAt,
+        inlineBytes,
+      })
+      .onConflictDoNothing({ target: [schema.rawObservation.rawSha256, schema.rawObservation.capturedAt] });
+
+    // 7. writeSnapshot. idempotencyKey is derived from the raw content hash
+    // (not carried by IngestEnvelope itself) so that reposting the exact
+    // same raw payload for this account dedupes at the snapshot level — via
+    // writeSnapshot's own ON CONFLICT (account_id, idempotency_key) DO
+    // NOTHING path — instead of racing the (account_id, taken_at) UNIQUE
+    // constraint when a client naively retries with the same takenAt. When
+    // the SAME takenAt is reused with DIFFERENT content (a different
+    // idempotency_key), that race is real — writeSnapshot then throws a raw
+    // 23505 on snapshot_account_id_taken_at_key, caught below and reported
+    // as 409 (review round 1, finding 1).
+    const result = await deps.writeSnapshot(db, {
       accountId: accountRow.accountId,
-      endpoint: 'genshin/api/character/list+detail',
-      capturedAt: takenAt,
-      inlineBytes,
-    })
-    .onConflictDoNothing({ target: [schema.rawObservation.rawSha256, schema.rawObservation.capturedAt] });
+      takenAt,
+      parserVersion: deps.parserVersion ?? PARSER_VERSION,
+      docSchema: DOC_SCHEMA_VERSION,
+      lang: envelope.account.lang,
+      rawSha256,
+      normalized,
+      idempotencyKey: rawSha256Hex,
+      cliVersion: envelope.cliVersion,
+    });
 
-  // 7. writeSnapshot. `idempotencyKey` is derived from the raw content hash
-  // (not carried by IngestEnvelope itself) so that reposting the exact same
-  // raw payload for this account dedupes at the snapshot level — via
-  // writeSnapshot's own `ON CONFLICT (account_id, idempotency_key) DO
-  // NOTHING` path — instead of racing the `(account_id, taken_at)` UNIQUE
-  // constraint when a client naively retries with the same `takenAt`.
-  const result = await deps.writeSnapshot(db, {
-    accountId: accountRow.accountId,
-    takenAt,
-    parserVersion: deps.parserVersion ?? PARSER_VERSION,
-    docSchema: DOC_SCHEMA_VERSION,
-    lang: envelope.account.lang,
-    rawSha256,
-    normalized,
-    idempotencyKey: rawSha256Hex,
-    cliVersion: envelope.cliVersion,
-  });
-
-  // BigInt isn't JSON-serializable (JSON.stringify throws on it), hence the
-  // explicit stringification here.
-  return Response.json(
-    {
-      snapshotId: result.snapshotId.toString(),
-      changedChars: result.changedChars,
-      deduped: result.deduped,
-    },
-    { status: 200 },
-  );
+    // BigInt isn't JSON-serializable (JSON.stringify throws on it), hence
+    // the explicit stringification here.
+    return Response.json(
+      {
+        snapshotId: result.snapshotId.toString(),
+        changedChars: result.changedChars,
+        deduped: result.deduped,
+      },
+      { status: 200 },
+    );
+  } catch (err) {
+    if (isTakenAtUniqueViolation(err)) {
+      return Response.json({ error: 'snapshot já existe para este horário de captura' }, { status: 409 });
+    }
+    // Anything else unexpected (a DB outage, a bug in
+    // upsertProvisionalCatalog, putRaw failing, ...) — logged server-side
+    // for diagnosis, but the response stays generic: no error message,
+    // stack, query, or payload detail leaks to the client.
+    console.error('POST /api/ingest: erro inesperado após a validação do envelope', err);
+    return Response.json({ error: 'erro interno ao processar o snapshot' }, { status: 500 });
+  }
 }
 
 /**

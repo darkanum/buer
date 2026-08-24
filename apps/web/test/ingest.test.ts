@@ -61,7 +61,35 @@ const PROVISIONAL_CHAR = {
   constellations: [],
 };
 
+/** `property_type: 9999` is not in @onewash/core's normalize.ts PROP subset
+ * — a syntactically valid envelope whose raw content core's normalize()
+ * cannot handle. Exercises the review-round-1 "400, not an uncaught 500"
+ * boundary for untrusted `raw` content. */
+const UNMAPPED_PROP_CHAR = {
+  base: { id: 10000015, element: 'Cryo', level: 80, promote_level: 5, actived_constellation_num: 0, fetter: 10 },
+  weapon: { id: 11301, level: 80, promote_level: 5, affix_level: 1 },
+  relics: [
+    {
+      pos: 1,
+      set: { id: 10001 },
+      level: 20,
+      rarity: 5,
+      main_property: { property_type: 5, value: '4780' },
+      sub_property_list: [{ property_type: 9999, value: '1%', times: 1 }],
+    },
+  ],
+  skills: [],
+  constellations: [],
+};
+
 const DETAIL = { list: [KNOWN_CHAR_1, KNOWN_CHAR_2, PROVISIONAL_CHAR] };
+/** Same characters as DETAIL, but KNOWN_CHAR_1's level differs — a
+ * different raw content hash (so a different idempotency_key) for use with
+ * the SAME `takenAt` as DETAIL's envelope, to drive the
+ * UNIQUE(account_id, taken_at) conflict test. */
+const DETAIL_VARIANT = {
+  list: [{ ...KNOWN_CHAR_1, base: { ...KNOWN_CHAR_1.base, level: 89 } }, KNOWN_CHAR_2, PROVISIONAL_CHAR],
+};
 
 function makeEnvelope(overrides: Record<string, unknown> = {}) {
   return {
@@ -212,5 +240,71 @@ describe('POST /api/ingest (handleIngest)', () => {
 
     const rows = await testDb.pglite.query<{ n: number }>('SELECT count(*)::int AS n FROM app.snapshot');
     expect(rows.rows[0]?.n).toBe(1);
+  });
+
+  it('400 (não 500) quando raw contém um property_type não mapeado por normalize()', async () => {
+    const { deps, testDb } = await makeCtx();
+    const badDetail = { list: [UNMAPPED_PROP_CHAR] };
+    const res = await handleIngest(
+      deps,
+      mkRequest(makeEnvelope({ raw: { list: {}, detail: badDetail } }), { 'x-api-key': 'ow_live_ok' }),
+    );
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: unknown };
+    expect(json).toHaveProperty('error');
+    // Non-leaking: the message is core's own short diagnostic, never a dump
+    // of the raw payload it failed on.
+    expect(String(json.error)).not.toContain('sub_property_list');
+    expect(String(json.error).length).toBeLessThan(200);
+
+    const rows = await testDb.pglite.query<{ n: number }>('SELECT count(*)::int AS n FROM app.snapshot');
+    expect(rows.rows[0]?.n).toBe(0);
+  });
+
+  it('409 quando o mesmo taken_at é reusado com conteúdo diferente (conflito de UNIQUE(account_id, taken_at))', async () => {
+    const { deps, testDb } = await makeCtx();
+
+    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    expect(first.status).toBe(200);
+
+    const second = await handleIngest(
+      deps,
+      mkRequest(makeEnvelope({ raw: { list: {}, detail: DETAIL_VARIANT } }), { 'x-api-key': 'ow_live_ok' }),
+    );
+    expect(second.status).toBe(409);
+    expect(await second.json()).toHaveProperty('error');
+
+    const rows = await testDb.pglite.query<{ n: number }>('SELECT count(*)::int AS n FROM app.snapshot');
+    expect(rows.rows[0]?.n).toBe(1);
+  });
+
+  it('reingest da mesma conta (mesmo dono) atualiza nickname/lang em app.account', async () => {
+    const { deps, testDb } = await makeCtx('user-1');
+
+    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    expect(first.status).toBe(200);
+
+    const second = await handleIngest(
+      deps,
+      mkRequest(
+        makeEnvelope({
+          takenAt: '2026-09-06T00:00:00.000Z',
+          account: { gameUid: 'uid-1', region: 'os_usa', nickname: 'Novo Nick', lang: 'pt-pt' },
+        }),
+        { 'x-api-key': 'ow_live_ok' },
+      ),
+    );
+    expect(second.status).toBe(200);
+
+    const rows = await testDb.pglite.query<{ n: number; nickname: string; owner_id: string }>(
+      'SELECT count(*)::int AS n FROM app.account',
+    );
+    expect(rows.rows[0]?.n).toBe(1);
+
+    const account = await testDb.pglite.query<{ nickname: string; owner_id: string }>(
+      "SELECT nickname, owner_id FROM app.account WHERE game_uid = 'uid-1' AND region = 'os_usa'",
+    );
+    expect(account.rows[0]?.nickname).toBe('Novo Nick');
+    expect(account.rows[0]?.owner_id).toBe('user-1');
   });
 });
