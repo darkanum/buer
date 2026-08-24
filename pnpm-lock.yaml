@@ -24,6 +24,25 @@ importers:
         specifier: ^2
         version: 2.1.9(@types/node@22.20.1)
 
+  packages/cookies:
+    dependencies:
+      better-sqlite3:
+        specifier: ^13
+        version: 13.0.3
+    devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7
+        version: 7.6.13
+      '@types/node':
+        specifier: ^22.20.1
+        version: 22.20.1
+      typescript:
+        specifier: ^5.6
+        version: 5.9.3
+      vitest:
+        specifier: ^2
+        version: 2.1.9(@types/node@22.20.1)
+
   packages/core:
     dependencies:
       zod:
@@ -47,7 +66,7 @@ importers:
         version: link:../core
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@electric-sql/pglite@0.5.7)(@types/pg@8.23.1)(pg@8.23.0)
+        version: 0.45.2(@electric-sql/pglite@0.5.7)(@types/better-sqlite3@7.6.13)(@types/pg@8.23.1)(better-sqlite3@13.0.3)(pg@8.23.0)
       pg:
         specifier: ^8.23.0
         version: 8.23.0
@@ -946,6 +965,9 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@types/better-sqlite3@7.6.13':
+    resolution: {integrity: sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==}
+
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
@@ -987,6 +1009,10 @@ packages:
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
+
+  better-sqlite3@13.0.3:
+    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
+    engines: {node: '>=22'}
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -1206,6 +1232,10 @@ packages:
     resolution: {integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  node-addon-api@8.9.2:
+    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
+    engines: {node: ^18 || ^20 || >= 21}
 
   package-manager-detector@1.8.0:
     resolution: {integrity: sha512-yQA4H19AmPEoMUeavPMDIe1higySl/gH/yaQrkT/s07Qp+7pp2hYz30N3z2l5BkjVkF9Ow6o0wjJamm2y7Sn0A==}
@@ -1981,6 +2011,10 @@ snapshots:
   '@turbo/windows-arm64@2.10.11':
     optional: true
 
+  '@types/better-sqlite3@7.6.13':
+    dependencies:
+      '@types/node': 22.20.1
+
   '@types/estree@1.0.9': {}
 
   '@types/node@22.20.1':
@@ -2035,6 +2069,10 @@ snapshots:
 
   assertion-error@2.0.1: {}
 
+  better-sqlite3@13.0.3:
+    dependencies:
+      node-addon-api: 8.9.2
+
   buffer-from@1.1.2: {}
 
   cac@6.7.14: {}
@@ -2064,10 +2102,12 @@ snapshots:
       esbuild: 0.25.12
       tsx: 4.23.12
 
-  drizzle-orm@0.45.2(@electric-sql/pglite@0.5.7)(@types/pg@8.23.1)(pg@8.23.0):
+  drizzle-orm@0.45.2(@electric-sql/pglite@0.5.7)(@types/better-sqlite3@7.6.13)(@types/pg@8.23.1)(better-sqlite3@13.0.3)(pg@8.23.0):
     optionalDependencies:
       '@electric-sql/pglite': 0.5.7
+      '@types/better-sqlite3': 7.6.13
       '@types/pg': 8.23.1
+      better-sqlite3: 13.0.3
       pg: 8.23.0
 
   es-module-lexer@1.7.0: {}
@@ -2232,6 +2272,8 @@ snapshots:
   ms@2.1.3: {}
 
   nanoid@3.3.18: {}
+
+  node-addon-api@8.9.2: {}
 
   package-manager-detector@1.8.0: {}
 
