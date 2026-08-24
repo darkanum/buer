@@ -25,6 +25,10 @@ importers:
         version: 2.1.9(@types/node@22.20.1)
 
   packages/core:
+    dependencies:
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@types/node':
         specifier: ^22.20.1
@@ -726,6 +730,9 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+
 snapshots:
 
   '@changesets/apply-release-plan@8.0.0':
@@ -1332,3 +1339,5 @@ snapshots:
       stackback: 0.0.2
 
   yaml@2.9.0: {}
+
+  zod@4.4.3: {}
