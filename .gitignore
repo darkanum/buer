@@ -1,0 +1,22 @@
+node_modules/
+.next/
+dist/
+build/
+*.tsbuildinfo
+
+# ambiente
+.env
+.env.*
+!.env.example
+
+# ferramentas locais do agente
+.claude/
+.remember/
+
+# saidas locais da CLI
+*.local.json
+snapshots-local/
+
+# so
+.DS_Store
+Thumbs.db
