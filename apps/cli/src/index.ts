@@ -11,6 +11,7 @@ import { runWhoami } from './commands/whoami.js';
 // `SyncFlags` is a type-only import — erased at compile time, so it adds
 // no runtime import.
 import type { SyncFlags } from './commands/sync.js';
+import { redact } from './redact.js';
 
 export interface ParsedArgs {
   command: string;
@@ -112,10 +113,22 @@ export async function main(argv: string[]): Promise<void> {
   }
 }
 
+/**
+ * Global error handler: every uncaught rejection from `main` reaches
+ * stderr only after going through {@link redact} — this is the single
+ * choke point that guarantees a HoYoLAB cookie or OneWash API token
+ * embedded in an error message (a raw fetch failure, a thrown
+ * `NoSessionError`, anything) never gets printed verbatim, no matter
+ * which command or dependency produced it.
+ */
+export function reportError(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  return redact(message);
+}
+
 if (import.meta.main) {
   main(process.argv.slice(2)).catch((err: unknown) => {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(message);
+    console.error(reportError(err));
     process.exitCode = 1;
   });
 }
