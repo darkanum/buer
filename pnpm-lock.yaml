@@ -87,6 +87,18 @@ importers:
         specifier: ^2
         version: 2.1.9(@types/node@22.20.1)
 
+  packages/hoyolab:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.1
+        version: 22.20.1
+      typescript:
+        specifier: ^5.6
+        version: 5.9.3
+      vitest:
+        specifier: ^2
+        version: 2.1.9(@types/node@22.20.1)
+
 packages:
 
   '@changesets/apply-release-plan@8.0.0':
