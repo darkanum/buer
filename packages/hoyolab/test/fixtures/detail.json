@@ -1,0 +1,15 @@
+{
+  "retcode": 0,
+  "message": "OK",
+  "data": {
+    "list": [
+      {
+        "base": { "id": 10000089, "element": "Hydro", "level": 90 },
+        "weapon": { "id": 13509, "level": 90 },
+        "relics": [],
+        "skills": [],
+        "constellations": []
+      }
+    ]
+  }
+}
