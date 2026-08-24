@@ -2,10 +2,33 @@ import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PGlite } from '@electric-sql/pglite';
+import type { InferInsertModel } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
+import { characterState } from '../src/schema/app.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const drizzleDir = join(here, '..', 'drizzle');
+
+// Type-level guard (checked by `pnpm --filter @onewash/db typecheck`, not at
+// runtime): app.character_state.content_hash is `GENERATED ALWAYS AS
+// (sha256(doc_canon)) STORED` in Postgres, so the insert shape drizzle-orm
+// infers for it must NOT accept `contentHash`. If `.generatedAlwaysAs()` ever
+// stops excluding the column from `InferInsertModel`, this object literal
+// starts type-checking again and the `@ts-expect-error` below turns into a
+// hard "unused directive" error under tsc.
+type CharacterStateInsert = InferInsertModel<typeof characterState>;
+const _characterStateInsertRejectsContentHash: CharacterStateInsert = {
+  accountId: 1n,
+  charKey: '10000089',
+  docSchema: 1,
+  docCanon: Buffer.alloc(0),
+  // @ts-expect-error contentHash is a DB-generated column; it must not be insertable.
+  contentHash: Buffer.alloc(32),
+  charLevel: 1,
+  ascension: 0,
+  constellation: 0,
+};
+void _characterStateInsertRejectsContentHash;
 
 /** Concatenates every migration file under drizzle/*.sql, in filename order. */
 async function loadMigrationSql(): Promise<string> {

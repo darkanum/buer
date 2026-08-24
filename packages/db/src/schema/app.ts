@@ -148,8 +148,10 @@ export const snapshot = app.table(
 // --- 5.5 Estado de personagem — content-addressed ---
 //
 // content_hash é `GENERATED ALWAYS AS (sha256(doc_canon)) STORED` no Postgres
-// (sha256(bytea) é IMMUTABLE desde PG 11). Drizzle não expressa colunas geradas
-// com uma função arbitrária; modelada aqui como bytea comum para leitura tipada.
+// (sha256(bytea) é IMMUTABLE desde PG 11). drizzle-orm@0.45.2 EXPÕE
+// `.generatedAlwaysAs(sql`...`)` no column builder (ver pg-core/columns/common.d.ts),
+// então isto é modelado como coluna gerada de fato — InferInsertModel exclui
+// contentHash, então um INSERT que tente setá-la não passa o typecheck.
 // DDL source of truth: drizzle/0000_init.sql.
 export const characterState = app.table(
   'character_state',
@@ -166,7 +168,7 @@ export const characterState = app.table(
       .references(() => docSchema.docSchema),
     // FONTE DA VERDADE: os bytes exatos hasheados (jsonb não serve como forma canônica).
     docCanon: bytea('doc_canon').notNull(),
-    contentHash: bytea('content_hash'), // GENERATED ALWAYS AS (sha256(doc_canon)) STORED — ver comentário acima
+    contentHash: bytea('content_hash').generatedAlwaysAs(sql`sha256(doc_canon)`),
     charLevel: smallint('char_level').notNull(),
     ascension: smallint('ascension').notNull(),
     constellation: smallint('constellation').notNull(),
