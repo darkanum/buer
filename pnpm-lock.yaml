@@ -42,6 +42,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@onewash/core':
+        specifier: workspace:*
+        version: link:../core
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@electric-sql/pglite@0.5.7)(@types/pg@8.23.1)(pg@8.23.0)

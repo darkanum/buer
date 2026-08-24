@@ -23,6 +23,7 @@
     "vitest": "^2"
   },
   "dependencies": {
+    "@onewash/core": "workspace:*",
     "drizzle-orm": "^0.45.2",
     "pg": "^8.23.0"
   }
