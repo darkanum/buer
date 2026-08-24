@@ -6,7 +6,7 @@
 // ../data/property.json + ../data/weapon-type.json for the two hand-authored
 // tables (see their provenance notes in scripts/sync.ts's header comments).
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -90,4 +90,21 @@ export function loadArtifactSets(): ArtifactSetMap {
 
 export function loadSlotMain(): SlotMainMap {
   return readData<SlotMainMap>('slot-main.json');
+}
+
+/** Original image URL (HoYoLAB/Enka CDN) -> mirrored R2 object key. Written
+ * by ../scripts/assets-sync.ts (`pnpm --filter @onewash/gi-data assets:sync`). */
+export type AssetManifest = Record<string, string>;
+
+/**
+ * Reads data/assets.json. Returns `{}` (never throws) when the file doesn't
+ * exist yet — the normal state until `assets:sync` has actually run against
+ * live R2 credentials (never the case in dev/CI); a hash simply isn't
+ * mirrored yet, which callers (apps/web's render.ts) are expected to treat
+ * as "fall back to the original URL", not as an error.
+ */
+export function loadAssetManifest(): AssetManifest {
+  const file = path.join(DATA, 'assets.json');
+  if (!existsSync(file)) return {};
+  return JSON.parse(readFileSync(file, 'utf8')) as AssetManifest;
 }
