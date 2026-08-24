@@ -125,16 +125,17 @@ describe('HoyolabClient', () => {
   });
 
   it('envia os bodies corretos (role_id/server/sort_type e role_id/server/character_ids) e encadeia os ids de listCharacters até characterDetail via fetchAll', async () => {
-    const calls: { url: string; body: string | undefined }[] = [];
+    const calls: { url: string; reqBody: string | undefined; resPayload: unknown }[] = [];
     const responses: Record<string, unknown> = {
       getUserGameRolesByCookie: fx('roles'),
       'character/list': fx('list'),
       'character/detail': fx('detail'),
     };
     const recordingFetch = (async (url: any, init: any) => {
-      calls.push({ url: String(url), body: init?.body });
       const key = Object.keys(responses).find((k) => String(url).includes(k))!;
-      return new Response(JSON.stringify(responses[key]), { status: 200 });
+      const resPayload = responses[key];
+      calls.push({ url: String(url), reqBody: init?.body, resPayload });
+      return new Response(JSON.stringify(resPayload), { status: 200 });
     }) as any;
 
     const c = new HoyolabClient({ cookies: { ltoken_v2: 'x', ltuid_v2: '1' }, fetch: recordingFetch });
@@ -145,13 +146,20 @@ describe('HoyolabClient', () => {
     expect(listCall).toBeDefined();
     expect(detailCall).toBeDefined();
 
-    const listBody = JSON.parse(listCall!.body as string);
-    expect(listBody).toEqual({ role_id: '800000000', server: 'os_asia', sort_type: 1 });
+    const listReqBody = JSON.parse(listCall!.reqBody as string);
+    expect(listReqBody).toEqual({ role_id: '800000000', server: 'os_asia', sort_type: 1 });
 
-    // Prova o encadeamento: os ids vêm exatamente do fixture list.json (10000089, 10000046),
-    // via listCharacters(), e são os mesmos enviados no body de character/detail — não um
-    // subconjunto, não reordenados, não hardcoded no cliente.
-    const detailBody = JSON.parse(detailCall!.body as string);
-    expect(detailBody).toEqual({ role_id: '800000000', server: 'os_asia', character_ids: [10000089, 10000046] });
+    // Deriva os ids esperados da RESPOSTA gravada de character/list (não de um literal
+    // hardcoded [10000089, 10000046]) — se o encadeamento listCharacters() ->
+    // characterDetail() quebrar (ids errados, reordenados, ou hardcoded no cliente), os
+    // dois lados divergem e o teste falha. A resposta gravada é exatamente o que o mock
+    // devolveu para a chamada de character/list — não uma cópia paralela do fixture.
+    const listResponsePayload = listCall!.resPayload as { data: { list: Array<{ id: number }> } };
+    const expectedIds = listResponsePayload.data.list.map((char) => char.id);
+
+    const detailReqBody = JSON.parse(detailCall!.reqBody as string);
+    expect(detailReqBody.role_id).toBe('800000000');
+    expect(detailReqBody.server).toBe('os_asia');
+    expect(detailReqBody.character_ids).toEqual(expectedIds);
   });
 });
