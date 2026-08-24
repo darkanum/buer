@@ -2,8 +2,8 @@ import type { NextConfig } from 'next';
 
 // --- Why this file isn't empty ------------------------------------------
 //
-// `apps/web` depends on workspace packages (`@onewash/core`, `@onewash/db`,
-// `@onewash/gi-data`) that ship TypeScript SOURCE ONLY — their
+// `apps/web` depends on workspace packages (`@buer/core`, `@buer/db`,
+// `@buer/gi-data`) that ship TypeScript SOURCE ONLY — their
 // `main`/`exports` point straight at `./src/index.ts`, there's no compiled
 // `dist`. Two separate things then break `next build`:
 //
@@ -28,7 +28,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // TS-source-only workspace packages: run them through Next's build
   // pipeline instead of treating them as pre-compiled node_modules code.
-  transpilePackages: ['@onewash/core', '@onewash/db', '@onewash/gi-data'],
+  transpilePackages: ['@buer/core', '@buer/db', '@buer/gi-data'],
 
   webpack(config) {
     // Let webpack follow NodeNext-style relative imports (`./scrub.js`)

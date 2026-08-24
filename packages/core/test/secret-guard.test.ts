@@ -31,10 +31,10 @@ function realisticFakeValue(param: string): string {
  * which avoids depending on `sh` being on the test runner's PATH).
  */
 function makeTempRepo(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'onewash-secret-guard-'));
+  const dir = mkdtempSync(join(tmpdir(), 'buer-secret-guard-'));
   execFileSync('git', ['init', '-q'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@onewash.local'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'OneWash Test'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'test@buer.local'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Buer Test'], { cwd: dir });
   const hookDest = join(dir, '.git', 'hooks', 'pre-commit');
   copyFileSync(HOOK_SOURCE, hookDest);
   chmodSync(hookDest, 0o755);

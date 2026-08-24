@@ -26,13 +26,13 @@ importers:
 
   apps/cli:
     dependencies:
-      '@onewash/cookies':
+      '@buer/cookies':
         specifier: workspace:*
         version: link:../../packages/cookies
-      '@onewash/core':
+      '@buer/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@onewash/hoyolab':
+      '@buer/hoyolab':
         specifier: workspace:*
         version: link:../../packages/hoyolab
     devDependencies:
@@ -60,13 +60,13 @@ importers:
       '@better-auth/utils':
         specifier: 0.4.2
         version: 0.4.2
-      '@onewash/core':
+      '@buer/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@onewash/db':
+      '@buer/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@onewash/gi-data':
+      '@buer/gi-data':
         specifier: workspace:*
         version: link:../../packages/gi-data
       better-auth:
@@ -148,7 +148,7 @@ importers:
 
   packages/db:
     dependencies:
-      '@onewash/core':
+      '@buer/core':
         specifier: workspace:*
         version: link:../core
       drizzle-orm:
@@ -179,7 +179,7 @@ importers:
 
   packages/engine:
     dependencies:
-      '@onewash/core':
+      '@buer/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

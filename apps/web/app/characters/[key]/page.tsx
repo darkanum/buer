@@ -3,7 +3,7 @@
 // main+substats, active set-piece counts, PLUS a reserved analysis panel
 // that renders an honest empty state (the design explicitly requires
 // reserving this layout slot now, for the second-cycle engine — see
-// @onewash/engine's BuildEvaluator/Score, not wired here on purpose: mapping
+// @buer/engine's BuildEvaluator/Score, not wired here on purpose: mapping
 // a persisted CharacterDoc into a Build/EvaluationContext is exactly the
 // "segundo ciclo" work the spec defers, §11).
 
@@ -38,7 +38,7 @@ export default async function CharacterDetailPage({ params }: CharacterDetailPag
 
   // Active set-piece counts (how many pieces of each set are currently
   // equipped) — NOT the bonus TEXT. Set-bonus effect descriptions aren't in
-  // @onewash/gi-data yet (§5.1: catalog carries no effect/description
+  // @buer/gi-data yet (§5.1: catalog carries no effect/description
   // column by design), so this reports what's verifiable from the doc
   // (piece counts crossing the 2pc/4pc thresholds) without inventing wording
   // for what those thresholds actually do.
@@ -158,7 +158,7 @@ export default async function CharacterDetailPage({ params }: CharacterDetailPag
 
       {/* Painel de análise reservado (design spec §4.1) — a UI intencionalmente
           existe e ocupa layout agora, para o motor do segundo ciclo (ver
-          @onewash/engine's BuildEvaluator) encaixar aqui sem precisar de uma
+          @buer/engine's BuildEvaluator) encaixar aqui sem precisar de uma
           segunda passada de design. Estado vazio honesto: nenhuma nota,
           score ou sugestão é calculada ou inventada nesta fase. */}
       <section style={{ border: '1px dashed #444', borderRadius: 8, padding: '1rem' }}>

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { writeSnapshot } from '@onewash/db';
-import { PROTOCOL_VERSION } from '@onewash/core';
+import { writeSnapshot } from '@buer/db';
+import { PROTOCOL_VERSION } from '@buer/core';
 import { handleIngest, inlinePutRaw, type IngestDeps } from '../app/api/ingest/handler.js';
 import { makeIngestTestDb, type IngestTestDb } from './ingest-helpers.js';
 
-// Two REAL characters known to @onewash/gi-data's bundled data (Furina
+// Two REAL characters known to @buer/gi-data's bundled data (Furina
 // 10000089 + weapon 13509 "engulfing-lightning" + artifact set 15025
 // "deepwood-memories"; Hu Tao 10000046 + weapon 13502 "skyward-spine" +
 // artifact set 15009 "prayers-for-illumination") — same shape and values as
 // packages/core/test/fixtures/detail.sample.json, so the sub-stat
-// reconstruction in @onewash/core's substat.ts (which only has a tier table
+// reconstruction in @buer/core's substat.ts (which only has a tier table
 // for 5★ rolls) is exercised against values already known to resolve. Plus
 // one character/weapon/artifact-set combo with ids that do NOT exist in
 // gi-data's data, to exercise the provisional-catalog-upsert path.
@@ -49,7 +49,7 @@ const KNOWN_CHAR_2 = {
   skills: [{ skill_id: 10351, level_current: 8, skill_type: 1 }],
   constellations: [],
 };
-/** char_key/weapon_id/set_id here are NOT in @onewash/gi-data's data —
+/** char_key/weapon_id/set_id here are NOT in @buer/gi-data's data —
  * exercises the `provisional: true` branch of upsertProvisionalCatalog. */
 const PROVISIONAL_CHAR = {
   base: { id: 99999001, element: 'Anemo', level: 1, promote_level: 0, actived_constellation_num: 0, fetter: 1 },
@@ -61,7 +61,7 @@ const PROVISIONAL_CHAR = {
   constellations: [],
 };
 
-/** `property_type: 9999` is not in @onewash/core's normalize.ts PROP subset
+/** `property_type: 9999` is not in @buer/core's normalize.ts PROP subset
  * — a syntactically valid envelope whose raw content core's normalize()
  * cannot handle. Exercises the review-round-1 "400, not an uncaught 500"
  * boundary for untrusted `raw` content. */
@@ -138,7 +138,7 @@ describe('POST /api/ingest (handleIngest)', () => {
 
   it('400 em envelope malformado (protocolVersion errado) com erro útil', async () => {
     const { deps } = await makeCtx();
-    const res = await handleIngest(deps, mkRequest(makeEnvelope({ protocolVersion: 999 }), { 'x-api-key': 'ow_live_ok' }));
+    const res = await handleIngest(deps, mkRequest(makeEnvelope({ protocolVersion: 999 }), { 'x-api-key': 'buer_live_ok' }));
     expect(res.status).toBe(400);
     expect(await res.json()).toHaveProperty('error');
   });
@@ -146,14 +146,14 @@ describe('POST /api/ingest (handleIngest)', () => {
   it('400 em envelope malformado (raw ausente) com erro útil', async () => {
     const { deps } = await makeCtx();
     const { raw: _raw, ...withoutRaw } = makeEnvelope();
-    const res = await handleIngest(deps, mkRequest(withoutRaw, { 'x-api-key': 'ow_live_ok' }));
+    const res = await handleIngest(deps, mkRequest(withoutRaw, { 'x-api-key': 'buer_live_ok' }));
     expect(res.status).toBe(400);
     expect(await res.json()).toHaveProperty('error');
   });
 
   it('400 em corpo não-JSON, sem crashar', async () => {
     const { deps } = await makeCtx();
-    const res = await handleIngest(deps, mkRequest('isto não é json', { 'x-api-key': 'ow_live_ok' }));
+    const res = await handleIngest(deps, mkRequest('isto não é json', { 'x-api-key': 'buer_live_ok' }));
     expect(res.status).toBe(400);
     expect(await res.json()).toHaveProperty('error');
   });
@@ -166,7 +166,7 @@ describe('POST /api/ingest (handleIngest)', () => {
       userId: 'attacker',
       account: { ...base.account, ownerId: 'attacker' },
     };
-    const res = await handleIngest(deps, mkRequest(spoofed, { 'x-api-key': 'ow_live_ok' }));
+    const res = await handleIngest(deps, mkRequest(spoofed, { 'x-api-key': 'buer_live_ok' }));
     expect(res.status).toBe(200);
 
     const rows = await testDb.pglite.query<{ owner_id: string }>('SELECT owner_id FROM app.account');
@@ -176,13 +176,13 @@ describe('POST /api/ingest (handleIngest)', () => {
 
   it('rejeita ingest de outro usuário na mesma conta (game_uid+region já reivindicada)', async () => {
     const { deps, testDb } = await makeCtx('user-a');
-    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'buer_live_ok' }));
     expect(first.status).toBe(200);
 
     const depsOtherUser: IngestDeps = { ...deps, verifyApiKey: async () => ({ userId: 'user-b' }) };
     const second = await handleIngest(
       depsOtherUser,
-      mkRequest(makeEnvelope({ takenAt: '2026-09-06T00:00:00.000Z' }), { 'x-api-key': 'ow_live_ok' }),
+      mkRequest(makeEnvelope({ takenAt: '2026-09-06T00:00:00.000Z' }), { 'x-api-key': 'buer_live_ok' }),
     );
     expect(second.status).toBe(403);
 
@@ -192,7 +192,7 @@ describe('POST /api/ingest (handleIngest)', () => {
 
   it('happy path: cria o snapshot e as linhas provisórias de catálogo', async () => {
     const { deps, testDb } = await makeCtx();
-    const res = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    const res = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'buer_live_ok' }));
     expect(res.status).toBe(200);
 
     const json = (await res.json()) as { snapshotId: string; changedChars: number; deduped: boolean };
@@ -226,12 +226,12 @@ describe('POST /api/ingest (handleIngest)', () => {
   it('dedupe: o mesmo payload postado 2x não cria um 2º snapshot', async () => {
     const { deps, testDb } = await makeCtx();
 
-    const res1 = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    const res1 = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'buer_live_ok' }));
     expect(res1.status).toBe(200);
     const json1 = (await res1.json()) as { snapshotId: string; deduped: boolean };
     expect(json1.deduped).toBe(false);
 
-    const res2 = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    const res2 = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'buer_live_ok' }));
     expect(res2.status).toBe(200);
     const json2 = (await res2.json()) as { snapshotId: string; deduped: boolean; changedChars: number };
     expect(json2.deduped).toBe(true);
@@ -247,7 +247,7 @@ describe('POST /api/ingest (handleIngest)', () => {
     const badDetail = { list: [UNMAPPED_PROP_CHAR] };
     const res = await handleIngest(
       deps,
-      mkRequest(makeEnvelope({ raw: { list: {}, detail: badDetail } }), { 'x-api-key': 'ow_live_ok' }),
+      mkRequest(makeEnvelope({ raw: { list: {}, detail: badDetail } }), { 'x-api-key': 'buer_live_ok' }),
     );
     expect(res.status).toBe(400);
     const json = (await res.json()) as { error: unknown };
@@ -264,12 +264,12 @@ describe('POST /api/ingest (handleIngest)', () => {
   it('409 quando o mesmo taken_at é reusado com conteúdo diferente (conflito de UNIQUE(account_id, taken_at))', async () => {
     const { deps, testDb } = await makeCtx();
 
-    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'buer_live_ok' }));
     expect(first.status).toBe(200);
 
     const second = await handleIngest(
       deps,
-      mkRequest(makeEnvelope({ raw: { list: {}, detail: DETAIL_VARIANT } }), { 'x-api-key': 'ow_live_ok' }),
+      mkRequest(makeEnvelope({ raw: { list: {}, detail: DETAIL_VARIANT } }), { 'x-api-key': 'buer_live_ok' }),
     );
     expect(second.status).toBe(409);
     expect(await second.json()).toHaveProperty('error');
@@ -281,7 +281,7 @@ describe('POST /api/ingest (handleIngest)', () => {
   it('reingest da mesma conta (mesmo dono) atualiza nickname/lang em app.account', async () => {
     const { deps, testDb } = await makeCtx('user-1');
 
-    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'ow_live_ok' }));
+    const first = await handleIngest(deps, mkRequest(makeEnvelope(), { 'x-api-key': 'buer_live_ok' }));
     expect(first.status).toBe(200);
 
     const second = await handleIngest(
@@ -291,7 +291,7 @@ describe('POST /api/ingest (handleIngest)', () => {
           takenAt: '2026-09-06T00:00:00.000Z',
           account: { gameUid: 'uid-1', region: 'os_usa', nickname: 'Novo Nick', lang: 'pt-pt' },
         }),
-        { 'x-api-key': 'ow_live_ok' },
+        { 'x-api-key': 'buer_live_ok' },
       ),
     );
     expect(second.status).toBe(200);

@@ -21,15 +21,15 @@ import {
   type IngestDb,
   type WriteSnapshotArgs,
   type WriteSnapshotResult,
-} from '@onewash/db';
+} from '@buer/db';
 import {
   IngestEnvelope,
   normalize,
   parseCharKey,
   type CharacterKey,
   type NormalizedSnapshot,
-} from '@onewash/core';
-import { loadArtifactSets, loadCharacters, loadWeapons } from '@onewash/gi-data';
+} from '@buer/core';
+import { loadArtifactSets, loadCharacters, loadWeapons } from '@buer/gi-data';
 import { verifyApiKey as productionVerifyApiKey } from '../../../lib/auth.js';
 import { db as productionDb } from '../../../lib/db.js';
 
@@ -39,7 +39,7 @@ import { db as productionDb } from '../../../lib/db.js';
 const DOC_SCHEMA_VERSION = 1;
 /** Version of THIS route's server-side parsing (normalize()) logic — distinct
  * from `IngestEnvelope`'s wire-format `PROTOCOL_VERSION`. Bump when
- * `@onewash/core`'s normalize() changes what it extracts from `raw`, so
+ * `@buer/core`'s normalize() changes what it extracts from `raw`, so
  * `app.snapshot.parser_version` can drive a future reparse-on-upgrade job
  * (see the `snapshot_reparse` index). */
 const PARSER_VERSION = 1;
@@ -107,7 +107,7 @@ export const productionDeps: IngestDeps = {
 // DB (or the first time this account reports a never-before-seen
 // character/weapon/artifact set), those rows don't exist yet, and
 // writeSnapshot would fail outright. This fills them in first, best-effort:
-// known ids (per @onewash/gi-data) get real slug/rarity/etc and
+// known ids (per @buer/gi-data) get real slug/rarity/etc and
 // `provisional=false`; unknown ids get a minimal, synthesized-slug row with
 // `provisional=true` so a later catalog sync can backfill the real data
 // without an app-level migration.
@@ -176,7 +176,7 @@ async function upsertProvisionalCatalog(db: IngestDb, normalized: NormalizedSnap
 // can still carry a raw that normalize() chokes on (unmapped property_type,
 // missing base/weapon/relics fields, a Traveler id with no element, an
 // unreconstructable sub-stat roll) — all synchronous throws from
-// @onewash/core, never something IngestEnvelope.safeParse catches. Left
+// @buer/core, never something IngestEnvelope.safeParse catches. Left
 // unhandled, any of those becomes an uncaught 500 instead of a
 // client-actionable 400.
 
@@ -319,7 +319,7 @@ export async function handleIngest(deps: IngestDeps, req: Request): Promise<Resp
 
   // 4. normalize() the raw payload into content-addressed character docs.
   // envelope.raw is untrusted beyond its top-level { list, detail } shape —
-  // @onewash/core's normalize()/propKey/charKey/reconstructTiers all throw
+  // @buer/core's normalize()/propKey/charKey/reconstructTiers all throw
   // synchronously on a shape or value they don't recognize. Isolated in its
   // own try/catch (review round 1, finding 1) so that throw becomes a 400
   // with a short, non-leaking reason, not an uncaught 500 — the message is

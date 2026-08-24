@@ -10,7 +10,7 @@
 // reshaping a JSON, or a game update changing an enum) silently producing wrong
 // catalog data.
 //
-// Run: `pnpm --filter @onewash/gi-data sync` (plain `node scripts/sync.ts` —
+// Run: `pnpm --filter @buer/gi-data sync` (plain `node scripts/sync.ts` —
 // Node 24 strips TypeScript syntax natively, no build step needed).
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -213,7 +213,7 @@ if (Object.keys(artifactSets).length < 50) {
 //
 // The vendored files do NOT encode this rule directly: relics.json's per-item
 // EquipType is Enka's internal grouping enum (not the HoYoLAB `pos` slot
-// convention @onewash/core already uses — see packages/core/src/canon.ts), and
+// convention @buer/core already uses — see packages/core/src/canon.ts), and
 // relic_levels.json only has per-rarity substat roll magnitudes, not which main
 // stats are selectable per slot. This table is the fixed, unchanged-since-launch
 // game design rule (flower=HP/plume=ATK are single-option; sands/goblet/circlet

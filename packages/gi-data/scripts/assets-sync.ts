@@ -20,7 +20,7 @@
 // This script needs live credentials to actually upload, so it is NOT
 // exercised in CI — only assetKey (in ../src/assets.ts) is unit-tested.
 //
-// Run: `pnpm --filter @onewash/gi-data assets:sync <urls.json>`, where
+// Run: `pnpm --filter @buer/gi-data assets:sync <urls.json>`, where
 // urls.json is a JSON array of image URL strings. (Node 24 strips TypeScript
 // syntax natively, no build step needed.)
 

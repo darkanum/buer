@@ -6,9 +6,9 @@ import {
   EmbeddedProvider,
   type SessionProvider,
   type HoyolabSession,
-} from '@onewash/cookies';
-import { HoyolabClient, DEFAULT_LANG, type FetchAllResult } from '@onewash/hoyolab';
-import { IngestEnvelope, PROTOCOL_VERSION, normalize } from '@onewash/core';
+} from '@buer/cookies';
+import { HoyolabClient, DEFAULT_LANG, type FetchAllResult } from '@buer/hoyolab';
+import { IngestEnvelope, PROTOCOL_VERSION, normalize } from '@buer/core';
 import { readConfig as readConfigReal, type Config } from '../config.js';
 import { postIngest as postIngestReal, saveFailedPayload, type PostIngestResult } from '../api.js';
 import { CLI_VERSION } from '../version.js';
@@ -17,7 +17,7 @@ import { defaultFirefoxProfileDir } from '../firefox-profile.js';
 export interface SyncFlags {
   /** Path to also write the locally-normalized snapshot to (convenience only — the server is the authority). */
   out?: string;
-  /** Do everything except send to the OneWash API. */
+  /** Do everything except send to the Buer API. */
   dryRun?: boolean;
   /** Which browser's cookie store to read. Only `'firefox'` is supported so far. */
   browser?: string;
@@ -134,7 +134,7 @@ export async function runSync(deps: SyncDeps, flags: SyncFlags = {}): Promise<Sy
 
   const cfg = deps.readConfig();
   if (!cfg.apiToken) {
-    throw new Error('nenhum token da API OneWash configurado. Rode `onewash login <token>` antes de `sync`.');
+    throw new Error('nenhum token da API Buer configurado. Rode `buer login <token>` antes de `sync`.');
   }
 
   try {
@@ -144,8 +144,8 @@ export async function runSync(deps: SyncDeps, flags: SyncFlags = {}): Promise<Sy
     const savedPath = saveFailedPayload(envelope);
     const reason = err instanceof Error ? err.message : String(err);
     throw new Error(
-      `falha ao enviar para a API OneWash: ${reason}. ` +
-        `Os dados extraídos foram salvos em ${savedPath} — rode \`onewash sync\` novamente mais tarde para tentar reenviar.`,
+      `falha ao enviar para a API Buer: ${reason}. ` +
+        `Os dados extraídos foram salvos em ${savedPath} — rode \`buer sync\` novamente mais tarde para tentar reenviar.`,
     );
   }
 }

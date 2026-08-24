@@ -1,5 +1,5 @@
 {
-  "name": "@onewash/web",
+  "name": "@buer/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,9 +13,9 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
-    "@onewash/core": "workspace:*",
-    "@onewash/db": "workspace:*",
-    "@onewash/gi-data": "workspace:*",
+    "@buer/core": "workspace:*",
+    "@buer/db": "workspace:*",
+    "@buer/gi-data": "workspace:*",
     "@aws-sdk/client-s3": "^3",
     "@better-auth/api-key": "^1.7.1",
     "@better-auth/core": "1.7.1",

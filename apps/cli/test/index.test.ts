@@ -11,9 +11,9 @@ describe('parseArgs', () => {
   });
 
   it('mantém argumentos posicionais (ex.: o token de login)', () => {
-    expect(parseArgs(['login', 'ow_live_test', '--api-base-url', 'http://x'])).toEqual({
+    expect(parseArgs(['login', 'buer_live_test', '--api-base-url', 'http://x'])).toEqual({
       command: 'login',
-      positional: ['ow_live_test'],
+      positional: ['buer_live_test'],
       flags: { 'api-base-url': 'http://x' },
     });
   });
@@ -29,8 +29,8 @@ describe('reportError (handler global de erro)', () => {
     expect(out).not.toContain('abc123');
   });
 
-  it('redige um token ow_live_ antes de formatar a mensagem', () => {
-    const out = reportError(new Error('falha ao enviar com token ow_live_deadbeef'));
+  it('redige um token buer_live_ antes de formatar a mensagem', () => {
+    const out = reportError(new Error('falha ao enviar com token buer_live_deadbeef'));
     expect(out).not.toContain('deadbeef');
   });
 

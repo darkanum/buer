@@ -1,5 +1,5 @@
-import { getSession, NoSessionError, type HoyolabSession } from '@onewash/cookies';
-import { HoyolabClient, HoyolabError, ACCOUNT_BASE } from '@onewash/hoyolab';
+import { getSession, NoSessionError, type HoyolabSession } from '@buer/cookies';
+import { HoyolabClient, HoyolabError, ACCOUNT_BASE } from '@buer/hoyolab';
 import { readConfig as readConfigReal, type Config } from '../config.js';
 import { buildProviders } from './sync.js';
 
@@ -30,9 +30,9 @@ export interface DoctorReport {
   cookieValid: boolean;
   /** Did HoYoLAB's API respond at all? */
   hoyolabReachable: boolean;
-  /** Did the configured OneWash API respond? */
+  /** Did the configured Buer API respond? */
   apiReachable: boolean;
-  /** Is a OneWash API token configured (`login` already run)? */
+  /** Is a Buer API token configured (`login` already run)? */
   paired: boolean;
 }
 

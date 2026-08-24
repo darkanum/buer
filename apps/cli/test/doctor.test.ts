@@ -5,7 +5,7 @@ const baseDeps: DoctorDeps = {
   findSession: async () => ({ ltoken_v2: 'x', ltuid_v2: '1' }),
   checkHoyolab: async () => ({ reachable: true, valid: true }),
   checkApi: async () => true,
-  readConfig: () => ({ apiToken: 'ow_live_x', apiBaseUrl: 'http://x' }),
+  readConfig: () => ({ apiToken: 'buer_live_x', apiBaseUrl: 'http://x' }),
 };
 
 describe('runDoctor', () => {
@@ -43,7 +43,7 @@ describe('runDoctor', () => {
     expect(report.hoyolabReachable).toBe(true);
   });
 
-  it('HoYoLAB e API OneWash inalcançáveis', async () => {
+  it('HoYoLAB e API Buer inalcançáveis', async () => {
     const report = await runDoctor({
       ...baseDeps,
       findSession: async () => null,

@@ -22,9 +22,9 @@
 // and parsed in JS, exactly as §5.11 says.
 
 import { sql } from 'drizzle-orm';
-import type { IngestDb } from '@onewash/db';
-import type { CharacterDoc, CharacterKey } from '@onewash/core';
-import { parseCharKey } from '@onewash/core';
+import type { IngestDb } from '@buer/db';
+import type { CharacterDoc, CharacterKey } from '@buer/core';
+import { parseCharKey } from '@buer/core';
 import {
   loadArtifactSets,
   loadAssetManifest,
@@ -35,7 +35,7 @@ import {
   type CharacterMap,
   type PropertyMap,
   type WeaponMap,
-} from '@onewash/gi-data';
+} from '@buer/gi-data';
 
 // ---------------------------------------------------------------------------
 // gi-data lookups — loaded once (local JSON reads, no network), same pattern
@@ -73,7 +73,7 @@ export interface CharacterCatalogInfo {
   readonly provisional: boolean;
 }
 
-/** Resolves display info for a char_key from @onewash/gi-data. For the
+/** Resolves display info for a char_key from @buer/gi-data. For the
  * Traveler (composite key `10000005:anemo`), the element comes from the KEY
  * itself, not from the catalog entry (gi-data's characters.json has no
  * `element` for either Traveler avatar id — see packages/gi-data/scripts/sync.ts's
@@ -121,7 +121,7 @@ export function describeArtifactSet(setId: number): ArtifactSetCatalogInfo {
   return { setId, slug, displayName: humanizeSlug(slug), maxRarity: entry?.maxRarity ?? null, provisional: !entry };
 }
 
-/** Slot number -> the GOOD/engine name (see @onewash/engine's `ArtifactSlot`
+/** Slot number -> the GOOD/engine name (see @buer/engine's `ArtifactSlot`
  * union) — shared by the detail and history screens so both use the same
  * labels. */
 export const ARTIFACT_SLOT_LABELS: Record<1 | 2 | 3 | 4 | 5, string> = {
@@ -433,7 +433,7 @@ export interface RosterChange {
  * The artifact-fingerprint rule (the crux of this function): for a given
  * slot, if `before`'s and `after`'s artifact have the SAME `fp` (identical
  * set+slot+main-stat+substat-tiers — see `artifactFingerprint` in
- * @onewash/core), the piece itself didn't change, so a higher `lvl` means it
+ * @buer/core), the piece itself didn't change, so a higher `lvl` means it
  * was fed EXP -> `artifact_upgrade`. A DIFFERENT `fp` means a physically
  * different piece is now in that slot (whatever its level) -> `artifact_swap`.
  * `fp` is compared as-is (never recomputed here) — it's already part of the

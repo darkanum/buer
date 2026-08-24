@@ -7,7 +7,7 @@ import { db } from './db.js';
 
 /** Loose on purpose — matches `drizzleAdapter`'s own `db: DB` parameter type
  * ({@link https://github.com/better-auth/better-auth `@better-auth/drizzle-adapter`}),
- * so both the Postgres-backed `Database` from `@onewash/db` (production) and
+ * so both the Postgres-backed `Database` from `@buer/db` (production) and
  * a `drizzle-orm/pglite` instance (tests, see test/helpers.ts) satisfy it. */
 type DrizzleDb = Parameters<typeof drizzleAdapter>[0];
 
@@ -17,7 +17,7 @@ type DrizzleDb = Parameters<typeof drizzleAdapter>[0];
  * Exposed as a factory — not just the `auth` singleton below — so tests can
  * wire it to an in-memory PGlite db that carries Better Auth's own tables
  * (see test/helpers.ts and the "Testability" section of
- * .superpowers/sdd/2026-08-24-onewash-fase-1/task-8.1-report.md): real
+ * .superpowers/sdd/2026-08-24-buer-fase-1/task-8.1-report.md): real
  * Better Auth logic, real (if ephemeral) storage, no live network.
  */
 export function createAuth(database: DrizzleDb) {
@@ -45,7 +45,7 @@ export function createAuth(database: DrizzleDb) {
     },
     plugins: [
       apiKey({
-        defaultPrefix: 'ow_live_',
+        defaultPrefix: 'buer_live_',
         // disableKeyHashing stays false (the default): keys are hashed with
         // @better-auth/api-key's defaultKeyHasher, which is SHA-256.
         permissions: {

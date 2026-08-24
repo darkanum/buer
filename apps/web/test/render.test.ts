@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { accountHash, artifactFingerprint, contentHash, type CanonArtifact, type CharacterDoc, type NormalizedSnapshot } from '@onewash/core';
-import { schema, writeSnapshot, type IngestDb } from '@onewash/db';
+import { accountHash, artifactFingerprint, contentHash, type CanonArtifact, type CharacterDoc, type NormalizedSnapshot } from '@buer/core';
+import { schema, writeSnapshot, type IngestDb } from '@buer/db';
 import { diffSnapshots, getAccountView, getCharacter, type DiffableCharacter } from '../lib/render.js';
 import { makeIngestTestDb } from './ingest-helpers.js';
 
@@ -107,7 +107,7 @@ describe('diffSnapshots (pure)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// getAccountView / getCharacter — real PGlite db, migrated with @onewash/db's
+// getAccountView / getCharacter — real PGlite db, migrated with @buer/db's
 // own migration (packages/db/drizzle/0000_init.sql via makeIngestTestDb,
 // already built for Task 8.2's ingest tests), seeded via the REAL
 // writeSnapshot() — not hand-inserted rows — so the read layer is exercised

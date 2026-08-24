@@ -5,7 +5,7 @@
 // §4.2's `assets:sync` script (packages/gi-data/scripts/assets-sync.ts)
 // mirrors the ~350 known assets UP FRONT and records `originalUrl ->
 // assetKey` in packages/gi-data/data/assets.json (read here via
-// `loadAssetManifest()` — see @onewash/gi-data's src/index.ts). This route
+// `loadAssetManifest()` — see @buer/gi-data's src/index.ts). This route
 // is the request-time complement: a hash is only ever "known" if it's a
 // VALUE somewhere in that manifest (i.e. some source URL really does hash to
 // it — assetKey() itself, packages/gi-data/src/assets.ts, is what produced
@@ -36,7 +36,7 @@ import {
   PutObjectCommand,
   type S3ClientConfig,
 } from '@aws-sdk/client-s3';
-import { loadAssetManifest } from '@onewash/gi-data';
+import { loadAssetManifest } from '@buer/gi-data';
 
 /** Matches §4.2's `Cache-Control: public, max-age=31536000, immutable` —
  * applied both when serving an object already in R2 and right after this
@@ -47,7 +47,7 @@ const IMMUTABLE_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 // Manifest reverse lookup — hash (assetKey) -> original source URL.
 // ---------------------------------------------------------------------------
 //
-// loadAssetManifest() (from @onewash/gi-data) returns `{}`, never throws,
+// loadAssetManifest() (from @buer/gi-data) returns `{}`, never throws,
 // when packages/gi-data/data/assets.json doesn't exist yet — the normal
 // state until assets:sync has actually run against live R2 credentials
 // (never the case in dev/CI/Fase 1, per that function's own doc comment).
@@ -229,7 +229,7 @@ function getR2(): { client: S3Client; bucket: string } {
  * `name === 'NoSuchKey'` (or an HTTP 404), not a distinct exception class —
  * same duck-typed check as assets-sync.ts's own (unexported)
  * `isNotFoundError`, necessarily re-declared here since that helper isn't
- * part of @onewash/gi-data's public surface. */
+ * part of @buer/gi-data's public surface. */
 function isNotFoundError(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
   if (err.name === 'NotFound' || err.name === 'NoSuchKey') return true;

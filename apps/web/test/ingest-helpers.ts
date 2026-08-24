@@ -3,11 +3,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
-import { schema, type IngestDb } from '@onewash/db';
+import { schema, type IngestDb } from '@buer/db';
 
 const here = dirname(fileURLToPath(import.meta.url));
 // apps/web/test -> apps/web -> apps -> repo root -> packages/db/drizzle.
-// `@onewash/db`'s package.json only maps "." and "./schema" (see its
+// `@buer/db`'s package.json only maps "." and "./schema" (see its
 // exports field), so its migration SQL isn't reachable as a package
 // subpath import — a relative fs path to the sibling workspace package is
 // the same approach apps/web/test/helpers.ts and packages/db/test/helpers.ts
@@ -23,7 +23,7 @@ async function loadDbMigrationSql(): Promise<string> {
 }
 
 export interface IngestTestDb {
-  /** Drizzle instance typed against @onewash/db's schema — satisfies
+  /** Drizzle instance typed against @buer/db's schema — satisfies
    * `IngestDb`, same as `writeSnapshot`'s own tests (packages/db/test/helpers.ts). */
   db: IngestDb;
   /** Raw PGlite handle, for assertions the Drizzle query builder doesn't
@@ -32,7 +32,7 @@ export interface IngestTestDb {
 }
 
 /**
- * Spins up an in-memory PGlite instance migrated with `@onewash/db`'s own
+ * Spins up an in-memory PGlite instance migrated with `@buer/db`'s own
  * migration (packages/db/drizzle/0000_init.sql) — `app.account`,
  * `catalog.*`, `app.raw_object`/`raw_observation`, `app.snapshot`, etc.
  * Better Auth's own tables are NOT part of this db: `handleIngest`'s tests

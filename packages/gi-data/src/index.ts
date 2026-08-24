@@ -93,7 +93,7 @@ export function loadSlotMain(): SlotMainMap {
 }
 
 /** Original image URL (HoYoLAB/Enka CDN) -> mirrored R2 object key. Written
- * by ../scripts/assets-sync.ts (`pnpm --filter @onewash/gi-data assets:sync`). */
+ * by ../scripts/assets-sync.ts (`pnpm --filter @buer/gi-data assets:sync`). */
 export type AssetManifest = Record<string, string>;
 
 /**

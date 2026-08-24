@@ -1,9 +1,9 @@
 import { defineConfig } from 'drizzle-kit';
 
 // Better Auth's own tables (user/session/account/verification/apikey — see
-// lib/auth-schema.ts) live in this app, separate from @onewash/db's app/
+// lib/auth-schema.ts) live in this app, separate from @buer/db's app/
 // catalog schemas. The SQL under ./drizzle is generated from that file via
-// `pnpm --filter @onewash/web exec drizzle-kit generate` and is what
+// `pnpm --filter @buer/web exec drizzle-kit generate` and is what
 // test/helpers.ts feeds into PGlite for verifyApiKey's tests. Not run
 // against a live DB in CI — `db:migrate` (drizzle-kit migrate) is for
 // deploying it against DATABASE_URL_DIRECT.

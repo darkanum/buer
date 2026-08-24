@@ -9,7 +9,7 @@ import { characterState } from '../src/schema/app.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const drizzleDir = join(here, '..', 'drizzle');
 
-// Type-level guard (checked by `pnpm --filter @onewash/db typecheck`, not at
+// Type-level guard (checked by `pnpm --filter @buer/db typecheck`, not at
 // runtime): app.character_state.content_hash is `GENERATED ALWAYS AS
 // (sha256(doc_canon)) STORED` in Postgres, so the insert shape drizzle-orm
 // infers for it must NOT accept `contentHash`. If `.generatedAlwaysAs()` ever

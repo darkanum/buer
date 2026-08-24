@@ -1,5 +1,5 @@
 {
-  "name": "@onewash/db",
+  "name": "@buer/db",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -23,7 +23,7 @@
     "vitest": "^2"
   },
   "dependencies": {
-    "@onewash/core": "workspace:*",
+    "@buer/core": "workspace:*",
     "drizzle-orm": "^0.45.2",
     "pg": "^8.23.0"
   }

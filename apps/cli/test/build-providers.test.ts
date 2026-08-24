@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PasteProvider, EmbeddedProvider, FirefoxProvider } from '@onewash/cookies';
+import { PasteProvider, EmbeddedProvider, FirefoxProvider } from '@buer/cookies';
 import { buildProviders } from '../src/commands/sync.js';
 
 // `resolveFirefoxProfileDir` is stubbed in every case below so this test

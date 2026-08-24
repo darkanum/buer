@@ -3,7 +3,7 @@
 //
 // A CRUX: `app.character_state.content_hash` é GENERATED ALWAYS AS (sha256(doc_canon))
 // STORED. Para que esse hash calculado pelo Postgres coincida com
-// `@onewash/core`'s `contentHash(doc)`, o `doc_canon` gravado TEM que ser
+// `@buer/core`'s `contentHash(doc)`, o `doc_canon` gravado TEM que ser
 // exatamente `canonBytes(doc)` — os mesmos bytes que o core hasheou. Dado isso,
 // dedupe e detecção de mudança são feitos comparando o `state_id` resolvido via
 // o `content_hash` computado pelo BANCO (nunca comparando strings de hash calculadas
@@ -11,7 +11,7 @@
 
 import { sql } from 'drizzle-orm';
 import type { PgDatabase } from 'drizzle-orm/pg-core';
-import { canonBytes, type NormalizedSnapshot } from '@onewash/core';
+import { canonBytes, type NormalizedSnapshot } from '@buer/core';
 import * as schema from './schema/index.js';
 
 /**
@@ -98,7 +98,7 @@ export async function writeSnapshot(db: IngestDb, args: WriteSnapshotArgs): Prom
   return db.transaction(async (tx) => {
     // 1. Advisory lock por conta — primeira instrução da transação (spec §5.6).
     await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(hashtextextended('onewash.account'::text, ${args.accountId.toString()}::bigint))`,
+      sql`SELECT pg_advisory_xact_lock(hashtextextended('buer.account'::text, ${args.accountId.toString()}::bigint))`,
     );
 
     const accountHashBytes = Buffer.from(args.normalized.accountHash, 'hex');
@@ -154,7 +154,7 @@ export async function writeSnapshot(db: IngestDb, args: WriteSnapshotArgs): Prom
     let changedChars = 0;
     for (const c of args.normalized.characters) {
       // A CRUX: doc_canon É canonBytes(c.doc) — os mesmos bytes que
-      // @onewash/core hasheou para c.contentHash / normalized.accountHash.
+      // @buer/core hasheou para c.contentHash / normalized.accountHash.
       // sha256(doc_canon) computado pelo Postgres (coluna gerada) portanto
       // coincide byte-a-byte com contentHash(c.doc) calculado em JS.
       const docCanon = Buffer.from(canonBytes(c.doc));

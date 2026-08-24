@@ -6,13 +6,13 @@ export interface LoginOptions {
 }
 
 /**
- * Persists the OneWash API token (never the HoYoLAB cookie — that one
+ * Persists the Buer API token (never the HoYoLAB cookie — that one
  * never touches disk). Preserves the existing `apiBaseUrl` unless
  * `opts.apiBaseUrl` overrides it.
  */
 export function runLogin(token: string, opts: LoginOptions = {}): Config {
   if (!token) {
-    throw new Error('login precisa de um token: `onewash login <token>`.');
+    throw new Error('login precisa de um token: `buer login <token>`.');
   }
   const existing = readConfig();
   const cfg: Config = {

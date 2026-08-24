@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'OneWash',
+  title: 'Buer',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

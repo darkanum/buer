@@ -85,7 +85,7 @@ export const rawObject = app.table(
     rawSha256: bytea('raw_sha256').primaryKey(),
     byteLen: integer('byte_len').notNull(),
     codec: text('codec').notNull(),
-    objectKey: text('object_key'), // 'r2://onewash-raw/ab/cd/<hex>.json.zst'; NULL = purgado
+    objectKey: text('object_key'), // 'r2://buer-raw/ab/cd/<hex>.json.zst'; NULL = purgado
     purgedAt: timestamp('purged_at', { withTimezone: true }),
     firstSeenAt: timestamp('first_seen_at', { withTimezone: true }).notNull().defaultNow(),
   },

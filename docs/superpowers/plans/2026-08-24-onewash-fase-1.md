@@ -1,4 +1,4 @@
-# OneWash Fase 1 — Plano de Implementação
+# Buer Fase 1 — Plano de Implementação
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -20,7 +20,7 @@ Requisitos do projeto inteiro — cada tarefa os herda implicitamente:
 - **Segredos nunca em disco nem em log:** o cookie do HoYoLAB é usado e descartado, nunca gravado. Cookie e token nunca aparecem em log, erro ou stack trace, nem truncados. Vale como teste.
 - **Repo público:** fixtures passam por scrubber antes de commit; pre-commit hook barra `ltoken_v2`, `ltuid_v2`, `cookie_token_v2`.
 - **API do HoYoLAB:** cookies só `ltoken_v2`+`ltuid_v2`; header `x-rpc-language: pt-pt` obrigatório; base URL configurável; parser tolera corpo não-JSON e campos novos.
-- **Token da API OneWash:** prefixo `ow_live_`, SHA-256 armazenado, escopo único `snapshots:write`, mostrado uma vez.
+- **Token da API Buer:** prefixo `buer_live_`, SHA-256 armazenado, escopo único `snapshots:write`, mostrado uma vez.
 - **Idioma:** o HoYoLAB usa código `pt-pt` para conteúdo pt-BR. `account.lang` default `'pt-pt'`, com `CHECK (lang <> 'pt-br')`.
 - **Substat CRIT DMG 5★ tem 4 tiers: 5.44 / 6.22 / 6.99 / 7.77** (não 3).
 - **TDD:** cada tarefa começa por um teste que falha. Commits frequentes. CI nunca toca a API real do HoYoLAB (replay/fixtures).
@@ -30,7 +30,7 @@ Requisitos do projeto inteiro — cada tarefa os herda implicitamente:
 ## Estrutura de arquivos (mapa de decomposição)
 
 ```
-onewash/
+buer/
   package.json              workspace root (scripts turbo, pnpm)
   pnpm-workspace.yaml
   turbo.json
@@ -154,7 +154,7 @@ packages:
 `package.json` (root):
 ```json
 {
-  "name": "onewash",
+  "name": "buer",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@9",
@@ -217,7 +217,7 @@ export default ['packages/*', 'apps/*'];
 `packages/core/package.json`:
 ```json
 {
-  "name": "@onewash/core",
+  "name": "@buer/core",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -308,7 +308,7 @@ describe('charKey', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/core test keys`
+Run: `pnpm --filter @buer/core test keys`
 Expected: FAIL — `keys.js` não existe.
 
 - [ ] **Step 3: Implementar**
@@ -338,7 +338,7 @@ export function parseCharKey(k: CharacterKey): { avatarId: number; element?: Ele
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/core test keys`
+Run: `pnpm --filter @buer/core test keys`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -382,7 +382,7 @@ describe('reconstructTiers', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/core test substat`
+Run: `pnpm --filter @buer/core test substat`
 Expected: FAIL — `substat.js` não existe.
 
 - [ ] **Step 3: Implementar (tabelas + busca de combinação)**
@@ -437,7 +437,7 @@ export function reconstructTiers(
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/core test substat`
+Run: `pnpm --filter @buer/core test substat`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -493,7 +493,7 @@ describe('canon', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/core test canon`
+Run: `pnpm --filter @buer/core test canon`
 Expected: FAIL — `canon.js` não existe.
 
 - [ ] **Step 3: Implementar (ordenação recursiva estável)**
@@ -547,7 +547,7 @@ export function accountHash(pairs: { charKey: string; contentHash: string }[]): 
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/core test canon`
+Run: `pnpm --filter @buer/core test canon`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -599,7 +599,7 @@ describe('IngestEnvelope', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/core test protocol`
+Run: `pnpm --filter @buer/core test protocol`
 Expected: FAIL — `protocol.js` não existe.
 
 - [ ] **Step 3: Implementar**
@@ -628,7 +628,7 @@ Adicionar `zod: ^4` às deps de `packages/core`.
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/core test protocol`
+Run: `pnpm --filter @buer/core test protocol`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -677,7 +677,7 @@ describe('scrubRaw', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/core test scrub`
+Run: `pnpm --filter @buer/core test scrub`
 Expected: FAIL — `scrub.js` não existe.
 
 - [ ] **Step 3: Implementar**
@@ -704,7 +704,7 @@ export function scrubRaw(v: unknown): unknown {
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/core test scrub`
+Run: `pnpm --filter @buer/core test scrub`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -766,7 +766,7 @@ describe('normalize', () => {
 - [ ] **Step 2: Gerar a fixture (a partir do payload do spike 1) e rodar o teste**
 
 Após o spike 1 produzir um `detail` real, salvá-lo como `test/fixtures/detail.sample.json` **passado por `scrubRaw`**. Rodar:
-Run: `pnpm --filter @onewash/core test normalize`
+Run: `pnpm --filter @buer/core test normalize`
 Expected: FAIL — `normalize.js` não existe.
 
 - [ ] **Step 3: Implementar o normalizador**
@@ -835,7 +835,7 @@ Criar `src/index.ts` re-exportando keys, canon, substat, protocol, normalize, sc
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/core test`
+Run: `pnpm --filter @buer/core test`
 Expected: PASS (todos os testes de core)
 
 - [ ] **Step 5: Commit**
@@ -856,7 +856,7 @@ git commit -m "feat(core): normalizador raw HoYoLAB → docs canônicos"
 - Test: `packages/engine/test/interfaces.test.ts` (só typecheck — sem runtime)
 
 **Interfaces:**
-- Consumes: tipos de `@onewash/core` (Element, keys, StatKey, ArtifactPiece etc.)
+- Consumes: tipos de `@buer/core` (Element, keys, StatKey, ArtifactPiece etc.)
 - Produces: todos os contratos da spec §6 — `BuildEvaluator`, `PreparedEvaluator`, `EvaluatorCapabilities`, `EvaluationContext`, `Score`, `Provenance`, `BuildSearcher`, `TeamSearcher`, `TeamEvaluator`, `RosterAdvisor`, `GameDataProvider`, `EvaluatorRegistry`, `GoodCodec`, e os tipos de apoio (Objective, Constraint, TeamComposition, EnemyProfile, RotationRef, HitMode, AbilityRef, ReactionPremise, etc.).
 
 - [ ] **Step 1: Teste que falha (compilação de um consumidor fictício das interfaces)**
@@ -876,16 +876,16 @@ describe('interfaces', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/engine test`
+Run: `pnpm --filter @buer/engine test`
 Expected: FAIL — `interfaces.js` não existe.
 
 - [ ] **Step 3: Copiar as interfaces da spec §6.1–§6.7**
 
-Transcrever verbatim os blocos TypeScript da spec §6 para `src/interfaces.ts`, importando de `@onewash/core` os tipos que já existem (`Element`, `CharacterKey`, `WeaponKey`, `ArtifactSetKey`, `ArtifactSlot`, `StatKey`, `ArtifactPiece`, `WeaponInstance`, `CharacterInstance`, `Roster`, `Substat`). Definir localmente os que são só do motor. `package.json` depende de `@onewash/core: workspace:*`.
+Transcrever verbatim os blocos TypeScript da spec §6 para `src/interfaces.ts`, importando de `@buer/core` os tipos que já existem (`Element`, `CharacterKey`, `WeaponKey`, `ArtifactSetKey`, `ArtifactSlot`, `StatKey`, `ArtifactPiece`, `WeaponInstance`, `CharacterInstance`, `Roster`, `Substat`). Definir localmente os que são só do motor. `package.json` depende de `@buer/core: workspace:*`.
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/engine test && pnpm --filter @onewash/engine typecheck`
+Run: `pnpm --filter @buer/engine test && pnpm --filter @buer/engine typecheck`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -934,7 +934,7 @@ describe('contrato BuildEvaluator (NullEvaluator)', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/engine test contract`
+Run: `pnpm --filter @buer/engine test contract`
 Expected: FAIL — `null-evaluator.js` não existe.
 
 - [ ] **Step 3: Implementar a NullEvaluator**
@@ -972,7 +972,7 @@ export class NullEvaluator implements BuildEvaluator {
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/engine test`
+Run: `pnpm --filter @buer/engine test`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1019,7 +1019,7 @@ describe('migration', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/db test`
+Run: `pnpm --filter @buer/db test`
 Expected: FAIL — schema/migration inexistente.
 
 - [ ] **Step 3: Escrever o schema Drizzle e gerar a migration**
@@ -1037,7 +1037,7 @@ Traduzir a DDL da spec §5 para Drizzle (`pgSchema('catalog')`, `pgSchema('app')
 - [ ] **Step 4: Rodar e ver passar (contra PGlite em memória)**
 
 Adicionar `@electric-sql/pglite` como devDep. `loadMigrationSql()` concatena os arquivos de `drizzle/*.sql`.
-Run: `pnpm --filter @onewash/db test`
+Run: `pnpm --filter @buer/db test`
 Expected: PASS — a migration executa, ambas as tabelas raw existem.
 
 - [ ] **Step 5: Commit**
@@ -1054,7 +1054,7 @@ git commit -m "feat(db): schema Drizzle + migration inicial (raw particionado re
 - Test: `packages/db/test/ingest.test.ts`
 
 **Interfaces:**
-- Consumes: `db` client (3.1), `NormalizedSnapshot`/`PromotedCols` de `@onewash/core` (1.6).
+- Consumes: `db` client (3.1), `NormalizedSnapshot`/`PromotedCols` de `@buer/core` (1.6).
 - Produces:
   - `writeSnapshot(db, args): Promise<{ snapshotId: bigint; changedChars: number; deduped: boolean }>` onde `args = { accountId, takenAt, parserVersion, docSchema, lang, rawSha256, normalized: NormalizedSnapshot, idempotencyKey }`.
   - Comportamento: adquire `pg_advisory_xact_lock` por conta; `INSERT ... ON CONFLICT (account_id,doc_schema,content_hash) DO NOTHING` nos estados; fecha e abre intervalos de timeline conforme mudança; emite `change_event`; **mesmo payload 2× não cria estado novo** (dedupe por hash).
@@ -1095,16 +1095,16 @@ describe('writeSnapshot', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/db test ingest`
+Run: `pnpm --filter @buer/db test ingest`
 Expected: FAIL — `ingest.js` não existe.
 
 - [ ] **Step 3: Implementar a gravação transacional**
 
-Numa transação: `SELECT pg_advisory_xact_lock(hashtextextended('onewash.account', accountId))`; inserir `snapshot`; para cada personagem, `INSERT INTO character_state ... ON CONFLICT DO NOTHING RETURNING state_id`; comparar com o intervalo aberto atual da timeline (`WHERE valid_to IS NULL`) — se `content_hash` diferente, fechar o aberto (`valid_to = takenAt, closed_by='change'`), abrir novo, e emitir `change_event`; se igual, só atualizar `last_seen_at`; contar `changedChars`; setar `account_hash`, `changed_chars`, `observed_chars`.
+Numa transação: `SELECT pg_advisory_xact_lock(hashtextextended('buer.account', accountId))`; inserir `snapshot`; para cada personagem, `INSERT INTO character_state ... ON CONFLICT DO NOTHING RETURNING state_id`; comparar com o intervalo aberto atual da timeline (`WHERE valid_to IS NULL`) — se `content_hash` diferente, fechar o aberto (`valid_to = takenAt, closed_by='change'`), abrir novo, e emitir `change_event`; se igual, só atualizar `last_seen_at`; contar `changedChars`; setar `account_hash`, `changed_chars`, `observed_chars`.
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/db test`
+Run: `pnpm --filter @buer/db test`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1148,7 +1148,7 @@ describe('ds1', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/hoyolab test ds`
+Run: `pnpm --filter @buer/hoyolab test ds`
 Expected: FAIL — `ds.js` não existe.
 
 - [ ] **Step 3: Implementar**
@@ -1167,7 +1167,7 @@ export function ds1(now: number, rand: string): string {
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/hoyolab test ds`
+Run: `pnpm --filter @buer/hoyolab test ds`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1232,7 +1232,7 @@ describe('HoyolabClient', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/hoyolab test client`
+Run: `pnpm --filter @buer/hoyolab test client`
 Expected: FAIL — `client.js` não existe.
 
 - [ ] **Step 3: Implementar o cliente**
@@ -1241,7 +1241,7 @@ Expected: FAIL — `client.js` não existe.
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/hoyolab test`
+Run: `pnpm --filter @buer/hoyolab test`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1292,7 +1292,7 @@ describe('FirefoxProvider', () => {
 - [ ] **Step 2: Gerar a fixture e rodar**
 
 Script único para criar `test/fixtures/cookies.sqlite` com o schema `moz_cookies` e uma linha de cada cookie (valores falsos). Rodar:
-Run: `pnpm --filter @onewash/cookies test firefox`
+Run: `pnpm --filter @buer/cookies test firefox`
 Expected: FAIL — `firefox.js` não existe.
 
 - [ ] **Step 3: Implementar**
@@ -1330,7 +1330,7 @@ export class FirefoxProvider implements SessionProvider {
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/cookies test firefox`
+Run: `pnpm --filter @buer/cookies test firefox`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1381,7 +1381,7 @@ describe('cadeia', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/cookies test chain`
+Run: `pnpm --filter @buer/cookies test chain`
 Expected: FAIL
 
 - [ ] **Step 3: Implementar paste + chain**
@@ -1420,7 +1420,7 @@ export async function getSession(opts: { providers: SessionProvider[] }): Promis
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/cookies test`
+Run: `pnpm --filter @buer/cookies test`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -1462,7 +1462,7 @@ describe('sessionFromStorageState', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/cookies test embedded`
+Run: `pnpm --filter @buer/cookies test embedded`
 Expected: FAIL
 
 - [ ] **Step 3: Implementar (Playwright como dependência opcional)**
@@ -1471,7 +1471,7 @@ Extrair `sessionFromStorageState` puro; `tryGet()` importa `playwright` dinamica
 
 - [ ] **Step 4: Rodar e ver passar (unitário) + verificação manual (spike 2)**
 
-Run: `pnpm --filter @onewash/cookies test embedded`
+Run: `pnpm --filter @buer/cookies test embedded`
 Expected: PASS (unitário). E2E real: checklist manual do spike 2.
 
 - [ ] **Step 5: Commit**
@@ -1525,21 +1525,21 @@ describe('gi-data', () => {
 
 - [ ] **Step 2: Rodar e ver falhar**
 
-Run: `pnpm --filter @onewash/gi-data test`
+Run: `pnpm --filter @buer/gi-data test`
 Expected: FAIL — dados não gerados / loader inexistente.
 
 - [ ] **Step 3: Escrever o script de sync e gerar os dados**
 
-`scripts/sync.ts` lê as fontes vendorizadas (podem reusar os JSONs já baixados na pesquisa: `affixes.json`, `avatars.json`, `weapons.json`, `relics.json`, `relic_levels.json`, `locs.json`, `allStat_gen.json`), extrai os mapas e o catálogo, valida presença dos campos esperados (senão `throw`), e grava em `data/*.json`. `src/index.ts` são loaders tipados que importam esses JSONs. Rodar `pnpm --filter @onewash/gi-data sync`.
+`scripts/sync.ts` lê as fontes vendorizadas (podem reusar os JSONs já baixados na pesquisa: `affixes.json`, `avatars.json`, `weapons.json`, `relics.json`, `relic_levels.json`, `locs.json`, `allStat_gen.json`), extrai os mapas e o catálogo, valida presença dos campos esperados (senão `throw`), e grava em `data/*.json`. `src/index.ts` são loaders tipados que importam esses JSONs. Rodar `pnpm --filter @buer/gi-data sync`.
 
 - [ ] **Step 4: Rodar e ver passar**
 
-Run: `pnpm --filter @onewash/gi-data test`
+Run: `pnpm --filter @buer/gi-data test`
 Expected: PASS
 
 - [ ] **Step 5: Completar o `PROP` do normalizador**
 
-Substituir o `PROP` embarcado em `packages/core/src/normalize.ts` por importação de `@onewash/gi-data` (`loadProperty`). Rodar `pnpm --filter @onewash/core test` — deve continuar PASS. Commitar tudo.
+Substituir o `PROP` embarcado em `packages/core/src/normalize.ts` por importação de `@buer/gi-data` (`loadProperty`). Rodar `pnpm --filter @buer/core test` — deve continuar PASS. Commitar tudo.
 
 ```bash
 git add packages/gi-data packages/core/src/normalize.ts
@@ -1610,14 +1610,14 @@ import { readConfig, writeConfig, redactConfig } from '../src/config.js';
 describe('config', () => {
   it('grava com permissão 0600 e lê de volta', () => {
     const dir = mkdtempSync(join(tmpdir(), 'ow-'));
-    writeConfig({ apiToken: 'ow_live_secret', apiBaseUrl: 'http://x' }, dir);
-    expect(readConfig(dir).apiToken).toBe('ow_live_secret');
+    writeConfig({ apiToken: 'buer_live_secret', apiBaseUrl: 'http://x' }, dir);
+    expect(readConfig(dir).apiToken).toBe('buer_live_secret');
     if (process.platform !== 'win32') {
       expect(statSync(join(dir, 'config.json')).mode & 0o777).toBe(0o600);
     }
   });
   it('redactConfig nunca revela o token', () => {
-    const r = redactConfig({ apiToken: 'ow_live_secret', apiBaseUrl: 'http://x' });
+    const r = redactConfig({ apiToken: 'buer_live_secret', apiBaseUrl: 'http://x' });
     expect(JSON.stringify(r)).not.toContain('secret');
     expect(r.paired).toBe(true);
   });
@@ -1644,7 +1644,7 @@ git commit -m "feat(cli): config local (0600) e login/logout/whoami sem vazar to
 - Produces:
   - `runSync(deps, flags): Promise<SyncResult>` — deps injetáveis (`getSession`, `client factory`, `postIngest`) para teste. Monta o `IngestEnvelope` (raw cru + account), envia via `postIngest`. Flags: `--out`, `--dry-run`, `--browser`, `--login`, `--cookie`, `--json`.
   - `SyncResult = { characters:number; changed:number; sent:boolean }` — resumo comparado ao último sync (o servidor devolve `changedChars`).
-  - `runDoctor(deps): Promise<DoctorReport>` — checa: navegador/cookie achado? cookie válido? HoYoLAB responde? API OneWash responde?
+  - `runDoctor(deps): Promise<DoctorReport>` — checa: navegador/cookie achado? cookie válido? HoYoLAB responde? API Buer responde?
   - `postIngest(env, token, baseUrl)` em `api.ts`; em falha de envio, grava o cru local e informa como reenviar.
 
 - [ ] **Step 1: Teste que falha (fluxo completo com deps mockadas; --dry-run não envia)**
@@ -1659,7 +1659,7 @@ const deps = {
     list: { list: [] }, detail: { list: [] },
     account: { gameUid: '8', region: 'os_asia', nickname: 'T' } }) }),
   postIngest: vi.fn(async () => ({ changedChars: 3 })),
-  readConfig: () => ({ apiToken: 'ow_live_x', apiBaseUrl: 'http://x' }),
+  readConfig: () => ({ apiToken: 'buer_live_x', apiBaseUrl: 'http://x' }),
 };
 
 describe('runSync', () => {
@@ -1696,7 +1696,7 @@ git commit -m "feat(cli): sync (orquestra extração→envio) e doctor"
 **Interfaces:**
 - Consumes: nada
 - Produces:
-  - `redact(text: string): string` — mascara qualquer `ltoken_v2=...`, `ltuid_v2=...`, `ow_live_...` e cookies em URLs/headers.
+  - `redact(text: string): string` — mascara qualquer `ltoken_v2=...`, `ltuid_v2=...`, `buer_live_...` e cookies em URLs/headers.
   - Handler global que passa toda mensagem de erro por `redact` antes de imprimir.
 
 - [ ] **Step 1: Teste que falha**
@@ -1707,7 +1707,7 @@ import { redact } from '../src/redact.js';
 describe('redact', () => {
   it('mascara cookie e token em qualquer contexto', () => {
     expect(redact('Cookie: ltoken_v2=abc123; ltuid_v2=7')).not.toContain('abc123');
-    expect(redact('token ow_live_deadbeef falhou')).not.toContain('deadbeef');
+    expect(redact('token buer_live_deadbeef falhou')).not.toContain('deadbeef');
   });
   it('preserva o resto da mensagem', () => {
     expect(redact('erro 500 no /api/ingest')).toContain('/api/ingest');
@@ -1737,7 +1737,7 @@ git commit -m "feat(cli): redação obrigatória de segredos em toda saída"
 **Interfaces:**
 - Consumes: `db` client (3.1)
 - Produces:
-  - `auth` (instância Better Auth) com providers Google/Discord, plugin `apiKey` (prefixo `ow_live_`, escopo `snapshots:write`, hash SHA-256), `nextCookies()`.
+  - `auth` (instância Better Auth) com providers Google/Discord, plugin `apiKey` (prefixo `buer_live_`, escopo `snapshots:write`, hash SHA-256), `nextCookies()`.
   - `verifyApiKey(req): Promise<{ userId: string } | null>` — resolve o token do header e devolve o dono (`referenceId`), nunca do body.
   - Route handler em `app/api/auth/[...all]/route.ts` via `toNextJsHandler`.
 
@@ -1753,7 +1753,7 @@ describe('verifyApiKey', () => {
     expect(await verifyApiKey(req)).toBeNull();
   });
   it('rejeita token inválido', async () => {
-    const req = new Request('http://x/api/ingest', { headers: { 'x-api-key': 'ow_live_nope' } });
+    const req = new Request('http://x/api/ingest', { headers: { 'x-api-key': 'buer_live_nope' } });
     expect(await verifyApiKey(req)).toBeNull();
   });
 });
@@ -1795,7 +1795,7 @@ describe('POST /api/ingest', () => {
   });
   it('400 em envelope malformado com erro útil', async () => {
     vi.mock('../lib/auth.js', () => ({ verifyApiKey: async () => ({ userId: 'u1' }) }));
-    const res = await POST(mk({ protocolVersion: 999 }, { 'x-api-key': 'ow_live_ok' }));
+    const res = await POST(mk({ protocolVersion: 999 }, { 'x-api-key': 'buer_live_ok' }));
     expect(res.status).toBe(400);
     expect(await res.json()).toHaveProperty('error');
   });
@@ -1822,7 +1822,7 @@ git commit -m "feat(web): rota /api/ingest (token→cru→normalize→snapshot) 
 - Test: `apps/web/test/render.test.ts`
 
 **Interfaces:**
-- Consumes: `db` + view `app.account_at` (3.1), `CharacterDoc` (core), catálogo/i18n (`@onewash/gi-data`), manifesto de assets (6.2).
+- Consumes: `db` + view `app.account_at` (3.1), `CharacterDoc` (core), catálogo/i18n (`@buer/gi-data`), manifesto de assets (6.2).
 - Produces:
   - `getAccountView(accountId)` / `getCharacter(accountId, charKey)` / `diffSnapshots(a,b)` — funções de leitura (Server Components).
   - Páginas: onboarding (mostra comando + token, sem dado antes de sync), grid (cards com filtro/ordenação, cabeçalho da conta), detalhe (identidade, constelações, talentos, atributos completos, arma, 5 artefatos com main+substats, bônus de conjunto, **painel de análise reservado em estado vazio**), histórico (seletor + diff).

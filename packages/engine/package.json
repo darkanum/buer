@@ -1,5 +1,5 @@
 {
-  "name": "@onewash/engine",
+  "name": "@buer/engine",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -17,6 +17,6 @@
     "vitest": "^2"
   },
   "dependencies": {
-    "@onewash/core": "workspace:*"
+    "@buer/core": "workspace:*"
   }
 }

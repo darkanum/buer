@@ -3,7 +3,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 /**
- * Local CLI config. `apiToken` is the OneWash API token (never the HoYoLAB
+ * Local CLI config. `apiToken` is the Buer API token (never the HoYoLAB
  * cookie — that one is obtained in-memory per `sync` run and never
  * persisted). Optional because a freshly-installed CLI (or one that just
  * ran `logout`) has no token yet.
@@ -19,7 +19,7 @@ export interface RedactedConfig {
   apiBaseUrl: string;
 }
 
-/** Default OneWash API base URL, used until `login` (or `--api-base-url`) overrides it. */
+/** Default Buer API base URL, used until `login` (or `--api-base-url`) overrides it. */
 export const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
 const CONFIG_DIR_NAME = '.genshin';
@@ -56,7 +56,7 @@ export function readConfig(dir?: string): Config {
 
 /**
  * Writes the local config with permission `0600` (owner read/write only —
- * this file may contain the OneWash API token). `writeFileSync`'s `mode`
+ * this file may contain the Buer API token). `writeFileSync`'s `mode`
  * only applies when the file is *created*; `chmodSync` afterwards makes
  * sure a pre-existing file (e.g. left over with looser permissions) ends
  * up `0600` too. Both are no-ops on win32 (no POSIX permission bits), but
@@ -74,7 +74,7 @@ export function writeConfig(cfg: Config, dir?: string): void {
   }
 }
 
-/** Removes the persisted OneWash API token; keeps `apiBaseUrl`. */
+/** Removes the persisted Buer API token; keeps `apiBaseUrl`. */
 export function clearApiToken(dir?: string): Config {
   const cfg: Config = { apiBaseUrl: readConfig(dir).apiBaseUrl };
   writeConfig(cfg, dir);

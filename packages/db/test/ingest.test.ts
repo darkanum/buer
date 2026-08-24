@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { accountHash, contentHash, type CharacterDoc, type NormalizedSnapshot } from '@onewash/core';
+import { accountHash, contentHash, type CharacterDoc, type NormalizedSnapshot } from '@buer/core';
 import { describe, expect, it } from 'vitest';
 import type { Database } from '../src/client.js';
 import { writeSnapshot, type IngestDb } from '../src/ingest.js';
@@ -20,7 +20,7 @@ function _typeCheckOnly_productionDatabaseSatisfiesIngestDb(db: Database): void 
 void _typeCheckOnly_productionDatabaseSatisfiesIngestDb;
 
 /**
- * Minimal valid CharacterDoc (matches the shape @onewash/core's canon.ts
+ * Minimal valid CharacterDoc (matches the shape @buer/core's canon.ts
  * expects — v1, sans stats derivados). `overrides` lets tests drive a
  * "change" by editing a real doc field (e.g. `lvl`), never by hand-editing a
  * hash string: since `content_hash` is `sha256(doc_canon)` computed BY
@@ -43,7 +43,7 @@ function makeDoc(overrides: Partial<CharacterDoc> = {}): CharacterDoc {
 }
 
 /**
- * Builds a NormalizedSnapshot the same way @onewash/core's normalize() would
+ * Builds a NormalizedSnapshot the same way @buer/core's normalize() would
  * for MULTIPLE characters: contentHash per character + accountHash over the
  * whole set, both computed from the real docs, never asserted by hand. This
  * is what a realistic production snapshot looks like — one writeSnapshot()

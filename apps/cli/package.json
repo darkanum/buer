@@ -1,10 +1,10 @@
 {
-  "name": "@onewash/cli",
+  "name": "@buer/cli",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.ts",
   "bin": {
-    "onewash": "./dist/index.js"
+    "buer": "./dist/index.js"
   },
   "exports": {
     ".": "./src/index.ts"
@@ -15,9 +15,9 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@onewash/cookies": "workspace:*",
-    "@onewash/core": "workspace:*",
-    "@onewash/hoyolab": "workspace:*"
+    "@buer/cookies": "workspace:*",
+    "@buer/core": "workspace:*",
+    "@buer/hoyolab": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",

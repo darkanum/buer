@@ -32,7 +32,7 @@ fetched at build/sync time.
 
 ## Regenerating `data/*.json`
 
-Run `pnpm --filter @onewash/gi-data sync` — see `scripts/sync.ts`. It reads only the
+Run `pnpm --filter @buer/gi-data sync` — see `scripts/sync.ts`. It reads only the
 files listed above (plus the hand-authored `data/property.json` and
 `data/weapon-type.json`) and fails loudly (throws) if an expected field is missing, to
 guard against source drift.

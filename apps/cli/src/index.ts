@@ -4,7 +4,7 @@ import { runLogout } from './commands/logout.js';
 import { runWhoami } from './commands/whoami.js';
 // `sync`/`doctor` are loaded lazily (dynamic `import()`, below) rather than
 // with a static import: they're the only two commands that reach into
-// `@onewash/cookies`/`@onewash/hoyolab`, and keeping that out of this
+// `@buer/cookies`/`@buer/hoyolab`, and keeping that out of this
 // module's top-level import graph means `login`/`logout`/`whoami` keep
 // working standalone even in an environment where those packages can't be
 // loaded (e.g. no compiled output for a `noEmit` workspace dependency).
@@ -60,7 +60,7 @@ function flagBoolean(flags: Record<string, string | boolean>, name: string): boo
   return Boolean(flags[name]);
 }
 
-const USAGE = 'uso: onewash <login|logout|whoami|sync|doctor> [opções]';
+const USAGE = 'uso: buer <login|logout|whoami|sync|doctor> [opções]';
 
 export async function main(argv: string[]): Promise<void> {
   const { command, positional, flags } = parseArgs(argv);
@@ -68,7 +68,7 @@ export async function main(argv: string[]): Promise<void> {
   switch (command) {
     case 'login': {
       const token = positional[0];
-      if (!token) throw new Error('uso: onewash login <token>');
+      if (!token) throw new Error('uso: buer login <token>');
       const cfg = runLogin(token, { apiBaseUrl: flagString(flags, 'api-base-url') });
       console.log(`Token salvo. API base URL: ${cfg.apiBaseUrl}`);
       return;
@@ -116,7 +116,7 @@ export async function main(argv: string[]): Promise<void> {
 /**
  * Global error handler: every uncaught rejection from `main` reaches
  * stderr only after going through {@link redact} — this is the single
- * choke point that guarantees a HoYoLAB cookie or OneWash API token
+ * choke point that guarantees a HoYoLAB cookie or Buer API token
  * embedded in an error message (a raw fetch failure, a thrown
  * `NoSessionError`, anything) never gets printed verbatim, no matter
  * which command or dependency produced it.

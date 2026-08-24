@@ -1,5 +1,5 @@
 {
-  "name": "@onewash/hoyolab",
+  "name": "@buer/hoyolab",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.ts",

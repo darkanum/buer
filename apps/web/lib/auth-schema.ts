@@ -10,14 +10,14 @@
  *     list, incl. `configId` defaulting to `"default"` and `key`/`permissions`
  *     /`metadata` being stored as strings)
  *
- * These tables are intentionally separate from `@onewash/db`'s `app`/`catalog`
+ * These tables are intentionally separate from `@buer/db`'s `app`/`catalog`
  * Postgres schemas (see packages/db/src/schema) — they live in the default
  * `public` schema of the same database, own migration lineage
  * (apps/web/drizzle/*.sql, generated from this file via `drizzle-kit
  * generate`; see apps/web/drizzle.config.ts), and are never referenced by
- * `@onewash/db`'s Drizzle schema. `lib/auth.ts` wires Better Auth's Drizzle
+ * `@buer/db`'s Drizzle schema. `lib/auth.ts` wires Better Auth's Drizzle
  * adapter directly to this schema, on the same Postgres connection as
- * `@onewash/db`'s pooled client (see lib/db.ts).
+ * `@buer/db`'s pooled client (see lib/db.ts).
  *
  * The npm package that carries the `apiKey` plugin as of better-auth 1.7 is
  * `@better-auth/api-key` (NOT bundled into the `better-auth` core package's

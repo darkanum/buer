@@ -1,5 +1,5 @@
 /**
- * Shared domain vocabulary for @onewash/core.
+ * Shared domain vocabulary for @buer/core.
  *
  * Reserved for domain types that don't belong to a single module (e.g.
  * gi-data-derived lookups landing in Marco 6). As of Task 1.6,

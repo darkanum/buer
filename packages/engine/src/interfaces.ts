@@ -8,9 +8,9 @@
 // Objetivo e Restrições são dados serializáveis, nunca nós de um motor.
 //
 // `Element`, `CharacterKey`, `WeaponKey`, `ArtifactSetKey` e `StatKey` já existem em
-// @onewash/core (Marco 1) — importados daqui, não redefinidos, para evitar duplicidade
+// @buer/core (Marco 1) — importados daqui, não redefinidos, para evitar duplicidade
 // entre o branded-type de core e uma cópia local.
-import type { ArtifactSetKey, CharacterKey, Element, StatKey, WeaponKey } from '@onewash/core';
+import type { ArtifactSetKey, CharacterKey, Element, StatKey, WeaponKey } from '@buer/core';
 
 // ---------------------------------------------------------------------------
 // §6.1 Núcleo
@@ -551,7 +551,7 @@ export interface RosterMerger {
   merge(sources: readonly Roster[]): Roster;
 }
 export interface GoodCodec {
-  toGOOD(r: Roster): unknown; // {format:'GOOD', source:'onewash', version:3}
+  toGOOD(r: Roster): unknown; // {format:'GOOD', source:'buer', version:3}
   fromGOOD(x: unknown): Roster; // rejeitar rarity 1|2 na borda
 }
 

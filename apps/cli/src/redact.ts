@@ -11,12 +11,12 @@ const RULES: ReadonlyArray<{ re: RegExp; replacement: string }> = [
   { re: /ltoken_v2=[^;\s"'&]+/gi, replacement: 'ltoken_v2=[REDACTED]' },
   { re: /ltuid_v2=[^;\s"'&]+/gi, replacement: 'ltuid_v2=[REDACTED]' },
   { re: /cookie_token_v2=[^;\s"'&]+/gi, replacement: 'cookie_token_v2=[REDACTED]' },
-  { re: /ow_live_[A-Za-z0-9_-]+/gi, replacement: 'ow_live_[REDACTED]' },
+  { re: /buer_live_[A-Za-z0-9_-]+/gi, replacement: 'buer_live_[REDACTED]' },
 ];
 
 /**
  * Masks any HoYoLAB cookie (`ltoken_v2=`, `ltuid_v2=`, `cookie_token_v2=`)
- * or OneWash API token (`ow_live_...`) found anywhere in `text` — cookie
+ * or Buer API token (`buer_live_...`) found anywhere in `text` — cookie
  * header dumps, URLs with the cookie in a query string, plain error
  * messages, whatever. Everything else in the string is left untouched.
  *

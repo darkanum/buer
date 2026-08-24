@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { IngestEnvelope } from '@onewash/core';
+import type { IngestEnvelope } from '@buer/core';
 
 /** What the server hands back after a successful ingest. */
 export interface PostIngestResult {
@@ -79,7 +79,7 @@ export async function postIngest(
  * so the caller can tell the user how to find it.
  */
 export function saveFailedPayload(env: IngestEnvelope): string {
-  const path = join(tmpdir(), `onewash-failed-sync-${Date.now()}.json`);
+  const path = join(tmpdir(), `buer-failed-sync-${Date.now()}.json`);
   writeFileSync(path, JSON.stringify(env, null, 2), 'utf8');
   return path;
 }

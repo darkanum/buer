@@ -1,8 +1,8 @@
-import { db as makeDb, type Database } from '@onewash/db';
+import { db as makeDb, type Database } from '@buer/db';
 
 /**
  * Pooled Postgres connection for the web app (Next.js request-serving code),
- * built from @onewash/db's `db(url)` client factory — the same one
+ * built from @buer/db's `db(url)` client factory — the same one
  * `apps/cli`'s server-side ingest route and future request handlers use.
  * Points at the pooled endpoint (e.g. Neon's pgbouncer proxy) via
  * `DATABASE_URL`.

@@ -26,7 +26,7 @@ export default async function OnboardingPage() {
     <main style={{ maxWidth: 640, margin: '0 auto', padding: '2rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
       <h1>Conectar sua conta de Genshin Impact</h1>
       <p>
-        O OneWash lê o Battle Chronicle do HoYoLAB através de uma ferramenta de linha de
+        O Buer lê o Battle Chronicle do HoYoLAB através de uma ferramenta de linha de
         comando (CLI) que roda na SUA máquina, usando a sessão já aberta no SEU navegador. O
         código dela é aberto e auditável — nenhuma parte deste fluxo tenta ler ou decifrar o
         cookie store do Chrome/Edge.
@@ -34,14 +34,14 @@ export default async function OnboardingPage() {
 
       <h2>1. Instale a CLI</h2>
       <pre style={{ background: '#111', color: '#eee', padding: '0.75rem 1rem', borderRadius: 6, overflowX: 'auto' }}>
-        <code>npm install -g @onewash/cli</code>
+        <code>npm install -g @buer/cli</code>
       </pre>
 
       <h2>2. Gere um token de acesso</h2>
       <p>
         Esse token autentica a CLI como você, só para enviar snapshots (permissão{' '}
         <code>snapshots:write</code>) — ele NÃO dá acesso à sua conta HoYoLAB nem à sua conta
-        OneWash de outra forma.
+        Buer de outra forma.
       </p>
 
       {revealedToken ? (

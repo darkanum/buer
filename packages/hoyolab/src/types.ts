@@ -1,6 +1,6 @@
 // Tipos crus, propositalmente frouxos: hoyolab/ é um cliente de API de terceiro,
 // não o normalizador. `list`/`detail`/`base` ficam como `unknown` — quem sabe a
-// forma exata é @onewash/core#normalize (Marco 1), que já tolera campos novos.
+// forma exata é @buer/core#normalize (Marco 1), que já tolera campos novos.
 
 /** Apenas ltoken_v2 + ltuid_v2 — nunca cookie_token_v2 (ver §3.3 da spec). */
 export interface HoyolabCookies {

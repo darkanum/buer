@@ -20,7 +20,7 @@ describe('verifyApiKey', () => {
 
   it('rejeita token inválido', async () => {
     const { auth: testAuth } = await makeTestAuth();
-    const req = new Request('http://x/api/ingest', { headers: { 'x-api-key': 'ow_live_nope' } });
+    const req = new Request('http://x/api/ingest', { headers: { 'x-api-key': 'buer_live_nope' } });
     expect(await verifyApiKey(req, testAuth)).toBeNull();
   });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { IngestEnvelope } from '@onewash/core';
+import type { IngestEnvelope } from '@buer/core';
 import { postIngest } from '../src/api.js';
 
 const env = {
@@ -20,13 +20,13 @@ describe('postIngest', () => {
       return new Response(JSON.stringify({ changedChars: 5 }), { status: 200 });
     }) as unknown as typeof fetch;
 
-    const r = await postIngest(env, 'ow_live_test', 'http://x', { fetch: fakeFetch });
+    const r = await postIngest(env, 'buer_live_test', 'http://x', { fetch: fakeFetch });
 
     expect(r.changedChars).toBe(5);
     expect(seenUrl).toBe('http://x/api/ingest');
     const headers = seenInit?.headers as Record<string, string>;
-    expect(headers['x-api-key']).toBe('ow_live_test');
-    expect(headers.authorization).toBe('Bearer ow_live_test');
+    expect(headers['x-api-key']).toBe('buer_live_test');
+    expect(headers.authorization).toBe('Bearer buer_live_test');
     expect(seenInit?.body).toBe(JSON.stringify(env));
   });
 
@@ -43,13 +43,13 @@ describe('postIngest', () => {
 
   it('lança ApiError descritivo em falha HTTP, sem vazar o token', async () => {
     const fakeFetch = (async () => new Response('boom', { status: 500 })) as unknown as typeof fetch;
-    await expect(postIngest(env, 'ow_live_test', 'http://x', { fetch: fakeFetch })).rejects.toThrow(/HTTP 500/);
+    await expect(postIngest(env, 'buer_live_test', 'http://x', { fetch: fakeFetch })).rejects.toThrow(/HTTP 500/);
   });
 
   it('lança ApiError em falha de transporte (rede)', async () => {
     const fakeFetch = (async () => {
       throw new Error('ECONNREFUSED');
     }) as unknown as typeof fetch;
-    await expect(postIngest(env, 'ow_live_test', 'http://x', { fetch: fakeFetch })).rejects.toThrow(/ECONNREFUSED/);
+    await expect(postIngest(env, 'buer_live_test', 'http://x', { fetch: fakeFetch })).rejects.toThrow(/ECONNREFUSED/);
   });
 });

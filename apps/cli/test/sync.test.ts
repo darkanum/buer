@@ -7,7 +7,7 @@ const deps = {
     list: { list: [] }, detail: { list: [] },
     account: { gameUid: '8', region: 'os_asia', nickname: 'T' } }) }),
   postIngest: vi.fn(async () => ({ changedChars: 3 })),
-  readConfig: () => ({ apiToken: 'ow_live_x', apiBaseUrl: 'http://x' }),
+  readConfig: () => ({ apiToken: 'buer_live_x', apiBaseUrl: 'http://x' }),
 };
 
 describe('runSync', () => {

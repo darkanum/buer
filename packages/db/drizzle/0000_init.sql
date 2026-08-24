@@ -1,4 +1,4 @@
--- OneWash — initial schema (catalog + app), hand-authored.
+-- Buer — initial schema (catalog + app), hand-authored.
 --
 -- This file is the DDL source of truth (see Task 3.1 brief / design spec §5).
 -- It is transcribed verbatim from docs/superpowers/specs/2026-08-24-onewash-design.md
@@ -96,7 +96,7 @@ CREATE TABLE catalog.slot_main_allowed (
 );
 
 -- Nenhuma coluna de nome, descrição, efeito ou ícone em catalog.* — isso vive no
--- bundle @onewash/gi-data, indexado por slug.
+-- bundle @buer/gi-data, indexado por slug.
 
 -- ============================================================================
 -- §5.2 — Contas e credencial
@@ -144,7 +144,7 @@ CREATE TABLE app.raw_object (
   raw_sha256    bytea    PRIMARY KEY,
   byte_len      integer  NOT NULL,
   codec         text     NOT NULL CHECK (codec IN ('zstd','gzip','none')),
-  object_key    text,                          -- 'r2://onewash-raw/ab/cd/<hex>.json.zst'; NULL = purgado
+  object_key    text,                          -- 'r2://buer-raw/ab/cd/<hex>.json.zst'; NULL = purgado
   purged_at     timestamptz,
   first_seen_at timestamptz NOT NULL DEFAULT now(),
   CHECK (object_key IS NOT NULL OR purged_at IS NOT NULL)
@@ -246,7 +246,7 @@ CREATE UNIQUE INDEX character_timeline_one_open
 
 -- Sobreposição no passado é prevenida por construção: todo caminho de escrita adquire
 -- advisory lock por conta antes de tocar a timeline — isso é uma chamada em tempo de
--- execução (SELECT pg_advisory_xact_lock(hashtextextended('onewash.account', account_id))),
+-- execução (SELECT pg_advisory_xact_lock(hashtextextended('buer.account', account_id))),
 -- não DDL, e por isso não vive nesta migration.
 
 -- ============================================================================

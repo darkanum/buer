@@ -1,4 +1,4 @@
-# OneWash — Extrator HoYoLAB + Análise de Builds de Genshin Impact
+# Buer — Extrator HoYoLAB + Análise de Builds de Genshin Impact
 
 **Data:** 2026-08-24
 **Status:** Design aprovado (Fase 1) — pronto para plano de implementação
@@ -12,7 +12,7 @@ Existe uma página do HoYoLAB (Battle Chronicle) que lista todos os personagens 
 conta de Genshin Impact, com atributos, arma e artefatos equipados de cada um. A informação
 existe, mas é presa numa interface que só exibe e carrega um personagem por vez.
 
-O OneWash extrai esses dados de forma confiável e os transforma em duas coisas:
+O Buer extrai esses dados de forma confiável e os transforma em duas coisas:
 
 1. **Extrator (CLI)** — roda na máquina do jogador, obtém a sessão do HoYoLAB, chama a API
    do Battle Chronicle, e envia o resultado bruto para o site.
@@ -89,11 +89,11 @@ Fronteiras que existem por um motivo específico:
 ### 2.1 Fluxo de dados
 
 ```
-genshin login <token>      grava o token da API OneWash em ~/.genshin/config.json (perm restrita)
+genshin login <token>      grava o token da API Buer em ~/.genshin/config.json (perm restrita)
 genshin sync
   ├─ cookies/  obtém ltoken_v2 + ltuid_v2 (firefox-auto | embutido | --cookie)
   ├─ hoyolab/  getUserGameRolesByCookie → character/list → character/detail
-  └─ POST /api/ingest  (Bearer token OneWash)   ← envia o payload CRU
+  └─ POST /api/ingest  (Bearer token Buer)   ← envia o payload CRU
                  │
                  ▼
   web /api/ingest  valida token → grava raw_object + raw_observation
@@ -128,7 +128,7 @@ Três classes, cada uma com resposta distinta:
 ### 3.1 Comandos
 
 ```
-genshin login <token>     pareia esta máquina com a conta OneWash
+genshin login <token>     pareia esta máquina com a conta Buer
 genshin sync              extrai do HoYoLAB e envia
 genshin doctor            diagnóstico
 genshin whoami            mostra o pareamento e a conta detectada
@@ -153,7 +153,7 @@ investigação do zero.
 ### 3.2 Segurança em disco
 
 - **O cookie do HoYoLAB nunca é gravado.** Lido, usado na execução, descartado. O único
-  arquivo persistido é o token da API OneWash, revogável pelo site.
+  arquivo persistido é o token da API Buer, revogável pelo site.
 - **Redação obrigatória em toda saída.** Cookie e token nunca aparecem em log, stack trace ou
   mensagem de erro, nem truncados — porque a primeira coisa que um usuário faz ao dar erro é
   colar a saída inteira numa issue pública. Isso entra como teste, não como boa intenção.
@@ -339,7 +339,7 @@ CREATE TABLE catalog.slot_main_allowed (
 ```
 
 Nenhuma coluna de nome, descrição, efeito ou ícone em `catalog.*` — isso vive no bundle
-`@onewash/gi-data`, indexado por `slug`.
+`@buer/gi-data`, indexado por `slug`.
 
 ### 5.2 Contas e credencial
 
@@ -390,7 +390,7 @@ CREATE TABLE app.raw_object (
   raw_sha256    bytea    PRIMARY KEY,
   byte_len      integer  NOT NULL,
   codec         text     NOT NULL CHECK (codec IN ('zstd','gzip','none')),
-  object_key    text,                          -- 'r2://onewash-raw/ab/cd/<hex>.json.zst'; NULL = purgado
+  object_key    text,                          -- 'r2://buer-raw/ab/cd/<hex>.json.zst'; NULL = purgado
   purged_at     timestamptz,
   first_seen_at timestamptz NOT NULL DEFAULT now(),
   CHECK (object_key IS NOT NULL OR purged_at IS NOT NULL)
@@ -523,7 +523,7 @@ Sobreposição no passado é prevenida por construção: todo caminho de escrita
 lock por conta antes de tocar a timeline:
 
 ```sql
-SELECT pg_advisory_xact_lock(hashtextextended('onewash.account'::text, account_id));
+SELECT pg_advisory_xact_lock(hashtextextended('buer.account'::text, account_id));
 ```
 
 ### 5.7 Eventos — projeção descartável
@@ -1101,7 +1101,7 @@ export interface RosterSource {
 }
 export interface RosterMerger { merge(sources: readonly Roster[]): Roster; }
 export interface GoodCodec {
-  toGOOD(r: Roster): unknown;                   // {format:'GOOD', source:'onewash', version:3}
+  toGOOD(r: Roster): unknown;                   // {format:'GOOD', source:'buer', version:3}
   fromGOOD(x: unknown): Roster;                 // rejeitar rarity 1|2 na borda
 }
 ```
@@ -1118,18 +1118,18 @@ ciclo.
 |---|---|---|
 | Framework | Next.js 16 App Router | — |
 | Auth | Better Auth + plugin API Key (Google/Discord) | única com primitiva pronta para token de CLI; `next-auth` v5 nunca saiu do beta |
-| Token CLI | prefixo `ow_live_`, SHA-256 no banco, escopo único `snapshots:write`, mostrado uma vez | padrão de mercado, revogável |
+| Token CLI | prefixo `buer_live_`, SHA-256 no banco, escopo único `snapshots:write`, mostrado uma vez | padrão de mercado, revogável |
 | ORM | Drizzle 0.45 estável; pooled p/ app, string direta p/ migrations | tipos sem codegen, SQL legível; evitar v1 RC sem GA |
 | Postgres | Neon via Vercel Marketplace | sucessor do Vercel Postgres (morto); free 0,5 GB / 100 CU-h serve o começo |
 | Imagens | espelhar em Cloudflare R2, `unoptimized`, cache immutable | egress $0; hotlink do Enka quebra |
 | Validação | Zod v4 em `packages/core`, mesmo schema nos dois lados | servidor nunca confia no cliente |
-| Game data | `@onewash/gi-data` gerado por script; Enka `store/gi/*` + `allStat_gen` (GO, MIT), vendorizado por SHA | AnimeGameData cru tem chaves ofuscadas que rotacionam por patch |
+| Game data | `@buer/gi-data` gerado por script; Enka `store/gi/*` + `allStat_gen` (GO, MIT), vendorizado por SHA | AnimeGameData cru tem chaves ofuscadas que rotacionam por patch |
 | Monorepo | pnpm + Turborepo + Changesets | fronteiras por volatilidade |
 | Rate limit ingest | 2 camadas: WAF por IP + rate limit do plugin API Key por token | nenhuma sozinha resolve |
 
 Notas de armadilha verificadas:
 - **`workspace:*` só é reescrito por `pnpm publish`** — se algum CI usar `npm publish`, o
-  literal vaza e o install quebra. Publicar `@onewash/core` junto, ou bundlar o core na CLI e
+  literal vaza e o install quebra. Publicar `@buer/core` junto, ou bundlar o core na CLI e
   deixá-lo `private`.
 - **Mapa de propriedade em três dialetos** (string do jogo / int do Enka / chave GOOD) e três
   encodings só de weapon type — o trabalho de mapeamento é maior que "copiar um arquivo".
@@ -1157,7 +1157,7 @@ Deliberadamente **fora**: E2E de navegador nesta fase.
 Guardas específicas de repo público:
 - **Secret scanning próprio** (pre-commit) para `ltoken_v2`, `ltuid_v2`, `cookie_token_v2` — os
   padrões do GitHub não conhecem cookie da HoYoverse.
-- Registrar o prefixo `ow_live_` no GitHub Secret Scanning Partner Program após o launch.
+- Registrar o prefixo `buer_live_` no GitHub Secret Scanning Partner Program após o launch.
 
 ---
 
@@ -1220,4 +1220,4 @@ stack web, modelagem de snapshots). A 6ª (leitura de cookie no Windows) **falho
 `[cyber]` do modelo** ao sintetizar como contornar o ABE do Chrome — o que motivou a decisão de
 não depender dessa técnica (§1.2). Os datasets reais baixados durante a verificação (Enka,
 `allStat_gen`, AnimeGameData) confirmam tamanhos e valores citados e servirão de base para o
-script de `@onewash/gi-data`.
+script de `@buer/gi-data`.

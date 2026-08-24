@@ -1,6 +1,6 @@
 // Espelho Drizzle das tabelas `catalog.*` — spec §5.1.
 // DDL source of truth: drizzle/0000_init.sql (transcrição literal da spec).
-// Nenhuma coluna de nome/descrição/ícone aqui: isso vive em @onewash/gi-data, por slug.
+// Nenhuma coluna de nome/descrição/ícone aqui: isso vive em @buer/gi-data, por slug.
 
 import { sql } from 'drizzle-orm';
 import { boolean, check, integer, pgSchema, primaryKey, smallint, text, timestamp, unique } from 'drizzle-orm/pg-core';
