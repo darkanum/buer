@@ -52,12 +52,26 @@ export interface SyncResult {
   sent: boolean;
 }
 
+export interface BuildProvidersOptions {
+  /**
+   * Test seam: overrides how the default Firefox profile directory is
+   * resolved. Defaults to the real `defaultFirefoxProfileDir` (host
+   * filesystem lookup) — tests inject a stub here so `buildProviders` is
+   * fully hermetic (no real Firefox install required, and both "a profile
+   * was found" and "none was found" branches are directly assertable).
+   */
+  resolveFirefoxProfileDir?: () => string | null;
+}
+
 /**
  * Builds the session-provider chain from CLI flags, in the order the brief
  * specifies: `--cookie` (pasted cookie) first, then `--login` (embedded
- * browser), then always `FirefoxProvider` as the final fallback.
+ * browser), then `FirefoxProvider` last — but only when a default profile
+ * directory actually resolves (see `resolveFirefoxProfileDir`); when it
+ * doesn't, Firefox is simply omitted from the chain rather than added with
+ * a bogus path.
  */
-export function buildProviders(flags: SyncFlags): SessionProvider[] {
+export function buildProviders(flags: SyncFlags, opts: BuildProvidersOptions = {}): SessionProvider[] {
   if (flags.browser && flags.browser !== 'firefox') {
     throw new Error(`navegador não suportado: "${flags.browser}". Suportado hoje: firefox.`);
   }
@@ -66,7 +80,8 @@ export function buildProviders(flags: SyncFlags): SessionProvider[] {
   if (flags.cookie) providers.push(new PasteProvider(flags.cookie));
   if (flags.login) providers.push(new EmbeddedProvider());
 
-  const profilePath = defaultFirefoxProfileDir();
+  const resolveFirefoxProfileDir = opts.resolveFirefoxProfileDir ?? defaultFirefoxProfileDir;
+  const profilePath = resolveFirefoxProfileDir();
   if (profilePath) providers.push(new FirefoxProvider({ profilePath }));
 
   return providers;
