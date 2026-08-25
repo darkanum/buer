@@ -8,8 +8,8 @@
       "roles": ["buffer", "healer", "debuffer"],
       "scalesOn": "hp",
       "sets": [
-        { "kind": "4pc", "sets": ["tenacity-of-the-millelith"], "rank": 1, "condition": "prioridade quando o time quer o buff de ATQ e a resistência a interrupção que o conjunto dá ao acertar a habilidade" },
-        { "kind": "4pc", "sets": ["noblesse-oblige"], "rank": 2, "condition": "sem Tenacity farmado; troca o buff de ATQ por dano de burst mais alto" }
+        { "kind": "4pc", "sets": ["tenacity-of-the-millelith"], "rank": 1 },
+        { "kind": "4pc", "sets": ["noblesse-oblige"], "rank": 2, "condition": "sem Tenacity farmado; ainda dá +20% de ATQ ao time por 12s ao usar o burst (4pc) e +20% de dano de burst (2pc), mas o buff de ATQ fica só nessa janela pós-burst, não contínuo como o do Tenacity ao acertar a habilidade" }
       ],
       "mainStats": {
         "sands": ["hp_", "enerRech_"],
@@ -25,7 +25,7 @@
         { "kind": "min", "stat": "enerRech_", "value": 160, "hard": false, "why": "ela precisa reaplicar a marca de overheat da habilidade com frequência e ainda soltar o burst de cura/buff a cada janela de dano; abaixo de 160% de ER essas duas coisas começam a se atropelar entre rotações" },
         { "kind": "min", "stat": "hp_", "value": 40, "hard": false, "why": "tanto a cura quanto o buff de dano dela escalam com HP total; abaixo de ~40% de HP em substats+main-stats o buff que ela dá ao time fica pequeno demais para justificar o slot" }
       ],
-      "notes": "Confiança baixa nos números exatos do kit (custo de energia e magnitude do buff) — a curadoria aqui é mais conservadora que as outras fichas porque Chevreuse tem um kit menos familiar; ver ressalva no relatório da Task 11."
+      "notes": "Confiança baixa nos números exatos do kit (custo de energia e magnitude do buff) — a curadoria aqui é mais conservadora que as outras fichas porque Chevreuse tem um kit menos familiar; ver ressalva no relatório da Task 11. A opção de Tenacity of the Millelith não carrega justificativa (campo condition) de propósito: a revisão apontou que o texto original citava um mecanismo que o conjunto não tem (resistência a interrupção, quando o real é ATQ +20% e Força de Escudo +30% ao acertar a habilidade — e a Chevreuse não gera escudo próprio, então essa segunda parte não a beneficia); preferi remover a frase a arriscar outro palpite."
     }
   ],
   "provenance": {
