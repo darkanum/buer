@@ -37,6 +37,19 @@ export function checkSubstats(build: Build, variant: BuildVariant): Finding {
     ? 'Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★).'
     : undefined;
 
+  // Ficha sem prioridade de substats: não há regra para violar. Precisa vir
+  // ANTES do caminho `total === 0` — aquele é "a ficha pede e a build não
+  // entregou", isto é "a ficha não pede nada" — vereditos diferentes.
+  if (priority.size === 0) {
+    return {
+      check: 'substats',
+      status: 'on-target',
+      credit: 1,
+      summary: 'A ficha não fixa prioridade de substats.',
+      ...(caveat === undefined ? {} : { caveat }),
+    };
+  }
+
   if (total === 0) {
     return {
       check: 'substats',
@@ -55,10 +68,7 @@ export function checkSubstats(build: Build, variant: BuildVariant): Finding {
     check: 'substats',
     status: statusFor(credit),
     credit,
-    summary:
-      priority.size === 0
-        ? 'A ficha não fixa prioridade de substats.'
-        : `${useful} de ${total} rolls (${pct}%) nas stats prioritárias: ${variant.substats.join(', ')}.`,
+    summary: `${useful} de ${total} rolls (${pct}%) nas stats prioritárias: ${variant.substats.join(', ')}.`,
     ...(caveat === undefined ? {} : { caveat }),
   };
 }

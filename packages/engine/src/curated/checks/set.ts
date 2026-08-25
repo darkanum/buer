@@ -19,6 +19,10 @@ function creditForRank(rank: number): number {
 }
 
 export function checkSet(build: Build, variant: BuildVariant): Finding {
+  if (variant.sets.length === 0) {
+    return { check: 'set', status: 'on-target', credit: 1, summary: 'A ficha não fixa conjunto.' };
+  }
+
   const counts = equippedCounts(build);
   const equipped = [...counts.entries()]
     .filter(([, n]) => n >= 2)

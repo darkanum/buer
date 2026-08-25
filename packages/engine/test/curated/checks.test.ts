@@ -96,6 +96,13 @@ describe('checkSet', () => {
     expect(f.credit).toBe(0);
     expect(f.status).toBe('off-target');
   });
+
+  it('variante sem preferência de conjunto é on-target com crédito cheio', () => {
+    const v = { ...variant, sets: [] } as unknown as BuildVariant;
+    const f = checkSet(build(), v);
+    expect(f.status).toBe('on-target');
+    expect(f.credit).toBe(1);
+  });
 });
 
 describe('checkMainStats', () => {
@@ -150,6 +157,15 @@ describe('checkTargets', () => {
 
   it('variante sem alvo nenhum é on-target com crédito cheio', () => {
     expect(checkTargets({}, []).finding.credit).toBe(1);
+  });
+
+  it('alvo min com value <= 0 é descartado como inválido, não vira "cumprido" à toa', () => {
+    const invalid = { kind: 'min', stat: 'enerRech_', value: 0, hard: true, why: 'alvo mal configurado' } as const;
+    const r = checkTargets({ enerRech_: 50 }, [invalid]);
+    expect(r.finding.credit).toBe(0);
+    expect(r.finding.status).not.toBe('blocking');
+    expect(r.finding.caveat).toBeDefined();
+    expect(r.violated).toHaveLength(0);
   });
 });
 
@@ -213,5 +229,18 @@ describe('checkSubstats', () => {
 
   it('build sem substat nenhum não lança', () => {
     expect(() => checkSubstats(build(), variant)).not.toThrow();
+  });
+
+  it('variante sem prioridade de substats é on-target com crédito cheio', () => {
+    const v = { ...variant, substats: [] } as unknown as BuildVariant;
+    const f = checkSubstats(build(), v);
+    expect(f.status).toBe('on-target');
+    expect(f.credit).toBe(1);
+  });
+
+  it('prioridade de substats declarada mas build sem rolls continua off-target (situação diferente)', () => {
+    const f = checkSubstats(build(), variant);
+    expect(f.status).toBe('off-target');
+    expect(f.credit).toBe(0);
   });
 });

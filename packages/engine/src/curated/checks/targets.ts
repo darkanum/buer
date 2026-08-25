@@ -17,6 +17,9 @@ interface Evaluated {
 
 function evaluate(target: StatTarget, stats: ObservedStats): Evaluated | null {
   if (target.kind === 'min') {
+    // Alvo mal configurado (value <= 0) não afirma nada: descartar em vez de
+    // dividir por zero/negativo, que é como o ramo `ratio` já se protege.
+    if (target.value <= 0) return null;
     const actual = stats[target.stat];
     if (actual === undefined) return null;
     const ok = actual >= target.value;
