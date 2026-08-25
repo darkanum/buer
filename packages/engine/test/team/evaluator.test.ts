@@ -23,6 +23,7 @@ const XIANGLING = '10000023' as CharacterKey;
 // (Era a Barbara aqui; ela virou candidata legítima do slot de buffer/healer
 // do Hyperbloom quando esse slot deixou de ser um `anyOf` vazio.)
 const TIGHNARI = '10000069' as CharacterKey;
+const FISCHL = '10000031' as CharacterKey;
 
 describe('CuratedTeamEvaluator.teamsFor', () => {
   it('lista o National como time jogável para Xiangling', async () => {
@@ -60,6 +61,44 @@ describe('CuratedTeamEvaluator.teamsFor', () => {
     const r = await evaluator.teamsFor(TIGHNARI, roster);
     expect(r.playable).toHaveLength(0);
     expect(r.blocked).toHaveLength(0);
+  });
+
+  // -------------------------------------------------------------------------
+  // roleCoverage: o papel ROTULADO no slot não é o papel que o ocupante cumpre
+  // (Achado 2 da revisão final).
+  // -------------------------------------------------------------------------
+
+  it('roleCoverage não afirma coberto o papel que a ficha do ocupante não declara', async () => {
+    const r = await evaluator.teamsFor(FISCHL, roster);
+    const hyperbloom = r.playable.find((t) => t.match.archetype.id === 'hyperbloom');
+    expect(hyperbloom).toBeDefined();
+
+    // O slot 4 do Hyperbloom pede buffer/healer e nesta conta quem o ocupa é a
+    // Sucrose, cuja única variante declara driver/debuffer/buffer. "buffer"
+    // ela cumpre; "healer" ninguém neste time cumpre, e o assessment tem que
+    // dizer isso em vez de herdar o rótulo do slot.
+    const coverage = hyperbloom!.assessment.roleCoverage;
+    expect(coverage.buffer).not.toBe('missing');
+    expect(coverage.healer).toBe('missing');
+  });
+
+  it('todo papel dado como coberto é declarado por alguma ficha de quem está no time', async () => {
+    for (const subject of [XIANGLING, FISCHL]) {
+      const r = await evaluator.teamsFor(subject, roster);
+      for (const option of [...r.playable, ...r.blocked]) {
+        const declared = new Set<string>();
+        for (const key of option.match.fills) {
+          if (key === null) continue;
+          for (const variant of bank.profiles.get(key)?.variants ?? []) {
+            for (const role of variant.roles) declared.add(role);
+          }
+        }
+        for (const [role, state] of Object.entries(option.assessment.roleCoverage)) {
+          if (state === 'missing') continue;
+          expect(declared, `${option.match.archetype.id}: "${role}" dado como ${state}`).toContain(role);
+        }
+      }
+    }
   });
 
   it('roster sem xingqiu move o National de jogável para bloqueado', async () => {

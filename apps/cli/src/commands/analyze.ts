@@ -137,6 +137,7 @@ export async function runAnalyze(flags: AnalyzeFlags): Promise<AnalyzeResult> {
 
       if (profile && build) {
         const choice = selectVariant(profile, build, stats, bank.scoring, {
+          ...(slot === undefined ? {} : { slotRoles: slot.role }),
           ...(flags.variant === undefined ? {} : { pinned: flags.variant }),
           ...(slot?.variant === undefined ? {} : { fromArchetype: slot.variant }),
         });

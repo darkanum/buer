@@ -41,6 +41,13 @@ interface SlotOutcome {
   readonly meetsHardTargets: boolean;
   readonly requiredEr: number | null;
   readonly actualEr: number | null;
+  /**
+   * Papéis do slot que a variante ESCOLHIDA declara. É o que `roleCoverage`
+   * pode afirmar; os demais papéis do slot ficam `missing`, que é a verdade.
+   * Vazio quando o slot está vazio ou o ocupante não tem ficha — em nenhum
+   * dos dois casos há de onde tirar a afirmação.
+   */
+  readonly coveredRoles: readonly string[];
   readonly line: string;
 }
 
@@ -135,7 +142,7 @@ export class CuratedTeamEvaluator {
       if (key === null) {
         outcomes.push({
           slotIndex, character: null, variantLabel: null, variantId: null,
-          meetsHardTargets: false, requiredEr: null, actualEr: null,
+          meetsHardTargets: false, requiredEr: null, actualEr: null, coveredRoles: [],
           line: `Slot ${slotIndex + 1} (${slot.role.join('/')}): vazio — nenhum personagem seu ocupa este papel.`,
         });
         continue;
@@ -146,7 +153,7 @@ export class CuratedTeamEvaluator {
       if (!build || !profile) {
         outcomes.push({
           slotIndex, character: key, variantLabel: null, variantId: null,
-          meetsHardTargets: false, requiredEr: null, actualEr: null,
+          meetsHardTargets: false, requiredEr: null, actualEr: null, coveredRoles: [],
           line: `Slot ${slotIndex + 1}: ${String(key)} — sem ficha curada, build não julgada.`,
         });
         continue;
@@ -154,6 +161,7 @@ export class CuratedTeamEvaluator {
 
       const stats = await resolver.resolve(build);
       const choice = selectVariant(profile, build, stats, bank.scoring, {
+        slotRoles: slot.role,
         ...(slot.variant === undefined ? {} : { fromArchetype: slot.variant }),
       });
 
@@ -186,6 +194,7 @@ export class CuratedTeamEvaluator {
         meetsHardTargets: !result.blocked,
         requiredEr: erTarget && erTarget.kind === 'min' ? erTarget.value : null,
         actualEr: stats?.enerRech_ ?? null,
+        coveredRoles: choice.coveredSlotRoles,
         line:
           `Slot ${slotIndex + 1} (${slot.role.join('/')}): ${String(key)} — ` +
           `${choice.explanation} ${result.blocked ? 'Há alvo obrigatório fora do lugar.' : 'Alvos obrigatórios cumpridos.'}`,
@@ -197,11 +206,18 @@ export class CuratedTeamEvaluator {
       .map((k) => roster.characters.get(k)?.element)
       .filter((e): e is Element => e !== undefined);
 
+    // O papel ROTULADO no slot não é prova de que o ocupante o cumpre:
+    // `candidatesFor` casa por `.some(...)` (basta um papel em comum), então
+    // alguém entra num slot "buffer/healer" declarando só "buffer". Afirmar
+    // `healer: covered` ali seria afirmar o que ninguém verificou. Só a
+    // INTERSEÇÃO entre o que o slot pede e o que a variante escolhida declara
+    // vira covered/weak; o resto do slot fica `missing`, que é a verdade.
     const roleCoverage: Partial<Record<RoleTag, 'missing' | 'weak' | 'covered'>> = {};
     for (const [slotIndex, slot] of match.archetype.slots.entries()) {
       const outcome = outcomes[slotIndex]!;
-      const state = outcome.character === null ? 'missing' : outcome.meetsHardTargets ? 'covered' : 'weak';
+      const declared = new Set<string>(outcome.coveredRoles);
       for (const role of slot.role) {
+        const state = !declared.has(role) ? 'missing' : outcome.meetsHardTargets ? 'covered' : 'weak';
         // Não rebaixa: um papel coberto por um slot não vira "missing" por outro.
         if (roleCoverage[role] === 'covered') continue;
         if (roleCoverage[role] === 'weak' && state === 'missing') continue;

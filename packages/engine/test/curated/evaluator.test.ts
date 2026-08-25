@@ -88,6 +88,64 @@ describe('selectVariant', () => {
     });
     expect(choice.reason).toBe('best-match');
   });
+
+  // ---------------------------------------------------------------------
+  // Papel do slot na seleção de variante (Achado 2 da revisão final).
+  //
+  // As duas variantes sintéticas abaixo têm CONTEÚDO idêntico (mesmos sets,
+  // armas, main-stats e alvos) e diferem só nos papéis: a nota é a mesma, e
+  // sem a preferência por papel o desempate cai sempre na primeira da lista.
+  // É exatamente o caso que julgava a Noelle, num slot de healer, contra os
+  // alvos de main-DPS dela.
+  // ---------------------------------------------------------------------
+  const twoRoleProfile = () => {
+    const base = profile().variants[0]!;
+    return {
+      ...profile(),
+      variants: [
+        { ...base, id: 'carry', label: 'Carry', roles: ['main-dps'] as const },
+        { ...base, id: 'suporte', label: 'Suporte', roles: ['healer'] as const },
+      ],
+    };
+  };
+
+  it('slot que pede um papel prefere a variante que declara esse papel, mesmo empatada em nota', () => {
+    const build = equippedBuild(roster, XIANGLING)!;
+    const choice = selectVariant(twoRoleProfile(), build, build.observedStats ?? null, bank.scoring, {
+      slotRoles: ['healer'],
+    });
+    expect(choice.variant.id).toBe('suporte');
+    expect(choice.coveredSlotRoles).toEqual(['healer']);
+  });
+
+  it('quando NENHUMA variante cumpre o papel do slot, escolhe como antes mas REGISTRA isso', () => {
+    const build = equippedBuild(roster, XIANGLING)!;
+    const choice = selectVariant(twoRoleProfile(), build, build.observedStats ?? null, bank.scoring, {
+      slotRoles: ['shielder'],
+    });
+    expect(choice.variant.id).toBe('carry'); // o desempate de sempre
+    expect(choice.coveredSlotRoles).toEqual([]);
+    expect(choice.explanation).toMatch(/não cumpre/i);
+    expect(choice.explanation).toContain('shielder');
+  });
+
+  it('variante fixada que não cumpre o papel do slot também é registrada', () => {
+    const build = equippedBuild(roster, XIANGLING)!;
+    const choice = selectVariant(twoRoleProfile(), build, build.observedStats ?? null, bank.scoring, {
+      pinned: 'carry',
+      slotRoles: ['healer'],
+    });
+    expect(choice.variant.id).toBe('carry');
+    expect(choice.reason).toBe('pinned');
+    expect(choice.explanation).toMatch(/não cumpre/i);
+  });
+
+  it('slot sem papel declarado não inventa cobertura nem ressalva', () => {
+    const build = equippedBuild(roster, XIANGLING)!;
+    const choice = selectVariant(twoRoleProfile(), build, build.observedStats ?? null, bank.scoring, {});
+    expect(choice.coveredSlotRoles).toEqual([]);
+    expect(choice.explanation).not.toMatch(/não cumpre/i);
+  });
 });
 
 describe('CuratedBuildEvaluator', () => {
