@@ -313,13 +313,24 @@ describe('integridade do banco curado', () => {
   // de curadoria humana e o motor o serve como se fosse (§14.3).
   // ---------------------------------------------------------------------------
 
-  it('todo arquétipo commitado declara proveniência humana — nenhum é rascunho de máquina disfarçado', () => {
+  it('todo arquétipo commitado tem proveniência íntegra — vocabulário fechado e "researched"+"high" nunca coexistem', () => {
+    // Não fixa o valor de hoje (`human`/`medium`): `researched` nasce do
+    // pipeline `meta:research:archetypes`, e `researched-reviewed` é a
+    // promoção que `validateMeta` aceita de propósito (ver teste acima,
+    // "a promoção é o caminho legítimo"). Os três são estados legítimos de
+    // um arquétipo em disco — o teste guarda o invariante da §14.3, não o
+    // estado atual do banco.
     const raw = readRawMeta();
     expect(raw.archetypes.length).toBeGreaterThan(0);
     for (const a of raw.archetypes) {
       expect(a.provenance, `arquétipo "${a.id}"`).toBeDefined();
-      expect(a.provenance.authoredBy, `arquétipo "${a.id}"`).toBe('human');
-      expect(a.provenance.confidence, `arquétipo "${a.id}"`).toBe('medium');
+      expect(['human', 'researched', 'researched-reviewed'], `arquétipo "${a.id}"`)
+        .toContain(a.provenance.authoredBy);
+      expect(['high', 'medium', 'low'], `arquétipo "${a.id}"`)
+        .toContain(a.provenance.confidence);
+      const isMachineDraftClaimingReview =
+        a.provenance.authoredBy === 'researched' && a.provenance.confidence === 'high';
+      expect(isMachineDraftClaimingReview, `arquétipo "${a.id}"`).toBe(false);
     }
   });
 
