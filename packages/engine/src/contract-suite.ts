@@ -1,12 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import type { BuildEvaluator, EvaluationContext, Build } from './interfaces.js';
+import type { BuildEvaluator, EvaluationContext, Build, TeamComposition } from './interfaces.js';
+
+export interface ContractSuiteOptions {
+  /**
+   * Marque `true` para avaliador que depende de stats observados. Liga o
+   * teste de degradação: build sem `observedStats` tem que sair por
+   * `canHandle` com razões, nunca por exceção.
+   *
+   * Este é o teste que a Fase 3 vai usar como verificação de que trocar o
+   * StatResolver por um que CALCULA stats funcionou — quando o avaliador
+   * passar a aceitar build hipotética, é aqui que a mudança aparece.
+   */
+  readonly requiresObservedStats?: boolean;
+}
 
 /**
- * Reusable contract test suite for any BuildEvaluator implementation.
- * Tests the core interface obligations: batch evaluate, well-formed Score, canHandle negotiation.
- * @param make Factory function that creates a fresh evaluator instance
+ * Suíte de contrato reutilizável para qualquer BuildEvaluator: lote,
+ * Score bem-formado, negociação por canHandle.
+ * @param make fábrica que cria uma instância nova do avaliador
+ * @param opts obrigações extras conforme a natureza do avaliador
  */
-export function contractSuite(make: () => BuildEvaluator): void {
+export function contractSuite(make: () => BuildEvaluator, opts: ContractSuiteOptions = {}): void {
   const ctx = {} as EvaluationContext;
   const build = {} as Build;
 
@@ -43,5 +57,33 @@ export function contractSuite(make: () => BuildEvaluator): void {
       expect(verdict).toHaveProperty('ok');
       expect(typeof verdict.ok).toBe('boolean');
     });
+
+    if (opts.requiresObservedStats) {
+      it('recusa build sem observedStats por canHandle, com razões — nunca lança', () => {
+        const evaluator = make();
+        const subject = 'sujeito-de-teste';
+        const hypothetical = { conditionals: {}, character: { key: subject } } as unknown as Build;
+        const team = {
+          schemaVersion: 1,
+          slots: [{ build: hypothetical, role: [] }],
+          teamConditionals: {},
+        } as unknown as TeamComposition;
+        const hypotheticalCtx = {
+          gameVersion: '7.0',
+          team,
+          subject,
+          objective: { schemaVersion: 1, id: 't', label: 'T', terms: [], aggregate: 'sum' },
+          constraints: [],
+        } as unknown as EvaluationContext;
+
+        const verdict = evaluator.canHandle(hypotheticalCtx);
+
+        expect(verdict.ok).toBe(false);
+        if (!verdict.ok) {
+          expect(verdict.reasons.length).toBeGreaterThan(0);
+          expect(verdict.reasons.join(' ')).toMatch(/observedStats|stats observados/i);
+        }
+      });
+    }
   });
 }

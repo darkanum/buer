@@ -1,7 +1,7 @@
 # Buer — Status & Handoff
 
-**Atualizado:** 2026-08-24
-**Branch:** `design/onewash-fase-1` · **PR:** https://github.com/darkanum/buer/pull/1
+**Atualizado:** 2026-08-25
+**Branch:** `claude/buer-fase-2-motor-065ad4` (Fase 2) · Fase 1 em `design/onewash-fase-1`, PR https://github.com/darkanum/buer/pull/1
 **Local do projeto:** `X:\Projetos\Buer` (é aqui que se trabalha — NÃO em `X:\Projetos\OneWash`, que é de outro projeto)
 
 > Nota de nomenclatura: a branch e os arquivos de spec/plano mantêm o slug antigo `onewash` no nome (renomear quebraria o PR/links); todo o *conteúdo* e o escopo dos pacotes já é `@buer/*`.
@@ -51,20 +51,60 @@ pnpm --filter @buer/cli run start:dev sync --dry-run --region os_usa --raw-out "
 
 ---
 
-## Fase 2 — o motor de análise (PRÓXIMO)
+## Fase 2 — o motor de análise (COMPLETA)
 
-**Objetivo:** preencher o esqueleto de interfaces do motor (§6 da spec de Fase 1) com regras reais: avaliar a build atual, propor build ideal (set/main-stats/substats/arma), sugerir times, e sugerir aquisições.
+**Branch:** `claude/buer-fase-2-motor-065ad4` (29 commits sobre `design/onewash-fase-1`).
+**Spec:** `docs/superpowers/specs/2026-08-24-buer-fase-2-motor-design.md` · **Plano:** `docs/superpowers/plans/2026-08-24-buer-fase-2-motor.md`
 
-**Insumos pra começar (grounding do brainstorm de Fase 2):**
-- As interfaces já existem: `packages/engine/src/interfaces.ts` (`BuildEvaluator` `curated`→`analytic`→`simulation`, `BuildSearcher`, `TeamEvaluator`, `RosterAdvisor`, `GameDataProvider`, etc.) + `contractSuite` reutilizável.
-- Spec de Fase 1: `docs/superpowers/specs/2026-08-24-onewash-design.md` (§6 = contratos do motor).
-- Dado real pra calibrar: um roster de 63 personagens (extração validada).
-- Pesquisa de domínio já feita (na sessão de brainstorm de Fase 1): curado-primeiro; GO acoplou solver+fórmula (não repetir); gcsim resolve energia/ICD/rotação (caro); scores de time abertos são pesos mágicos sem calibração → validar contra Abyss/Theater é questão em aberto.
+### O que funciona (verificado rodando, não só nos testes)
 
-**Decisões abertas pro brainstorm de Fase 2:**
-- Começar por qual avaliador — `curated` (regras de meta escritas à mão, rápido de mostrar valor) vs `analytic` (cálculo de dano, exige as tabelas de scaling do gi-data que NÃO foram vendorizadas na Fase 1)?
-- De onde vem o "meta" curado (KQM/comunidade) e como mantê-lo versionado/auditável?
-- Precisamos das tabelas de scaling (curvas/ascensão/talentos/arma) — segundo ciclo do gi-data.
-- Métrica de validação: como saber que uma build/time sugerido é "bom"?
+```
+pnpm --filter @buer/cli run start:dev analyze --from <caminho-absoluto-da-extracao.json> --character xiangling
+pnpm --filter @buer/cli run start:dev analyze --from <caminho-absoluto-da-extracao.json> --account
+```
 
-**Recomendação:** começar a Fase 2 num contexto limpo (sessão nova / `/clear`), usando este STATUS.md + a §6 da spec + o roster real como grounding, e rodar o brainstorm de Fase 2 a partir daí.
+Saída real, sobre a conta de calibração de 63 personagens: times curados que o personagem consegue formar, quem foi para cada slot e contra qual variante está sendo julgado, ER medido contra o alvo de cada membro, os cinco achados da build, e as lacunas de aquisição. Tudo em nomes legíveis, não ids.
+
+- **307 testes verdes**, 16 pacotes/tarefas, `pnpm -w typecheck` limpo.
+- **Pacote novo `@buer/meta`** — dado curado versionado: 10 fichas de personagem (com variantes nomeadas), 5 arquétipos de time, pesos de pontuação. Validação que derruba o build quando o dado é inválido.
+- **`@buer/engine` preenchido** — `CuratedBuildEvaluator` (cinco verificações que produzem achados explicáveis, não uma nota), `CuratedTeamEvaluator` (matching bipartido exato de arquétipo contra roster), `CuratedRosterAdvisor` (aquisição derivada de arquétipo bloqueado), `StatResolver` como costura para a Fase 3.
+- **Montagem de `Roster`/`Build`** a partir do payload cru do HoYoLAB — não existia antes; era a peça faltante entre a extração e o motor.
+- **Golden file** sobre os 63 personagens reais + **13 casos-âncora** do que o sistema nunca pode afirmar.
+
+### O padrão de defeito desta fase (vale para a Fase 3)
+
+Seis defeitos da **mesma família** foram encontrados em revisão, e **nenhum quebrava teste**:
+valor ausente virando `0`; afirmação sobre o dado do usuário nunca verificada; rótulo afirmando origem falsa; identificador sem dono; lista filtrada por um critério e apresentada como se fosse por outro; papel marcado como coberto sem evidência.
+O contrato que os previne está na spec: *nenhum número sem origem rastreável; ausência nunca vira zero; nenhum rótulo afirma origem que não é a verdadeira.* Revise contra ele.
+
+Um sétimo defeito, no **dado** e não no código, colocava personagem de elemento antagônico dentro de arquétipo curado (geo num Hyperbloom) e apresentava como time `meta` jogável. Hoje há âncora que pega isso.
+
+### Pendente / adjudicado (decidido conscientemente, não esquecido)
+
+Ordenado por impacto de produto:
+
+1. **"Ainda sem time curado" é falso para Noelle e Gorou.** O `mono-geo` nomeia os dois; o time existe, só não é formável (faltam fichas de geo sub-dps e de um 3º slot). Pior: arquétipo em `too-far` não gera `coverageGap`, então não há sinal nenhum de que falta um geo. Conserto: uma linha de condição, ou escrever a ficha (a conta tem Albedo e Ningguang).
+2. **`redundancyWith` nunca chega à tela.** O advisor computa quem você já tem que faz o mesmo trabalho — a única parte do sistema que desaconselha gastar — e a CLI não serializa. Falta também a âncora que a §12 da spec nomeia literalmente ("nenhum candidato com `redundancyWith` não-vazio no topo").
+3. **`Provenance` é computada e descartada.** `confidence`, `citations` e `assumptions` não aparecem em lugar nenhum da saída — 0 ocorrências no golden. A §5.3 promete que a confiança da ficha chega ao usuário; não chega. `CuratedBuildEvaluator` e `DefaultEvaluatorRegistry` não têm consumidor de produção.
+4. **Todo dado curado tem `sources: []`.** "Curado" hoje significa "escrito à mão sem citação". `explanation.citations` é sempre vazio.
+5. **Três cópias divergentes da regra "este personagem pode hospedar este arquétipo"** (`candidatesFor`, `canHost`, `adviseFor`); a terceira erra na direção insegura.
+6. **Alvo duro não medido conta como cumprido** na contagem que ordena times.
+7. **A camada 5 da §12** (casos-âncora) tem 13 asserções sobre a forma do JSON do banco; os três exemplos que a spec nomeia — sobre a *saída* do sistema — não existem.
+8. **A §9 da spec (`FarmPlan`, `EquipPlan`, troca por dominância) não foi implementada** — lacuna consciente registrada no plano. Ausência limpa: só os dois tipos declarados, nenhum código pela metade.
+9. **Cobertura do banco:** 10 fichas cobrem 10 dos 120 personagens do catálogo. Na conta de calibração, 5 dos 63 personagens têm time jogável. É o gargalo real do produto, e é o que o **pipeline de autoria assistida (plano separado, §10 da spec)** existe para resolver.
+
+### Herdado da Fase 1, ainda aberto
+
+- `asc` (ascensão do personagem) vem sempre 0 — o payload não expõe `base.promote_level` do personagem. Não afeta a Fase 2 (usa stats observados); **afeta a Fase 3**, que precisa dele para calcular stats base.
+- Faltam tabelas de tier 3★/4★ → a qualidade de roll degrada em peça não-5★, com ressalva visível na saída.
+- Postgres provisionado (Neon), OAuth/login, bundle da CLI, pipeline de imagens, seletor de conta no site.
+
+---
+
+## Fase 3 — o avaliador analítico (PRÓXIMO)
+
+**O que destrava:** comparar builds hipotéticas. Hoje o motor julga o que está equipado; não sabe dizer se trocar a ampulheta melhora.
+
+**A costura já existe:** `StatResolver` (`packages/engine/src/stat-resolver.ts`). A Fase 2 entrega `ObservedStatResolver` (lê da captura); a Fase 3 entrega `ComputedStatResolver` (curvas + ascensão + arma + artefatos + bônus de set). **Mesma interface, mesmas fichas, mesmo avaliador, mesmo scoring.** Um teste da `contract-suite` já verifica que build sem `observedStats` sai por `canHandle` com razões, nunca por exceção — é essa a prova de que a troca funcionou.
+
+**O que precisa vendorizar:** as tabelas de scaling do gi-data (curvas de personagem, ascensão, talentos, arma), deliberadamente fora da Fase 1 (ver `packages/gi-data/vendor/SOURCES.md`).

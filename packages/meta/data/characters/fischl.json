@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "character": "fischl",
+  "variants": [
+    {
+      "id": "off-field-electro",
+      "label": "Sub-DPS de electro off-field (Oz)",
+      "roles": ["sub-dps"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["golden-troupe"], "rank": 1, "condition": "ela fica fora de campo praticamente o tempo todo com Oz ativo; Golden Troupe dá o bônus extra de dano de habilidade justamente para quem não está em campo" },
+        { "kind": "4pc", "sets": ["thundering-fury"], "rank": 2, "condition": "em time de overload/electro-charged, quando o dano vem majoritariamente da reação em vez do hit direto do Oz" }
+      ],
+      "mainStats": {
+        "sands": ["atk_", "enerRech_"],
+        "goblet": ["electro_dmg_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "atk_", "enerRech_"],
+      "weapons": [
+        { "weapon": "the-stringless", "rank": 1 },
+        { "weapon": "favonius-warbow", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 120, "hard": false, "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto" }
+      ],
+      "notes": "O dano dela é quase todo do Oz (habilidade), então o main-stat de circlet importa mais que ATQ bruto — ela raramente ataca normal em campo."
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

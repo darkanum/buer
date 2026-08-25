@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "national",
+  "label": "National",
+  "gameVersionAdded": "1.0",
+  "strength": "meta",
+  "tags": ["abyss", "f2p", "no-5star"],
+  "sources": [],
+  "slots": [
+    {
+      "role": ["sub-dps"],
+      "requires": { "kind": "character", "anyOf": ["xiangling"] },
+      "variant": "national-er",
+      "substitutable": false
+    },
+    {
+      "role": ["buffer", "healer"],
+      "requires": { "kind": "character", "anyOf": ["bennett"] },
+      "variant": "buffer-er",
+      "substitutable": false
+    },
+    {
+      "role": ["sub-dps", "enabler"],
+      "requires": { "kind": "character", "anyOf": ["xingqiu"] },
+      "substitutable": false
+    },
+    {
+      "role": ["driver", "debuffer"],
+      "requires": { "kind": "element", "element": "anemo", "withRole": ["driver", "debuffer"] },
+      "substitutable": true
+    }
+  ]
+}

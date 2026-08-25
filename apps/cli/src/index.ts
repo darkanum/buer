@@ -60,7 +60,7 @@ function flagBoolean(flags: Record<string, string | boolean>, name: string): boo
   return Boolean(flags[name]);
 }
 
-const USAGE = 'uso: buer <login|logout|whoami|sync|doctor> [opções]';
+const USAGE = 'uso: buer <login|logout|whoami|sync|doctor|analyze> [opções]';
 
 export async function main(argv: string[]): Promise<void> {
   const { command, positional, flags } = parseArgs(argv);
@@ -112,6 +112,21 @@ export async function main(argv: string[]): Promise<void> {
       const { runDoctor, createDoctorDeps } = await import('./commands/doctor.js');
       const report = await runDoctor(createDoctorDeps());
       console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+    case 'analyze': {
+      const { runAnalyze } = await import('./commands/analyze.js');
+      const { renderReport } = await import('../src/report.js');
+      const from = flagString(flags, 'from');
+      if (!from) throw new Error('uso: buer analyze --from <extracao.json> [--character <slug> | --account]');
+      const result = await runAnalyze({
+        from,
+        ...(flagString(flags, 'character') === undefined ? {} : { character: flagString(flags, 'character')! }),
+        ...(flagString(flags, 'variant') === undefined ? {} : { variant: flagString(flags, 'variant')! }),
+        account: flagBoolean(flags, 'account'),
+        json: flagBoolean(flags, 'json'),
+      });
+      console.log(flagBoolean(flags, 'json') ? JSON.stringify(result, null, 2) : renderReport(result));
       return;
     }
     default:

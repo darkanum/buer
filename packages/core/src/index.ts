@@ -16,4 +16,12 @@ export { normalize } from './normalize.js';
 
 export { scrubRaw } from './scrub.js';
 
+export { extractObservedStats } from './observed.js';
+
+// `propKey` já era usado internamente por normalize.ts e canon.ts, mas nunca
+// tinha sido exposto na fronteira do pacote — @buer/engine precisa dele para
+// traduzir `property_type` (main/sub stat de artefato) direto do payload cru
+// do HoYoLAB, sem duplicar a tabela FightProp que já vive em @buer/gi-data.
+export { propKey } from './properties.js';
+
 export * from './domain.js';

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "character": "razor",
+  "variants": [
+    {
+      "id": "physical-carry",
+      "label": "Main-DPS físico (claymore)",
+      "roles": ["main-dps"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["pale-flame"], "rank": 1 },
+        { "kind": "4pc", "sets": ["berserker"], "rank": 2, "condition": "sem Pale Flame farmado; opção f2p de crit rate no lugar do bônus de dano físico" }
+      ],
+      "mainStats": {
+        "sands": ["atk_", "enerRech_"],
+        "goblet": ["physical_dmg_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "atk_", "enerRech_"],
+      "weapons": [
+        { "weapon": "wolf-s-gravestone", "rank": 1 },
+        { "weapon": "serpent-spine", "rank": 2 },
+        { "weapon": "favonius-greatsword", "rank": 3, "minRefinement": 1 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 130, "hard": false, "why": "o burst custa 60 de energia e a habilidade acerta várias vezes gerando partícula própria; 130% já é suficiente para manter o buff de velocidade de ataque do burst em rotação sem depender de bateria externa" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto" }
+      ]
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

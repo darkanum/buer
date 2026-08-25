@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "character": "tighnari",
+  "variants": [
+    {
+      "id": "spread-carry",
+      "label": "Main-DPS de dendro (spread/aggravate)",
+      "roles": ["main-dps"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["gilded-dreams"], "rank": 1, "condition": "com pelo menos dois elementos distintos no time para o bônus de EM/ATQ da segunda metade do conjunto" },
+        { "kind": "4pc", "sets": ["deepwood-memories"], "rank": 2, "condition": "sem Gilded Dreams farmado; troca o buff próprio por redução de RES dendro do time" }
+      ],
+      "mainStats": {
+        "sands": ["atk_", "eleMas"],
+        "goblet": ["dendro_dmg_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "atk_", "eleMas"],
+      "weapons": [
+        { "weapon": "hunter-s-path", "rank": 1 },
+        { "weapon": "elegy-for-the-end", "rank": 2 },
+        { "weapon": "aqua-simulacra", "rank": 3 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 130, "hard": false, "why": "o burst custa 60 de energia e a habilidade acerta várias vezes gerando partícula própria; 130% já sustenta a rotação sem depender de bateria externa" },
+        { "kind": "min", "stat": "eleMas", "value": 200, "hard": false, "why": "o dano de spread/aggravate escala com maestria elemental; abaixo de ~200 o ganho por ponto ainda compensa crit, mas depois disso os retornos caem e crit volta a valer mais" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto" }
+      ]
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

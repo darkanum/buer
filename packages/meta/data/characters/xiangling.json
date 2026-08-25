@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "character": "xiangling",
+  "variants": [
+    {
+      "id": "national-er",
+      "label": "National (ER alto)",
+      "roles": ["sub-dps"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["emblem-of-severed-fate"], "rank": 1 },
+        { "kind": "4pc", "sets": ["crimson-witch-of-flames"], "rank": 2, "condition": "sem Emblem farmado; perde a conversão de ER em dano de burst" },
+        { "kind": "2+2", "sets": ["emblem-of-severed-fate", "crimson-witch-of-flames"], "rank": 3 }
+      ],
+      "mainStats": {
+        "sands": ["enerRech_", "atk_"],
+        "goblet": ["pyro_dmg_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "enerRech_", "atk_", "eleMas"],
+      "weapons": [
+        { "weapon": "the-catch", "rank": 1, "minRefinement": 5 },
+        { "weapon": "dragon-s-bane", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 200, "hard": true, "why": "Pyronado custa 80 de energia e Xiangling gera pouca partícula própria; abaixo de 200% de ER o burst não sai toda rotação e a build inteira deixa de funcionar" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto" }
+      ],
+      "notes": "Variante padrão em time nacional. O ER alto é o que define esta build, não o dano direto."
+    },
+    {
+      "id": "vaporize",
+      "label": "Vaporize (ER moderado)",
+      "roles": ["sub-dps"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["crimson-witch-of-flames"], "rank": 1 },
+        { "kind": "4pc", "sets": ["emblem-of-severed-fate"], "rank": 2 }
+      ],
+      "mainStats": {
+        "sands": ["atk_", "enerRech_"],
+        "goblet": ["pyro_dmg_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "atk_", "enerRech_", "eleMas"],
+      "weapons": [
+        { "weapon": "the-catch", "rank": 1, "minRefinement": 5 },
+        { "weapon": "dragon-s-bane", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 160, "hard": true, "why": "com aplicação de hydro constante no time, a partícula extra baixa a exigência de ER em relação ao National, mas 160% ainda é o piso para o burst voltar" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit muito desbalanceado desperdiça substats" }
+      ]
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

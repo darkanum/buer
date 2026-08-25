@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "overload-chevreuse",
+  "label": "Overload (Chevreuse)",
+  "gameVersionAdded": "4.6",
+  "strength": "strong",
+  "tags": ["abyss", "f2p"],
+  "sources": [],
+  "slots": [
+    {
+      "role": ["buffer", "healer", "debuffer"],
+      "requires": { "kind": "character", "anyOf": ["chevreuse"] },
+      "variant": "overload-support",
+      "substitutable": false
+    },
+    {
+      "role": ["sub-dps"],
+      "requires": { "kind": "character", "anyOf": ["fischl"] },
+      "variant": "off-field-electro",
+      "substitutable": false
+    },
+    {
+      "role": ["main-dps"],
+      "requires": { "kind": "element", "element": "pyro", "withRole": ["main-dps"] },
+      "substitutable": true
+    },
+    {
+      "role": ["sub-dps"],
+      "requires": { "kind": "character", "anyOf": ["fischl", "beidou", "lisa", "dori", "iansan", "sethos", "alyosha", "ororon", "varesa"] },
+      "substitutable": false
+    }
+  ]
+}

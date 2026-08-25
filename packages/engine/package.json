@@ -17,6 +17,8 @@
     "vitest": "^2"
   },
   "dependencies": {
-    "@buer/core": "workspace:*"
+    "@buer/core": "workspace:*",
+    "@buer/gi-data": "workspace:*",
+    "@buer/meta": "workspace:*"
   }
 }

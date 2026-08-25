@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "character": "gorou",
+  "variants": [
+    {
+      "id": "geo-support",
+      "label": "Suporte geo (buff de DEF/RES, ER alto)",
+      "roles": ["buffer"],
+      "scalesOn": "def",
+      "sets": [
+        { "kind": "4pc", "sets": ["husk-of-opulent-dreams"], "rank": 1 },
+        { "kind": "4pc", "sets": ["noblesse-oblige"], "rank": 2, "condition": "sem Husk farmado; troca acúmulo de DEF/dano geo por buff de ATQ de burst para o time" }
+      ],
+      "mainStats": {
+        "sands": ["enerRech_", "def_"],
+        "goblet": ["def_"],
+        "circlet": ["def_"]
+      },
+      "substats": ["enerRech_", "def_", "critRate_"],
+      "weapons": [
+        { "weapon": "favonius-warbow", "rank": 1 },
+        { "weapon": "sacrificial-bow", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 180, "hard": true, "why": "o burst custa 80 de energia e ele quase não ataca em campo, então gera pouquíssima partícula própria; abaixo de 180% de ER o buff de DEF/RES geo do time cai antes da próxima rotação" }
+      ],
+      "notes": "Ele não é dano — o slot dele no time é 100% sobre o burst estar de pé. DEF% em main-stats importa para o buff que ele dá, não para dano próprio."
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

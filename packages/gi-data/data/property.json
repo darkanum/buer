@@ -27,5 +27,18 @@
   "43": { "code": "FIGHT_PROP_GRASS_ADD_HURT", "goodKey": "dendro_dmg_", "isPercent": true, "decimals": 1 },
   "44": { "code": "FIGHT_PROP_WIND_ADD_HURT", "goodKey": "anemo_dmg_", "isPercent": true, "decimals": 1 },
   "45": { "code": "FIGHT_PROP_ROCK_ADD_HURT", "goodKey": "geo_dmg_", "isPercent": true, "decimals": 1 },
-  "46": { "code": "FIGHT_PROP_ICE_ADD_HURT", "goodKey": "cryo_dmg_", "isPercent": true, "decimals": 1 }
+  "46": { "code": "FIGHT_PROP_ICE_ADD_HURT", "goodKey": "cryo_dmg_", "isPercent": true, "decimals": 1 },
+  "50": { "code": "FIGHT_PROP_FIRE_SUB_HURT",     "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "51": { "code": "FIGHT_PROP_ELEC_SUB_HURT",     "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "52": { "code": "FIGHT_PROP_WATER_SUB_HURT",    "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "53": { "code": "FIGHT_PROP_GRASS_SUB_HURT",    "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "54": { "code": "FIGHT_PROP_WIND_SUB_HURT",     "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "55": { "code": "FIGHT_PROP_ROCK_SUB_HURT",     "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "56": { "code": "FIGHT_PROP_ICE_SUB_HURT",      "goodKey": null, "isPercent": true,  "decimals": 1 },
+  "80": { "code": "FIGHT_PROP_SKILL_CD_MINUS_RATIO", "goodKey": null, "isPercent": true, "decimals": 1 },
+  "81": { "code": "FIGHT_PROP_SHIELD_COST_MINUS_RATIO", "goodKey": "shield_", "isPercent": true, "decimals": 1 },
+  "2000": { "code": "FIGHT_PROP_MAX_HP",  "goodKey": "hp",  "isPercent": false, "decimals": 0 },
+  "2001": { "code": "FIGHT_PROP_CUR_ATTACK",  "goodKey": "atk", "isPercent": false, "decimals": 0 },
+  "2002": { "code": "FIGHT_PROP_CUR_DEFENSE", "goodKey": "def", "isPercent": false, "decimals": 0 },
+  "999999": { "code": "FIGHT_PROP_MAX_STAMINA", "goodKey": null, "isPercent": false, "decimals": 0 }
 }

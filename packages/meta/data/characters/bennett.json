@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "character": "bennett",
+  "variants": [
+    {
+      "id": "buffer-er",
+      "label": "Buffer de ATQ (ER alto)",
+      "roles": ["buffer", "healer"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["noblesse-oblige"], "rank": 1 },
+        { "kind": "2+2", "sets": ["noblesse-oblige", "emblem-of-severed-fate"], "rank": 2 }
+      ],
+      "mainStats": {
+        "sands": ["enerRech_"],
+        "goblet": ["hp_", "atk_"],
+        "circlet": ["hp_", "heal_"]
+      },
+      "substats": ["enerRech_", "hp_", "atk_"],
+      "weapons": [
+        { "weapon": "aquila-favonia", "rank": 1 },
+        { "weapon": "favonius-sword", "rank": 2 },
+        { "weapon": "sacrificial-sword", "rank": 3 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 180, "hard": true, "why": "o buff de ATQ vem do campo do burst; sem 180% de ER o campo fica com buraco entre rotações e o time inteiro perde o buff" }
+      ],
+      "notes": "O buff escala com o ATQ BASE de Bennett, não com o ATQ total — por isso ATQ% em ampulheta/cálice não é prioridade, e ER é."
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

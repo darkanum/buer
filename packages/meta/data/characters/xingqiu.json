@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "character": "xingqiu",
+  "variants": [
+    {
+      "id": "sub-dps-er",
+      "label": "Sub-DPS de hydro (ER alto)",
+      "roles": ["sub-dps", "enabler"],
+      "scalesOn": "atk",
+      "sets": [
+        { "kind": "4pc", "sets": ["emblem-of-severed-fate"], "rank": 1 },
+        { "kind": "4pc", "sets": ["noblesse-oblige"], "rank": 2, "condition": "quando ninguém mais no time carrega Noblesse" }
+      ],
+      "mainStats": {
+        "sands": ["atk_", "enerRech_"],
+        "goblet": ["hydro_dmg_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "atk_", "enerRech_"],
+      "weapons": [
+        { "weapon": "sacrificial-sword", "rank": 1 },
+        { "weapon": "favonius-sword", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 180, "hard": true, "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit desbalanceado desperdiça substats" }
+      ]
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}
