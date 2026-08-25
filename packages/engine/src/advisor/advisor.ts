@@ -1,10 +1,28 @@
-import type { CharacterKey, Element, RoleTag } from '@buer/core';
+import { parseCharKey, type CharacterKey, type Element, type RoleTag } from '@buer/core';
+import { loadCharacters } from '@buer/gi-data';
 import type { MetaBank, TeamArchetypeData } from '@buer/meta';
 import type {
   AcquisitionAdvice, AcquisitionCandidate, AdvisorPreferences, CoverageGap,
   InvestmentAxis, Provenance, Roster, RosterAdvisor,
 } from '../interfaces.js';
 import { matchArchetype } from '../team/matching.js';
+
+// Catálogo de TODO personagem do jogo (possuído ou não), ao contrário de
+// `roster.characters` que só conhece quem o jogador tem. Carregado uma vez
+// no módulo — mesmo padrão de `roster/from-hoyolab.ts` com `loadArtifactSets`.
+const CHARACTERS = loadCharacters();
+
+/**
+ * Elemento de um personagem QUALQUER, possuído ou não. `roster.characters`
+ * não serve para isso: `axis.character`, em `redundancyFor`, é por
+ * definição alguém que o jogador NÃO tem (achado Critical da revisão da
+ * Task 10) — o lookup ali precisa do catálogo do gi-data, não do roster.
+ */
+function elementOf(key: CharacterKey): Element | undefined {
+  const parsed = parseCharKey(key);
+  if (parsed.element) return parsed.element; // Traveler: o elemento está na própria chave
+  return CHARACTERS[parsed.avatarId]?.element as Element | undefined;
+}
 
 export interface CuratedRosterAdvisorOptions {
   readonly bank: MetaBank;
@@ -25,13 +43,17 @@ interface Blockage {
   readonly slotIndex: number;
 }
 
+// Cada chave carrega o DONO (`of`/`weapon`) — não só o salto. Sem isso, dois
+// personagens pedindo o mesmo salto (ex.: C0->C2) para arquétipos diferentes
+// colapsam num candidato só, e o `axis` resultante não diz de quem é a
+// constelação a subir (achado Important da revisão da Task 10).
 function axisKey(axis: InvestmentAxis): string {
   switch (axis.kind) {
     case 'newCharacter': return `char:${String(axis.character)}`;
     case 'newWeapon': return `weapon:${String(axis.weapon)}`;
-    case 'constellation': return `cons:${axis.from}->${axis.to}`;
-    case 'refinement': return `refine:${axis.from}->${axis.to}`;
-    case 'talent': return `talent:${axis.which}:${axis.from}->${axis.to}`;
+    case 'constellation': return `cons:${String(axis.of)}:${axis.from}->${axis.to}`;
+    case 'refinement': return `refine:${String(axis.weapon)}:${axis.from}->${axis.to}`;
+    case 'talent': return `talent:${String(axis.of)}:${axis.which}:${axis.from}->${axis.to}`;
     default: return 'artifact';
   }
 }
@@ -117,17 +139,23 @@ export class CuratedRosterAdvisor implements RosterAdvisor {
         const owned = roster.characters.get(named);
         let axis: InvestmentAxis;
 
+        const equippedWeapon = roster.weapons.find((w) => w.equippedBy === named);
+
         if (owned && slot.minConstellation !== undefined && owned.constellation < slot.minConstellation) {
-          axis = { kind: 'constellation', from: owned.constellation, to: slot.minConstellation };
-        } else if (owned && slot.minRefinement !== undefined) {
-          const weapon = roster.weapons.find((w) => w.equippedBy === named);
+          axis = { kind: 'constellation', of: named, from: owned.constellation, to: slot.minConstellation };
+        } else if (owned && slot.minRefinement !== undefined && equippedWeapon !== undefined) {
+          // `weapon` é obrigatório no eixo (identidade do INVESTIMENTO, não só
+          // do salto — achado Important da revisão da Task 10): sem arma
+          // equipada não há `WeaponKey` real para apontar, então não fabricamos
+          // um refinamento de "arma nenhuma" (cai no `else if (owned) continue`).
           axis = {
             kind: 'refinement',
-            from: (weapon?.refinement ?? 1) as 1 | 2 | 3 | 4 | 5,
+            weapon: equippedWeapon.key,
+            from: equippedWeapon.refinement,
             to: slot.minRefinement as 1 | 2 | 3 | 4 | 5,
           };
         } else if (owned) {
-          continue; // tem o personagem e ele atende: não é este que bloqueia
+          continue; // tem o personagem e ele atende (ou falta arma real p/ recomendar): não é este que bloqueia
         } else {
           axis = { kind: 'newCharacter', character: named };
         }
@@ -205,18 +233,15 @@ export class CuratedRosterAdvisor implements RosterAdvisor {
     for (const blockage of unlocks) {
       for (const role of blockage.archetype.slots[blockage.slotIndex]!.role) wantedRoles.add(role);
     }
-    // LIMITAÇÃO CONHECIDA: `axis.character` é, por definição, um personagem
-    // que o jogador NÃO TEM (é por isso que virou eixo `newCharacter`). Este
-    // lookup em `roster.characters` portanto nunca encontra nada e
-    // `wantedElement` fica sempre `undefined` — o filtro por elemento abaixo
-    // nunca liga de fato. Para consertar seria preciso o ELEMENTO do
-    // personagem-alvo vindo de outro lugar que não o roster do jogador (ex.:
-    // um catálogo de personagens em @buer/core ou @buer/meta que descreva
-    // personagens não possuídos). Mantido como está por decisão do brief —
-    // não corrigido aqui, fica para a revisão decidir.
-    const wantedElement = bank.profiles.has(axis.character)
-      ? roster.characters.get(axis.character)?.element
-      : undefined;
+    // CORRIGIDO (achado Critical da revisão da Task 10): `axis.character` é,
+    // por definição, um personagem que o jogador NÃO TEM — um lookup em
+    // `roster.characters` nunca resolve. `elementOf` consulta o catálogo do
+    // gi-data (todo personagem do jogo, possuído ou não), não o roster.
+    // Sem isso, `redundancyWith` podia apontar alguém de OUTRO elemento como
+    // "já faz esse trabalho", quando na prática essa pessoa não ocupa o slot
+    // bloqueado — o pior tipo de falso-negativo na única parte do sistema
+    // que ativamente desaconselha gastar.
+    const wantedElement = elementOf(axis.character);
 
     return [...roster.characters.keys()].filter((key) => {
       if (key === axis.character) return false;

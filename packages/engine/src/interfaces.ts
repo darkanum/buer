@@ -474,11 +474,26 @@ export interface ArchetypeSlot {
 }
 
 // Aquisição = valor marginal contra gap analysis, não tier list.
+// `of`/`weapon` são OBRIGATÓRIOS em constellation/talent/refinement: um eixo
+// sem dono funde, no advisor, dois personagens que precisam do MESMO salto
+// (ex.: C0->C2) em um único candidato — e o `axis` resultante não tem como
+// dizer de quem é a constelação a subir (achado de revisão da Task 10).
 export type InvestmentAxis =
   | { readonly kind: 'artifact' }
-  | { readonly kind: 'constellation'; readonly from: number; readonly to: number }
-  | { readonly kind: 'talent'; readonly which: 'auto' | 'skill' | 'burst'; readonly from: number; readonly to: number }
-  | { readonly kind: 'refinement'; readonly from: 1 | 2 | 3 | 4 | 5; readonly to: 1 | 2 | 3 | 4 | 5 }
+  | { readonly kind: 'constellation'; readonly of: CharacterKey; readonly from: number; readonly to: number }
+  | {
+      readonly kind: 'talent';
+      readonly of: CharacterKey;
+      readonly which: 'auto' | 'skill' | 'burst';
+      readonly from: number;
+      readonly to: number;
+    }
+  | {
+      readonly kind: 'refinement';
+      readonly weapon: WeaponKey;
+      readonly from: 1 | 2 | 3 | 4 | 5;
+      readonly to: 1 | 2 | 3 | 4 | 5;
+    }
   | { readonly kind: 'newCharacter'; readonly character: CharacterKey }
   | { readonly kind: 'newWeapon'; readonly weapon: WeaponKey };
 
