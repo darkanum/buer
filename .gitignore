@@ -21,3 +21,11 @@ snapshots-local/
 # so
 .DS_Store
 Thumbs.db
+
+# extrações locais (contêm UID/nickname reais — nunca commitar)
+extracao*.json
+*.raw.json
+.tmp*.json
+.next-dev.log
+# relatórios scratch dos subagentes
+/*-report.md
