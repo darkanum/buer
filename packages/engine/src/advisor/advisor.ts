@@ -116,8 +116,17 @@ export class CuratedRosterAdvisor implements RosterAdvisor {
           existing.blocked.push(blockage.archetype.id);
           continue;
         }
+        // CORRIGIDO (achado da revisão da Task 12, ao ligar `coverageGaps` na
+        // tela): faltava o filtro de ELEMENTO. Sem ele, um personagem com o
+        // papel certo mas elemento errado (ex.: Noelle, geo, main-dps) entrava
+        // na lista "com ficha no banco hoje" de uma lacuna de CRYO main-dps —
+        // afirmando que alguém cobre um papel que ele, de fato, não cobre
+        // (o mesmo tipo de rótulo com origem falsa que o contrato do produto
+        // proíbe). `elementOf` (acima) resolve o elemento de QUALQUER
+        // personagem do catálogo, possuído ou não — mesma função já usada em
+        // `redundancyFor`.
         const candidates = [...bank.profiles.values()]
-          .filter((p) => p.variants.some((v) => v.roles.some((r) => roles.includes(r))))
+          .filter((p) => elementOf(p.character) === element && p.variants.some((v) => v.roles.some((r) => roles.includes(r))))
           .map((p) => String(p.character));
         const gap = {
           description:

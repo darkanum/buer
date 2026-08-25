@@ -45,9 +45,20 @@ function renderCharacter(entry: CharacterReport): string[] {
     lines.push('  A UM SLOT DE DISTÂNCIA:');
     for (const team of entry.blockedTeams) lines.push(...renderTeam(team));
   }
-  if (entry.acquisitions.length > 0) {
+  // Mesma pergunta ("o que adquirir"), duas respostas possíveis: um
+  // candidato NOMEADO (invista nesta pessoa/arma que você já tem ou pode
+  // pegar) ou uma LACUNA de papel/elemento (falta alguém desse tipo — o
+  // banco não sabe dizer quem, só o que). O rótulo entre colchetes diz qual
+  // dos dois está na linha, senão as duas listas se confundem na tela.
+  if (entry.acquisitions.length > 0 || entry.coverageGaps.length > 0) {
     lines.push('  O QUE ADQUIRIR:');
-    for (const a of entry.acquisitions) lines.push(`    ${a.axis} — ${a.summary}`);
+    for (const a of entry.acquisitions) lines.push(`    [investir em alguém] ${a.axis} — ${a.summary}`);
+    for (const g of entry.coverageGaps) {
+      lines.push(
+        `    [lacuna sem candidato nomeado, severidade ${g.severity}] ${g.description} ` +
+          `(bloqueia: ${g.blockedArchetypes.join(', ')})`,
+      );
+    }
   }
   return lines;
 }

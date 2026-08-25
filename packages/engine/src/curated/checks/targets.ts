@@ -132,7 +132,13 @@ export function checkTargets(stats: ObservedStats | null, targets: readonly Stat
       ? `Alvos cumpridos: ${evaluated.map((e) => e.message).join('; ')}.`
       : `Fora do alvo: ${failed.map((e) => e.message).join('; ')}.`;
 
-  const why = failed.length > 0 ? failed.map((e) => e.target.why).join(' ') : undefined;
+  // Cada `why` autorado é uma cláusula independente, sem ponto final (é
+  // texto de conteúdo, não prosa fechada) — concatenar com espaço simples
+  // produzia frase corrida quando dois alvos violavam junto (achado da
+  // revisão da Task 12: "...deixa de funcionar crit muito desbalanceado...").
+  // `'; '` é o mesmo separador que `summary`, uma linha acima, já usa para a
+  // mesma situação (vários motivos, um ao lado do outro).
+  const why = failed.length > 0 ? failed.map((e) => e.target.why).join('; ') : undefined;
 
   return {
     finding: {

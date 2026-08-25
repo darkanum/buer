@@ -29,6 +29,21 @@ export interface TeamReport {
   readonly energy: readonly { readonly of: string; readonly required: number; readonly actual: number }[];
 }
 
+/**
+ * `advice.coverageGaps` (spec §8.2/§8.4) é a MESMA pergunta que
+ * `acquisitions` — "o que adquirir" — só que sem um personagem nomeado
+ * para responder: o slot que falta é por ELEMENTO/papel, não por alguém
+ * específico que o jogador não tem. Antes desta correção (achado Important
+ * da revisão da Task 12), `CuratedRosterAdvisor` já computava a descrição
+ * pronta e ela era descartada antes de chegar à tela — silêncio onde a
+ * resposta existia.
+ */
+export interface CoverageGapReport {
+  readonly description: string;
+  readonly severity: string;
+  readonly blockedArchetypes: readonly string[];
+}
+
 export interface CharacterReport {
   readonly key: string;
   readonly slug: string;
@@ -38,6 +53,7 @@ export interface CharacterReport {
   readonly playableTeams: readonly TeamReport[];
   readonly blockedTeams: readonly TeamReport[];
   readonly acquisitions: readonly { readonly axis: string; readonly unlocks: readonly string[]; readonly summary: string }[];
+  readonly coverageGaps: readonly CoverageGapReport[];
   readonly note?: string;
 }
 
@@ -170,6 +186,11 @@ export async function runAnalyze(flags: AnalyzeFlags): Promise<AnalyzeResult> {
         axis: axisLabel(c.axis),
         unlocks: c.unlocks.map((u) => u.archetype.id),
         summary: c.explanation.summary,
+      })),
+      coverageGaps: advice.coverageGaps.map((g) => ({
+        description: g.description,
+        severity: g.severity,
+        blockedArchetypes: g.blockedArchetypes,
       })),
       ...(note === undefined ? {} : { note }),
     });

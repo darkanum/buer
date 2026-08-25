@@ -29,6 +29,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -58,6 +59,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -87,6 +97,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -116,6 +127,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -145,6 +157,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de cryo que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "freeze"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -174,6 +195,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem time curado que inclua este personagem."
     },
     {
@@ -203,6 +225,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -261,7 +284,7 @@
               "status": "blocking",
               "credit": 0.63575,
               "summary": "Fora do alvo: enerRech_ 154.3 (alvo 200); critDMG_/critRate_ = 4.49 (faixa 1.5–2.5).",
-              "why": "Pyronado custa 80 de energia e Xiangling gera pouca partícula própria; abaixo de 200% de ER o burst não sai toda rotação e a build inteira deixa de funcionar crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+              "why": "Pyronado custa 80 de energia e Xiangling gera pouca partícula própria; abaixo de 200% de ER o burst não sai toda rotação e a build inteira deixa de funcionar; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
             },
             {
               "check": "weapon",
@@ -302,7 +325,8 @@
         }
       ],
       "blockedTeams": [],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": []
     },
     {
       "key": "10000024",
@@ -331,6 +355,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -389,7 +422,7 @@
               "status": "blocking",
               "credit": 0.5277777777777778,
               "summary": "Fora do alvo: enerRech_ 100.0 (alvo 180); critDMG_/critRate_ = 10.00 (faixa 1.5–2.5).",
-              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some crit desbalanceado desperdiça substats"
+              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some; crit desbalanceado desperdiça substats"
             },
             {
               "check": "weapon",
@@ -453,7 +486,7 @@
               "status": "blocking",
               "credit": 0.5277777777777778,
               "summary": "Fora do alvo: enerRech_ 100.0 (alvo 180); critDMG_/critRate_ = 10.00 (faixa 1.5–2.5).",
-              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some crit desbalanceado desperdiça substats"
+              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some; crit desbalanceado desperdiça substats"
             },
             {
               "check": "weapon",
@@ -524,7 +557,7 @@
               "status": "blocking",
               "credit": 0.5277777777777778,
               "summary": "Fora do alvo: enerRech_ 100.0 (alvo 180); critDMG_/critRate_ = 10.00 (faixa 1.5–2.5).",
-              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some crit desbalanceado desperdiça substats"
+              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some; crit desbalanceado desperdiça substats"
             },
             {
               "check": "weapon",
@@ -553,7 +586,16 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de cryo que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "freeze"
+          ]
+        }
+      ]
     },
     {
       "key": "10000027",
@@ -582,6 +624,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -640,7 +683,7 @@
               "status": "acceptable",
               "credit": 0.6908333333333333,
               "summary": "Fora do alvo: enerRech_ 105.8 (alvo 120); critDMG_/critRate_ = 13.32 (faixa 1.5–2.5).",
-              "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80 crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+              "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
             },
             {
               "check": "weapon",
@@ -706,7 +749,7 @@
               "status": "acceptable",
               "credit": 0.6908333333333333,
               "summary": "Fora do alvo: enerRech_ 105.8 (alvo 120); critDMG_/critRate_ = 13.32 (faixa 1.5–2.5).",
-              "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80 crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+              "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
             },
             {
               "check": "weapon",
@@ -735,7 +778,16 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ]
     },
     {
       "key": "10000032",
@@ -962,7 +1014,8 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": []
     },
     {
       "key": "10000034",
@@ -1020,7 +1073,7 @@
               "status": "acceptable",
               "credit": 0.6346153846153846,
               "summary": "Fora do alvo: enerRech_ 100.0 (alvo 130); critDMG_/critRate_ = 2.64 (faixa 1.5–2.5).",
-              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
             },
             {
               "check": "weapon",
@@ -1087,7 +1140,7 @@
               "status": "acceptable",
               "credit": 0.6346153846153846,
               "summary": "Fora do alvo: enerRech_ 100.0 (alvo 130); critDMG_/critRate_ = 2.64 (faixa 1.5–2.5).",
-              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
             },
             {
               "check": "weapon",
@@ -1122,7 +1175,16 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de geo que cumpra sub-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "minor",
+          "blockedArchetypes": [
+            "mono-geo"
+          ]
+        }
+      ]
     },
     {
       "key": "10000035",
@@ -1151,6 +1213,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1180,6 +1243,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1209,6 +1273,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de cryo que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "freeze"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1238,6 +1311,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1524,7 +1598,16 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de cryo que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "freeze"
+          ]
+        }
+      ]
     },
     {
       "key": "10000044",
@@ -1553,6 +1636,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1582,6 +1666,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1611,6 +1696,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1640,6 +1726,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1798,7 +1885,16 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de geo que cumpra sub-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "minor",
+          "blockedArchetypes": [
+            "mono-geo"
+          ]
+        }
+      ]
     },
     {
       "key": "10000061",
@@ -1827,6 +1923,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1856,6 +1953,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1885,6 +1983,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1914,6 +2021,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem time curado que inclua este personagem."
     },
     {
@@ -1943,6 +2051,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -1972,6 +2081,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2001,6 +2111,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2030,6 +2141,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2059,6 +2171,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2088,6 +2201,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de cryo que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "freeze"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2117,6 +2239,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2334,7 +2457,16 @@
           ]
         }
       ],
-      "acquisitions": []
+      "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ]
     },
     {
       "key": "10000092",
@@ -2363,6 +2495,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2392,6 +2525,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2421,6 +2555,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2450,6 +2593,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2479,6 +2623,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2508,6 +2661,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2537,6 +2691,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2566,6 +2721,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2595,6 +2759,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2624,6 +2797,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2653,6 +2827,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2682,6 +2857,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2711,6 +2887,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2740,6 +2917,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2769,6 +2947,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2798,6 +2977,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2827,6 +3007,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2856,6 +3037,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2885,6 +3067,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2914,6 +3097,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2943,6 +3127,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -2972,6 +3157,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -3001,6 +3187,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -3030,6 +3217,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -3059,6 +3247,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -3088,6 +3277,15 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [
+        {
+          "description": "Falta um personagem de pyro que cumpra main-dps. Nenhum personagem com ficha cobre esse papel ainda.",
+          "severity": "notable",
+          "blockedArchetypes": [
+            "overload-chevreuse"
+          ]
+        }
+      ],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     },
     {
@@ -3117,6 +3315,7 @@
       "playableTeams": [],
       "blockedTeams": [],
       "acquisitions": [],
+      "coverageGaps": [],
       "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
     }
   ]
