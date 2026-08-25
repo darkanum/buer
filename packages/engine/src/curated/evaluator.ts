@@ -27,8 +27,15 @@ const CAPS: EvaluatorCapabilities = {
 export interface CuratedBuildEvaluatorOptions {
   readonly bank: MetaBank;
   readonly resolver: StatResolver;
-  /** Variante exigida por slot de arquétipo, por personagem. */
-  readonly pinnedVariants?: ReadonlyMap<CharacterKey, string>;
+  /**
+   * Completude do roster de onde a build veio — vira `Provenance.rosterCompleteness`.
+   * Obrigatório e sem padrão: um padrão aqui esconderia de novo uma afirmação
+   * fabricada sobre o dado do usuário (mesmo defeito do Achado 1). Quem
+   * constrói o avaliador passa `roster.provenance.completeness`.
+   */
+  readonly rosterCompleteness: Provenance['rosterCompleteness'];
+  /** Variante exigida pelo slot do arquétipo, por personagem — regra 2 de `selectVariant` (spec §6.4). */
+  readonly archetypeVariants?: ReadonlyMap<CharacterKey, string>;
 }
 
 /** Acha, dentro do contexto, a build do personagem que está sendo avaliado. */
@@ -71,11 +78,10 @@ export class CuratedBuildEvaluator implements BuildEvaluator {
   }
 
   async prepare(ctx: EvaluationContext): Promise<PreparedEvaluator> {
-    const { bank, resolver, pinnedVariants } = this.opts;
+    const { bank, resolver, archetypeVariants, rosterCompleteness } = this.opts;
     const subject = ctx.subject;
     const profile = subject === undefined ? undefined : bank.profiles.get(subject);
     const gameVersion = ctx.gameVersion ?? ('7.0' as const);
-    const rosterCompleteness: Provenance['rosterCompleteness'] = 'full';
 
     const evaluateOne = async (
       build: Build,
@@ -83,9 +89,9 @@ export class CuratedBuildEvaluator implements BuildEvaluator {
       if (!profile) return null;
       const stats = await resolver.resolve(build);
       const choice = selectVariant(profile, build, stats, bank.scoring, {
-        ...(pinnedVariants?.get(profile.character) === undefined
+        ...(archetypeVariants?.get(profile.character) === undefined
           ? {}
-          : { fromArchetype: pinnedVariants.get(profile.character)! }),
+          : { fromArchetype: archetypeVariants.get(profile.character)! }),
       });
       return { assessment: assess(build, choice.variant, stats, bank.scoring), choice };
     };
@@ -122,16 +128,19 @@ export class CuratedBuildEvaluator implements BuildEvaluator {
             out.push(emptyScore());
             continue;
           }
-          const violations: ConstraintViolation[] = result.assessment.violated.map((target) => ({
+          const violations: ConstraintViolation[] = result.assessment.violated.map((v) => ({
             constraint: {
               kind: 'stat',
               of: profile!.character,
-              stat: target.kind === 'ratio' ? target.numerator : target.stat,
-              ...(target.kind === 'min' ? { min: target.value } : {}),
+              stat: v.target.kind === 'ratio' ? v.target.numerator : v.target.stat,
+              ...(v.target.kind === 'min' ? { min: v.target.value } : {}),
               hard: true,
             },
-            actual: 0,
-            required: target.kind === 'min' ? target.value : 0,
+            // Números MEDIDOS de verdade, propagados de checkTargets — nunca
+            // um literal aqui (Achado 1 da revisão: `actual: 0` fabricado
+            // feria o contrato "nenhum número sem origem rastreável").
+            actual: v.actual,
+            required: v.required,
             hard: true,
           })) as ConstraintViolation[];
 

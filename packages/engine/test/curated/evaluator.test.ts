@@ -91,7 +91,9 @@ describe('selectVariant', () => {
 });
 
 describe('CuratedBuildEvaluator', () => {
-  const make = () => new CuratedBuildEvaluator({ bank, resolver: new ObservedStatResolver() });
+  // 'full' é verdade aqui: a fixture é uma extração completa do HoYoLAB.
+  const make = () =>
+    new CuratedBuildEvaluator({ bank, resolver: new ObservedStatResolver(), rosterCompleteness: 'full' });
 
   contractSuite(make, { requiresObservedStats: true });
 
@@ -148,5 +150,75 @@ describe('CuratedBuildEvaluator', () => {
     expect(score!.provenance.datasetSha).toBe(bank.datasetSha);
     expect(score!.provenance.confidence).toBe('medium'); // xiangling.json é human/medium
     expect(score!.provenance.assumptions.join(' ')).toContain('scoring v1');
+  });
+
+  it('Score.violations carrega o valor MEDIDO da build, não um zero fabricado (revisão, Achado 1)', async () => {
+    const original = equippedBuild(roster, XIANGLING)!;
+    // ER conhecido e abaixo do alvo hard de 200 da variante national-er.
+    const build = { ...original, observedStats: { ...original.observedStats, enerRech_: 140 } };
+    const ctx = {
+      gameVersion: '7.0',
+      subject: XIANGLING,
+      team: { schemaVersion: 1, slots: [{ build, role: [] }], teamConditionals: {} },
+      objective: { schemaVersion: 1, id: 'o', label: 'O', terms: [], aggregate: 'sum' },
+      constraints: [],
+    } as never;
+    // Força a variante national-er (alvo ER 200) para o teste não depender
+    // de qual variante o best-match escolheria com ER baixo.
+    const evaluator = new CuratedBuildEvaluator({
+      bank,
+      resolver: new ObservedStatResolver(),
+      rosterCompleteness: 'full',
+      archetypeVariants: new Map([[XIANGLING, 'national-er']]),
+    });
+    const prepared = await evaluator.prepare(ctx);
+    const [score] = await prepared.evaluate([build as never]);
+
+    expect(score!.violations.length).toBeGreaterThan(0);
+    expect(score!.violations[0]!.actual).toBe(140);
+    expect(score!.violations[0]!.required).toBe(200);
+  });
+
+  it('archetypeVariants nomeia a variante exigida pelo arquétipo, não a fixação do usuário (revisão, Achado 2)', async () => {
+    const build = equippedBuild(roster, XIANGLING)!;
+    const ctx = {
+      gameVersion: '7.0',
+      subject: XIANGLING,
+      team: { schemaVersion: 1, slots: [{ build, role: [] }], teamConditionals: {} },
+      objective: { schemaVersion: 1, id: 'o', label: 'O', terms: [], aggregate: 'sum' },
+      constraints: [],
+    } as never;
+    const evaluator = new CuratedBuildEvaluator({
+      bank,
+      resolver: new ObservedStatResolver(),
+      rosterCompleteness: 'full',
+      archetypeVariants: new Map([[XIANGLING, 'vaporize']]),
+    });
+    const prepared = await evaluator.prepare(ctx);
+    const [score] = await prepared.evaluate([build]);
+
+    // Reason precisa ser 'archetype', nunca 'pinned' — a fixação do usuário
+    // (regra 1) é feita chamando selectVariant direto, por fora do avaliador.
+    expect(score!.provenance.assumptions.join(' ')).toContain('vaporize (archetype)');
+  });
+
+  it('rosterCompleteness vem de quem constrói o avaliador, não é fabricado (revisão, Achado 3)', async () => {
+    const build = equippedBuild(roster, XIANGLING)!;
+    const ctx = {
+      gameVersion: '7.0',
+      subject: XIANGLING,
+      team: { schemaVersion: 1, slots: [{ build, role: [] }], teamConditionals: {} },
+      objective: { schemaVersion: 1, id: 'o', label: 'O', terms: [], aggregate: 'sum' },
+      constraints: [],
+    } as never;
+    const partial = new CuratedBuildEvaluator({
+      bank,
+      resolver: new ObservedStatResolver(),
+      rosterCompleteness: 'partial',
+    });
+    const prepared = await partial.prepare(ctx);
+    const [score] = await prepared.evaluate([build]);
+
+    expect(score!.provenance.rosterCompleteness).toBe('partial');
   });
 });

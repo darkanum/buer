@@ -135,6 +135,13 @@ describe('checkTargets', () => {
     expect(r.finding.why).toContain('burst precisa sair');
   });
 
+  it('a violação carrega o valor MEDIDO de verdade, não um número fabricado', () => {
+    const r = checkTargets({ enerRech_: 140 }, [er200]);
+    expect(r.violated[0]!.actual).toBe(140);
+    expect(r.violated[0]!.required).toBe(200);
+    expect(r.violated[0]!.target).toBe(er200);
+  });
+
   it('alvo hard cumprido não bloqueia', () => {
     const r = checkTargets({ enerRech_: 210 }, [er200]);
     expect(r.finding.status).toBe('on-target');

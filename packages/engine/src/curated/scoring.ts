@@ -1,10 +1,11 @@
-import type { ObservedStats, StatTarget } from '@buer/core';
+import type { ObservedStats } from '@buer/core';
 import type { BuildVariant, ScoringWeights } from '@buer/meta';
 import type { Build } from '../interfaces.js';
 import type { CheckId, Finding } from './findings.js';
 import { checkSet } from './checks/set.js';
 import { checkMainStats } from './checks/main-stats.js';
 import { checkTargets } from './checks/targets.js';
+import type { ViolatedTarget } from './checks/targets.js';
 import { checkWeapon } from './checks/weapon.js';
 import { checkSubstats } from './checks/substats.js';
 
@@ -13,7 +14,8 @@ export interface CuratedAssessment {
   /** Só para ORDENAR. O produto é a lista de achados. */
   readonly value: number;
   readonly breakdown: Readonly<Record<CheckId, number>>;
-  readonly violated: readonly StatTarget[];
+  /** Alvos hard violados, cada um com o valor MEDIDO real (spec: sem número fabricado). */
+  readonly violated: readonly ViolatedTarget[];
   readonly blocked: boolean;
 }
 

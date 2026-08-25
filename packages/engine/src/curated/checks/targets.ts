@@ -1,10 +1,23 @@
 import type { ObservedStats, StatTarget } from '@buer/core';
 import { statusFor, type Finding } from '../findings.js';
 
+/**
+ * Um alvo `hard` violado, com o número MEDIDO de verdade — não só o alvo
+ * cru. `Score.violations` (spec §6.3, contrato de proveniência) proíbe
+ * número sem origem rastreável: `actual` é o que a build tem, `required` é
+ * o limiar que a ficha exige, e os dois vêm de `evaluate()`, nunca de um
+ * literal inventado no consumidor.
+ */
+export interface ViolatedTarget {
+  readonly target: StatTarget;
+  readonly actual: number;
+  readonly required: number;
+}
+
 export interface TargetsResult {
   readonly finding: Finding;
   /** Alvos `hard` violados — viram Score.violations (spec §6.3). */
-  readonly violated: readonly StatTarget[];
+  readonly violated: readonly ViolatedTarget[];
 }
 
 interface Evaluated {
@@ -13,6 +26,10 @@ interface Evaluated {
   readonly hard: boolean;
   readonly message: string;
   readonly target: StatTarget;
+  /** Valor medido de verdade — o que sobrevive até `Score.violations`. */
+  readonly actual: number;
+  /** Limiar exigido pela ficha/arquétipo para este alvo. */
+  readonly required: number;
 }
 
 function evaluate(target: StatTarget, stats: ObservedStats): Evaluated | null {
@@ -29,6 +46,8 @@ function evaluate(target: StatTarget, stats: ObservedStats): Evaluated | null {
       hard: target.hard,
       message: `${target.stat} ${actual.toFixed(1)} (alvo ${target.value})`,
       target,
+      actual,
+      required: target.value,
     };
   }
 
@@ -42,6 +61,8 @@ function evaluate(target: StatTarget, stats: ObservedStats): Evaluated | null {
       hard: false,
       message: `${target.stat} ${actual.toFixed(1)} (faixa ${target.min}–${target.max})`,
       target,
+      actual,
+      required: target.min,
     };
   }
 
@@ -56,6 +77,8 @@ function evaluate(target: StatTarget, stats: ObservedStats): Evaluated | null {
     hard: false,
     message: `${target.numerator}/${target.denominator} = ${ratio.toFixed(2)} (faixa ${target.min}–${target.max})`,
     target,
+    actual: ratio,
+    required: target.min,
   };
 }
 
@@ -119,6 +142,6 @@ export function checkTargets(stats: ObservedStats | null, targets: readonly Stat
       summary,
       ...(why === undefined ? {} : { why }),
     },
-    violated: blocking.map((e) => e.target),
+    violated: blocking.map((e) => ({ target: e.target, actual: e.actual, required: e.required })),
   };
 }
