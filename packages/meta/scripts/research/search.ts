@@ -25,8 +25,20 @@ export interface SearchDeps {
 
 export interface ResearchOutput {
   readonly text: string;
+  /** As URLs que a busca DE FATO consultou — nunca as que o modelo declarou. */
   readonly urls: readonly string[];
   readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
+  /**
+   * O teto de retomadas foi atingido com o turno ainda pausado.
+   *
+   * Sem este campo, esgotar `maxResumes` era indistinguível de terminar
+   * normalmente: a pesquisa cortada seguia para a extração, gerava claims
+   * parciais, e a reconciliação lia os campos que faltaram como "esta fonte
+   * não cobre isto" — que é a premissa central do pipeline, e aqui estaria
+   * mentindo. Um `true` aqui é motivo para o lote reportar o alvo numa seção
+   * própria e para a ficha registrar a ressalva em `notes`.
+   */
+  readonly truncated: boolean;
 }
 
 /**
@@ -92,14 +104,25 @@ function urlsOf(message: Anthropic.Message): string[] {
   return urls;
 }
 
-export async function researchCharacter(slug: string, deps: SearchDeps): Promise<ResearchOutput> {
+/**
+ * A primeira chamada de API, para QUALQUER prompt de pesquisa.
+ *
+ * Compartilhada entre a pesquisa de personagem e a de times: eram 45 linhas
+ * idênticas em dois arquivos, diferindo só no prompt — mesmo laço de
+ * `pause_turn`, mesma contagem de `usage`, mesmo cast. Duas cópias do mesmo
+ * laço significam que toda correção nele (o sinal de truncamento, por
+ * exemplo) teria que ser feita duas vezes, ou metade do pipeline ficaria com
+ * o defeito.
+ */
+export async function runResearchLoop(prompt: string, deps: SearchDeps): Promise<ResearchOutput> {
   const maxResumes = deps.maxResumes ?? 4;
-  const messages: Anthropic.MessageParam[] = [{ role: 'user', content: buildCharacterPrompt(slug) }];
+  const messages: Anthropic.MessageParam[] = [{ role: 'user', content: prompt }];
 
   const texts: string[] = [];
   const urls: string[] = [];
   let inputTokens = 0;
   let outputTokens = 0;
+  let truncated = false;
 
   for (let attempt = 0; attempt <= maxResumes; attempt++) {
     const stream = deps.client.stream({
@@ -129,6 +152,14 @@ export async function researchCharacter(slug: string, deps: SearchDeps): Promise
     // A busca web pode pausar um turno longo. O SDK não retoma sozinho: sem
     // este laço a resposta volta truncada, sem erro e sem aviso.
     if (message.stop_reason !== 'pause_turn') break;
+
+    // Sair por ESGOTAR o teto não é a mesma coisa que sair por ter acabado.
+    // Sem esta distinção, a pesquisa cortada seguia para a extração e a
+    // reconciliação tratava a lacuna como cobertura ausente da fonte.
+    if (attempt === maxResumes) {
+      truncated = true;
+      break;
+    }
     messages.push({ role: 'assistant', content: message.content });
   }
 
@@ -136,7 +167,12 @@ export async function researchCharacter(slug: string, deps: SearchDeps): Promise
     text: texts.filter((t) => t !== '').join('\n'),
     urls: [...new Set(urls)],
     usage: { inputTokens, outputTokens },
+    truncated,
   };
+}
+
+export function researchCharacter(slug: string, deps: SearchDeps): Promise<ResearchOutput> {
+  return runResearchLoop(buildCharacterPrompt(slug), deps);
 }
 
 /** Só para o prompt de arquétipo saber os ids de fonte válidos. */

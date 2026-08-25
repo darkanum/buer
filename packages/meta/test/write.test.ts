@@ -25,20 +25,37 @@ const full: ReconcileResult = {
   sources: ['https://icy-veins.com/x', 'https://game8.co/x'],
 };
 
-const base = { character: 'xiangling', claims, gameVersion: '7.0', authoredAt: '2026-08-25' };
+/**
+ * `consultedUrls` são as URLs que a BUSCA devolveu; `full.sources` são as que
+ * a EXTRAÇÃO declarou. Aqui as duas listas coincidem de propósito — os testes
+ * que exercitam a diferença passam listas diferentes.
+ */
+const base = {
+  character: 'xiangling',
+  claims,
+  gameVersion: '7.0',
+  authoredAt: '2026-08-25',
+  consultedUrls: ['https://icy-veins.com/x', 'https://game8.co/x'],
+  truncated: false,
+};
 
 describe('buildDraft', () => {
   it('monta a ficha com authoredBy researched e a confiança da reconciliação', () => {
     const d = buildDraft({ ...base, reconciled: full });
     expect(d.profile!.provenance.authoredBy).toBe('researched');
     expect(d.profile!.provenance.confidence).toBe('medium');
-    expect(d.profile!.provenance.sources).toEqual(full.sources);
     expect(d.profile!.provenance.authoredAt).toBe('2026-08-25');
   });
 
-  it('NUNCA produz confidence high — isso exige humano', () => {
-    const d = buildDraft({ ...base, reconciled: { ...full, confidence: 'medium' } });
-    expect(d.profile!.provenance.confidence).not.toBe('high');
+  it('preserva EXATAMENTE a confiança que a reconciliação deu, sem arredondar para cima', () => {
+    // O teste que estava aqui passava `confidence: 'medium'` e assertava
+    // `not.toBe('high')` — `buildDraft` copia o valor, então não podia falhar.
+    // Este exercita os dois valores que a reconciliação pode produzir e
+    // falharia com qualquer promoção, rebaixamento ou valor fixo.
+    for (const confidence of ['low', 'medium'] as const) {
+      const d = buildDraft({ ...base, reconciled: { ...full, confidence } });
+      expect(d.profile!.provenance.confidence).toBe(confidence);
+    }
   });
 
   it('o alvo de ER carrega o why da fonte de MAIOR preferência que tiver um', () => {
@@ -95,6 +112,44 @@ describe('buildDraft', () => {
   it('RECUSA quando nenhum slot de main-stat resolveu', () => {
     const sem = { ...full, agreed: { ...full.agreed, mainStats: undefined } };
     expect(buildDraft({ ...base, reconciled: sem }).profile).toBeNull();
+  });
+
+  // ---------------------------------------------------------------------------
+  // `provenance.sources` afirma ACESSO. A URL que o modelo declarou no passo
+  // de extração é afirmação dele, não registro de acesso.
+  // ---------------------------------------------------------------------------
+
+  it('sources traz as URLs CONSULTADAS, não as que a extração declarou', () => {
+    const d = buildDraft({
+      ...base,
+      reconciled: { ...full, sources: ['https://game8.co/inventada'] },
+      consultedUrls: ['https://icy-veins.com/real'],
+    });
+    expect(d.profile!.provenance.sources).toEqual(['https://icy-veins.com/real']);
+    expect(d.profile!.provenance.sources).not.toContain('https://game8.co/inventada');
+  });
+
+  it('a URL declarada e não confirmada vira NOTA nomeada, em vez de sumir', () => {
+    const d = buildDraft({
+      ...base,
+      reconciled: { ...full, sources: ['https://game8.co/inventada'] },
+      consultedUrls: ['https://icy-veins.com/real'],
+    });
+    expect(d.notes).toContain('https://game8.co/inventada');
+    expect(d.notes).toMatch(/não confirmada/i);
+  });
+
+  it('busca sem URL nenhuma deixa sources vazio e diz isso — não cai para a afirmação do modelo', () => {
+    const d = buildDraft({ ...base, reconciled: full, consultedUrls: [] });
+    expect(d.profile!.provenance.sources).toEqual([]);
+    expect(d.notes).toMatch(/não devolveu URL nenhuma/i);
+  });
+
+  it('pesquisa truncada vira ressalva na ficha, não só linha de relatório', () => {
+    const d = buildDraft({ ...base, reconciled: full, truncated: true });
+    expect(d.profile!.variants[0]!.notes).toMatch(/PESQUISA TRUNCADA/);
+    const inteira = buildDraft({ ...base, reconciled: full });
+    expect(inteira.profile!.variants[0]!.notes ?? '').not.toMatch(/PESQUISA TRUNCADA/);
   });
 
   it('a ficha montada passa no validateMeta do próprio pacote', async () => {

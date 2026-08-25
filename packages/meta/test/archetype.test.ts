@@ -3,7 +3,19 @@ import { buildArchetypeDrafts, buildArchetypePrompt, extractArchetypes, archetyp
 import { validateMeta } from '../src/validate.js';
 import { readRawMeta } from '../src/load.js';
 
-const base = { subject: 'xingqiu', gameVersion: '7.0', sources: ['https://icy-veins.com/t', 'https://game8.co/t'] };
+const base = {
+  subject: 'xingqiu',
+  gameVersion: '7.0',
+  // As URLs que a busca DE FATO consultou — uma por fonte, para que o teste
+  // consiga distinguir "cada arquétipo cita só quem o descreveu" de "todo
+  // arquétipo cita a lista inteira", que era o defeito.
+  consultedUrls: [
+    'https://icy-veins.com/t',
+    'https://www.game8.co/t',
+    'https://genshin-builds.com/t',
+  ],
+  truncated: false,
+};
 
 const time = (id: string, membros: string[], over: Record<string, unknown> = {}) => ({
   id,
@@ -100,7 +112,7 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
     expect(d.refused[0]!.because.join(' ')).toMatch(/xingqiu/);
   });
 
-  it('cada arquétipo cita só as fontes que o descreveram', () => {
+  it('cada arquétipo cita só as fontes que o descreveram — em `sources`, não só nas tags', () => {
     const claims = {
       ...base,
       teams: [
@@ -109,8 +121,39 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
       ],
     };
     const d = buildArchetypeDrafts({ claims, ...base });
+
     expect(d.archetypes[0]!.tags).toContain('citado-por:icy-veins');
     expect(d.archetypes[1]!.tags).toContain('citado-por:game8');
+
+    // `sources` é a proveniência de verdade — vira `explanation.citations` no
+    // motor. Antes, a lista INTEIRA de URLs consultadas era carimbada igual em
+    // todos os arquétipos do alvo, e o teste que se chamava assim assertava
+    // só sobre `tags`.
+    expect(d.archetypes[0]!.sources).toEqual(['https://icy-veins.com/t']);
+    expect(d.archetypes[1]!.sources).toEqual([
+      'https://www.game8.co/t',
+      'https://genshin-builds.com/t',
+    ]);
+  });
+
+  it('fonte que citou o time mas cuja URL não foi consultada não vira `sources` inventada', () => {
+    const claims = { ...base, teams: [time('a', ['xingqiu', 'b'], { citedBy: ['game8'] })] };
+    const d = buildArchetypeDrafts({
+      claims,
+      ...base,
+      consultedUrls: ['https://icy-veins.com/t'], // game8 nunca foi acessada
+    });
+    // A tag registra que game8 citou; `sources` continua afirmando só acesso.
+    expect(d.archetypes[0]!.tags).toContain('citado-por:game8');
+    expect(d.archetypes[0]!.sources).toEqual([]);
+  });
+
+  it('pesquisa truncada vira tag NO ARQUIVO, não só linha de relatório', () => {
+    const claims = { ...base, teams: [time('a', ['xingqiu', 'b'])] };
+    const cortada = buildArchetypeDrafts({ claims, ...base, truncated: true });
+    expect(cortada.archetypes[0]!.tags).toContain('pesquisa-truncada');
+    const inteira = buildArchetypeDrafts({ claims, ...base });
+    expect(inteira.archetypes[0]!.tags).not.toContain('pesquisa-truncada');
   });
 
   // ---------------------------------------------------------------------------
@@ -168,7 +211,6 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
     const raw = readRawMeta();
     const claims = {
       subject: 'xingqiu',
-      sources: base.sources,
       teams: [{
         id: 'national-pesquisado', label: 'National',
         members: [

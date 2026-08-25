@@ -62,13 +62,31 @@ describe('researchCharacter', () => {
     // a retomada reenvia o turno pausado como mensagem do assistente
     const second = calls[1] as { messages: { role: string }[] };
     expect(second.messages.at(-1)!.role).toBe('assistant');
+    // terminou de verdade: nada a ressalvar na ficha
+    expect(out.truncated).toBe(false);
   });
 
-  it('para de retomar depois do limite, em vez de girar para sempre', async () => {
+  it('para de retomar depois do limite, E MARCA que a pesquisa saiu truncada', async () => {
+    // O teste anterior aqui assertava `calls.length <= 3`, o que passaria
+    // mesmo se a retomada nunca acontecesse. Este exige as três chamadas
+    // exatas — prova a retomada — e o sinal de truncamento, que é o que
+    // impede a reconciliação de ler a pesquisa cortada como "a fonte não
+    // cobre este campo".
     const paused = { ...textMessage('parcial', 'pause_turn') };
     const { client, calls } = fakeClient([paused, paused, paused, paused, paused]);
-    await researchCharacter('xiangling', { client, maxResumes: 2 });
-    expect(calls.length).toBeLessThanOrEqual(3);
+    const out = await researchCharacter('xiangling', { client, maxResumes: 2 });
+
+    expect(calls).toHaveLength(3); // a primeira + exatamente 2 retomadas
+    for (const call of calls.slice(1)) {
+      expect((call as { messages: { role: string }[] }).messages.at(-1)!.role).toBe('assistant');
+    }
+    expect(out.truncated).toBe(true);
+  });
+
+  it('pesquisa que termina no primeiro turno não é truncada', async () => {
+    const { client } = fakeClient([textMessage('completo')]);
+    const out = await researchCharacter('xiangling', { client });
+    expect(out.truncated).toBe(false);
   });
 
   it('colhe as URLs dos resultados de busca', async () => {

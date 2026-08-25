@@ -15,12 +15,9 @@
 // `sync.ts` nunca precisou disso porque só lê JSON com `fs`, sem import
 // relativo cruzando arquivo.
 
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
-import { loadCharacters } from '@buer/gi-data';
 import type { RawMeta } from '../src/types.js';
 import { readRawMeta } from '../src/load.js';
+import { characterCatalog, currentGameVersion } from './catalog.js';
 
 export interface GapsDeps {
   readonly catalog: Record<string, { slug: string }>;
@@ -102,19 +99,11 @@ export function formatGaps(report: GapsReport): string {
   return lines.join('\n');
 }
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-
-/** Patch corrente, lido de `data/game-version.json`. */
-function currentGameVersion(): string {
-  const file = path.join(HERE, '..', 'data', 'game-version.json');
-  return (JSON.parse(readFileSync(file, 'utf8')) as { version: string }).version;
-}
-
 if (import.meta.main) {
   console.log(
     formatGaps(
       computeGaps({
-        catalog: loadCharacters() as unknown as Record<string, { slug: string }>,
+        catalog: characterCatalog(),
         raw: readRawMeta(),
         currentVersion: currentGameVersion(),
       }),

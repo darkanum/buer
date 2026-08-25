@@ -8,11 +8,11 @@
 // relatório, não arquivo.
 
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import type { StatTarget } from '@buer/core';
 import type { RawCharacterProfile } from '../../src/types.js';
 import { validateMeta } from '../../src/validate.js';
+import { DATA_DIR } from '../catalog.js';
 import { SOURCE_IDS, type CharacterClaims, type ReconcileResult } from './claims.js';
 
 export interface DraftDeps {
@@ -22,6 +22,22 @@ export interface DraftDeps {
   readonly gameVersion: string;
   /** Injetado, nunca `new Date()`: o rascunho precisa ser reproduzível. */
   readonly authoredAt: string;
+  /**
+   * As URLs que a busca web DE FATO consultou (`ResearchOutput.urls`).
+   *
+   * É isto — e só isto — que vai para `provenance.sources`. A Global
+   * Constraint do plano diz "toda URL CONSULTADA vai para
+   * `MetaProvenance.sources`", e antes daqui ia a URL que o MODELO declarou
+   * no passo de extração: uma afirmação do modelo apresentada como registro
+   * de acesso. O valor real existia desde a Task 3, com teste, e o lote de
+   * personagens simplesmente nunca o lia.
+   *
+   * Obrigatório de propósito: um parâmetro opcional aqui voltaria em silêncio
+   * para a afirmação do modelo no dia em que alguém esquecesse de passá-lo.
+   */
+  readonly consultedUrls: readonly string[];
+  /** A pesquisa saiu cortada por esgotar `maxResumes` (`ResearchOutput.truncated`). */
+  readonly truncated: boolean;
 }
 
 export interface DraftResult {
@@ -119,6 +135,34 @@ export function buildDraft(deps: DraftDeps): DraftResult {
     );
   }
 
+  // As URLs que a extração declarou e a busca não confirmou NÃO somem: viram
+  // nota, nomeadas como não confirmadas. O que não podem é entrar em
+  // `sources`, que afirma acesso.
+  const consultadas = new Set(deps.consultedUrls);
+  const declaradasNaoConfirmadas = deps.reconciled.sources.filter((u) => !consultadas.has(u));
+  if (declaradasNaoConfirmadas.length > 0) {
+    notasExtras.push(
+      [
+        'URLs citadas pela extração e não confirmadas na busca — ficam FORA de ' +
+          '`provenance.sources`, que lista só o que a busca web de fato consultou:',
+        ...declaradasNaoConfirmadas.map((u) => `- ${u}`),
+      ].join('\n'),
+    );
+  }
+  if (deps.consultedUrls.length === 0) {
+    notasExtras.push(
+      'A busca web não devolveu URL nenhuma para esta ficha: `provenance.sources` ' +
+        'está vazio de propósito, e não preenchido com o que a extração declarou.',
+    );
+  }
+  if (deps.truncated) {
+    notasExtras.push(
+      'PESQUISA TRUNCADA: o teto de retomadas foi atingido com o turno de busca ainda ' +
+        'pausado. Um campo ausente nesta ficha pode ser lacuna da pesquisa, e não da fonte — ' +
+        'repita a pesquisa deste personagem antes de promover a confiança.',
+    );
+  }
+
   const divergencias = describeDivergences(deps.reconciled);
   const notes = [divergencias, ...notasExtras].filter((s) => s !== '').join('\n\n');
 
@@ -147,7 +191,8 @@ export function buildDraft(deps: DraftDeps): DraftResult {
     ],
     provenance: {
       authoredBy: 'researched',
-      sources: [...deps.reconciled.sources],
+      // As URLs CONSULTADAS, não as declaradas pelo modelo. Ver `consultedUrls`.
+      sources: [...deps.consultedUrls],
       authoredAt: deps.authoredAt,
       validatedForVersion: deps.gameVersion,
       // Sai da reconciliação, nunca do modelo, e nunca 'high'.
@@ -158,18 +203,31 @@ export function buildDraft(deps: DraftDeps): DraftResult {
   return { profile, refusedBecause: [], notes };
 }
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const DATA = path.join(HERE, '..', '..', 'data');
+/**
+ * Grava o texto bruto da pesquisa em `data/research/<fileBase>.md`.
+ *
+ * Chamado ASSIM QUE a pesquisa volta, antes de qualquer decisão de recusar.
+ * Antes disto o `.md` só era escrito dentro de `writeDraft` — isto é, depois
+ * do `validateMeta` —, então nos dois caminhos de falha (rascunho recusado e
+ * exceção) as chamadas de API já estavam pagas e o texto era descartado. O
+ * plano justifica a arquitetura de duas chamadas dizendo que ela "deixa o
+ * texto da pesquisa como artefato para o revisor humano ler"; o revisor o
+ * perdia exatamente no caso em que mais precisaria dele.
+ */
+export function writeResearchText(fileBase: string, heading: string, text: string): void {
+  mkdirSync(path.join(DATA_DIR, 'research'), { recursive: true });
+  writeFileSync(path.join(DATA_DIR, 'research', `${fileBase}.md`), `# ${heading}\n\n${text}\n`, 'utf8');
+}
 
 export interface DraftIo {
-  readonly researchText: string;
   /** Valida contra o banco INTEIRO antes de gravar. */
   readonly existing: Parameters<typeof validateMeta>[0];
 }
 
 /**
- * Grava o rascunho e o texto da pesquisa ao lado dele. LANÇA se a ficha nova
- * invalidar o banco — a borda rejeita antes do disco, não depois.
+ * Grava o rascunho. LANÇA se a ficha nova invalidar o banco — a borda rejeita
+ * antes do disco, não depois. O texto da pesquisa já foi para o disco antes,
+ * via `writeResearchText`: ele não pode depender de a ficha ser aceita.
  */
 export function writeDraft(draft: DraftResult, io: DraftIo): void {
   if (!draft.profile) throw new Error('rascunho recusado; nada a gravar');
@@ -188,17 +246,8 @@ export function writeDraft(draft: DraftResult, io: DraftIo): void {
   }
 
   writeFileSync(
-    path.join(DATA, 'characters', `${draft.profile.character}.json`),
+    path.join(DATA_DIR, 'characters', `${draft.profile.character}.json`),
     `${JSON.stringify(draft.profile, null, 2)}\n`,
-    'utf8',
-  );
-
-  // O texto da pesquisa fica ao lado da ficha: é o que o revisor humano lê
-  // para decidir se promove a confiança.
-  mkdirSync(path.join(DATA, 'research'), { recursive: true });
-  writeFileSync(
-    path.join(DATA, 'research', `${draft.profile.character}.md`),
-    `# Pesquisa — ${draft.profile.character}\n\n${io.researchText}\n`,
     'utf8',
   );
 }

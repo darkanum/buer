@@ -88,5 +88,14 @@ export interface ReconcileResult {
   readonly divergences: readonly Divergence[];
   /** Derivada da concordância. NUNCA 'high' — isso exige revisão humana. */
   readonly confidence: 'medium' | 'low';
+  /**
+   * As URLs que o MODELO declarou no passo de extração, uma por claim.
+   *
+   * NÃO é o mesmo que "as URLs consultadas": quem sabe isso é
+   * `ResearchOutput.urls`, colhido dos blocos `web_search_tool_result` da
+   * primeira chamada. Estas aqui são afirmação do modelo, e por isso não
+   * entram em `provenance.sources` — a diferença entre as duas listas vira
+   * nota na ficha, nomeada como não confirmada (ver `buildDraft`).
+   */
   readonly sources: readonly string[];
 }

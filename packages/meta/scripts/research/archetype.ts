@@ -18,13 +18,12 @@
 
 import { z } from 'zod';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
-import type Anthropic from '@anthropic-ai/sdk';
-import { loadCharacters } from '@buer/gi-data';
 import { ROLE_TAGS } from '@buer/core';
 import type { RawTeamArchetype } from '../../src/types.js';
+import { characterCatalog } from '../catalog.js';
 import { MODEL, SOURCE_DOMAINS } from './client.js';
 import { SOURCE_IDS, type SourceId } from './claims.js';
-import type { SearchDeps, ResearchOutput } from './search.js';
+import { runResearchLoop, type SearchDeps, type ResearchOutput } from './search.js';
 import type { ExtractClient, ExtractDeps } from './extract.js';
 
 /** Da mais conservadora para a mais forte. Empate resolve para a primeira. */
@@ -39,13 +38,22 @@ export interface TeamOption {
   readonly citedBy: readonly SourceId[];
 }
 
-export interface ArchetypeClaims { readonly subject: string; readonly teams: readonly TeamOption[]; readonly sources: readonly string[] }
+/**
+ * `sources` foi removido daqui: era montado a partir de um mapa fixo de
+ * URL-base por fonte e não tinha leitor nenhum — quem preenche a proveniência
+ * do arquétipo é `ArchetypeDraftDeps.consultedUrls`, com as URLs que a busca
+ * de fato consultou.
+ */
+export interface ArchetypeClaims { readonly subject: string; readonly teams: readonly TeamOption[] }
 
 export interface ArchetypeDraftDeps {
   readonly claims: ArchetypeClaims;
   readonly subject: string;
   readonly gameVersion: string;
-  readonly sources: readonly string[];
+  /** As URLs que a busca web DE FATO consultou (`ResearchOutput.urls`). */
+  readonly consultedUrls: readonly string[];
+  /** A pesquisa saiu cortada por esgotar `maxResumes`. Vira tag no arquivo. */
+  readonly truncated: boolean;
 }
 
 /** Forma compartilhada de recusa: por que um time não virou arquétipo. */
@@ -80,6 +88,48 @@ export function buildArchetypePrompt(subject: string): string {
     'REGRA QUE NÃO PODE SER QUEBRADA: não invente membro nem papel. Se as fontes não deixam claro o',
     'papel de alguém, **omita o papel** dessa pessoa em vez de deduzir pelo elemento ou pela classe.',
   ].join('\n');
+}
+
+/**
+ * O domínio de cada fonte. Escrito por extenso, e não derivado de
+ * `SOURCE_DOMAINS` por índice: duas listas paralelas casadas por posição são
+ * exatamente o tipo de acoplamento que quebra em silêncio quando alguém
+ * reordena uma delas.
+ */
+const DOMAIN_BY_SOURCE: Readonly<Record<SourceId, string>> = {
+  'icy-veins': 'icy-veins.com',
+  game8: 'game8.co',
+  'genshin-builds': 'genshin-builds.com',
+};
+
+function hostOf(url: string): string | null {
+  try {
+    return new URL(url).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * As URLs consultadas que pertencem às fontes que descreveram ESTE time.
+ *
+ * Antes, a lista inteira de URLs consultadas era carimbada igual em TODOS os
+ * arquétipos do alvo — inclusive num time que uma única fonte descreveu, que
+ * saía citando as três. As `tags` (`citado-por:*`) já estavam certas por
+ * time; `sources`, que é a proveniência de verdade e vira
+ * `explanation.citations` no motor, não estava.
+ *
+ * Uma fonte que citou o time mas cuja URL não aparece entre as consultadas
+ * simplesmente não contribui com URL nenhuma — a tag `citado-por:` continua
+ * registrando que ela citou, e `sources` continua afirmando só acesso.
+ */
+function sourcesFor(citedBy: readonly SourceId[], consultedUrls: readonly string[]): string[] {
+  const domains = citedBy.map((s) => DOMAIN_BY_SOURCE[s]);
+  return consultedUrls.filter((url) => {
+    const host = hostOf(url);
+    if (host === null) return false;
+    return domains.some((d) => host === d || host.endsWith(`.${d}`));
+  });
 }
 
 /** Identidade de uma composição: o CONJUNTO de membros, sem ordem. */
@@ -183,8 +233,14 @@ export function buildArchetypeDrafts(deps: ArchetypeDraftDeps): ArchetypeDraftRe
       // A citação vira tag em vez de virar força: quantas fontes mencionam um
       // time é fato verificável; o quanto ele é bom é julgamento, e misturar os
       // dois faria um número contável se passar por opinião curada.
-      tags: citedBy.map((s) => `citado-por:${s}`),
-      sources: [...deps.sources],
+      tags: [
+        ...citedBy.map((s) => `citado-por:${s}`),
+        // A ressalva viaja NO ARQUIVO, não só na saída do lote: quem abrir
+        // este arquétipo daqui a um mês precisa ver que a pesquisa que o
+        // gerou saiu cortada.
+        ...(deps.truncated ? ['pesquisa-truncada'] : []),
+      ],
+      sources: sourcesFor(citedBy, deps.consultedUrls),
       slots: primary.members.map((m) => ({
         role: [...m.role],
         requires: { kind: 'character' as const, anyOf: [m.slug] },
@@ -197,82 +253,17 @@ export function buildArchetypeDrafts(deps: ArchetypeDraftDeps): ArchetypeDraftRe
 }
 
 // ---------------------------------------------------------------------------
-// Pesquisa (primeira chamada de API) — mesma mecânica de search.ts, prompt
-// diferente. `textOf`/`urlsOf` são duplicados de propósito: são helpers de
-// poucas linhas, e importar uma função privada de outro módulo já revisado
-// (Task 3) acoplaria os dois por um detalhe de implementação que nenhum dos
-// dois expõe no contrato público.
+// Pesquisa (primeira chamada de API) — o laço mora em search.ts.
+//
+// Era cópia literal de `researchCharacter`: 45 linhas diferindo só no prompt,
+// com o mesmo tratamento de `pause_turn`, a mesma soma de `usage` e o mesmo
+// cast. Manter as duas significaria corrigir o laço duas vezes — e a correção
+// do sinal de truncamento é exatamente o caso em que metade do pipeline
+// ficaria com o defeito.
 // ---------------------------------------------------------------------------
 
-function textOf(message: Anthropic.Message): string {
-  return message.content
-    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-    .map((b) => b.text)
-    .join('\n');
-}
-
-/**
- * Cuidado real: erro de server tool volta com HTTP 200 e um bloco cujo
- * `content` é um OBJETO de erro, não a lista de resultados. Iterar sem checar
- * `Array.isArray` quebra exatamente no caso em que a busca falhou.
- */
-function urlsOf(message: Anthropic.Message): string[] {
-  const urls: string[] = [];
-  for (const block of message.content as { type: string; content?: unknown }[]) {
-    if (block.type !== 'web_search_tool_result') continue;
-    if (!Array.isArray(block.content)) continue;
-    for (const result of block.content as { type?: string; url?: string }[]) {
-      if (typeof result.url === 'string') urls.push(result.url);
-    }
-  }
-  return urls;
-}
-
-export async function researchArchetypes(subject: string, deps: SearchDeps): Promise<ResearchOutput> {
-  const maxResumes = deps.maxResumes ?? 4;
-  const messages: Anthropic.MessageParam[] = [{ role: 'user', content: buildArchetypePrompt(subject) }];
-
-  const texts: string[] = [];
-  const urls: string[] = [];
-  let inputTokens = 0;
-  let outputTokens = 0;
-
-  for (let attempt = 0; attempt <= maxResumes; attempt++) {
-    const stream = deps.client.stream({
-      model: deps.model ?? MODEL,
-      // Streaming com teto alto: a busca web produz turnos longos, e sem
-      // streaming isso bate no timeout de HTTP do SDK.
-      max_tokens: 64000,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'high' },
-      tools: [
-        {
-          type: 'web_search_20260209',
-          name: 'web_search',
-          max_uses: deps.maxUses ?? 8,
-          allowed_domains: [...SOURCE_DOMAINS],
-        },
-      ],
-      messages,
-    } as Anthropic.MessageStreamParams);
-
-    const message = await stream.finalMessage();
-    texts.push(textOf(message));
-    urls.push(...urlsOf(message));
-    inputTokens += message.usage?.input_tokens ?? 0;
-    outputTokens += message.usage?.output_tokens ?? 0;
-
-    // A busca web pode pausar um turno longo. O SDK não retoma sozinho: sem
-    // este laço a resposta volta truncada, sem erro e sem aviso.
-    if (message.stop_reason !== 'pause_turn') break;
-    messages.push({ role: 'assistant', content: message.content });
-  }
-
-  return {
-    text: texts.filter((t) => t !== '').join('\n'),
-    urls: [...new Set(urls)],
-    usage: { inputTokens, outputTokens },
-  };
+export function researchArchetypes(subject: string, deps: SearchDeps): Promise<ResearchOutput> {
+  return runResearchLoop(buildArchetypePrompt(subject), deps);
 }
 
 // ---------------------------------------------------------------------------
@@ -308,18 +299,11 @@ function fold(name: string): string {
 /** Nome dobrado -> slug canônico do catálogo de personagens do gi-data. */
 function buildCharacterCatalog(): ReadonlyMap<string, string> {
   const catalog = new Map<string, string>();
-  for (const entry of Object.values(loadCharacters())) catalog.set(fold(entry.slug), entry.slug);
+  for (const entry of Object.values(characterCatalog())) catalog.set(fold(entry.slug), entry.slug);
   return catalog;
 }
 
 const ROLE_SET = new Set<string>(ROLE_TAGS);
-
-/** citedBy é um SourceId curto; aqui vira a URL-base do domínio correspondente. */
-const SOURCE_URL_BY_ID: Readonly<Record<SourceId, string>> = {
-  'icy-veins': 'https://icy-veins.com',
-  game8: 'https://game8.co',
-  'genshin-builds': 'https://genshin-builds.com',
-};
 
 export interface ExtractArchetypesResult {
   readonly claims: ArchetypeClaims;
@@ -429,11 +413,7 @@ export async function extractArchetypes(
     });
   }
 
-  const claims: ArchetypeClaims = {
-    subject,
-    teams,
-    sources: [...new Set(teams.flatMap((t) => t.citedBy))].map((id) => SOURCE_URL_BY_ID[id]),
-  };
+  const claims: ArchetypeClaims = { subject, teams };
 
   return {
     claims,

@@ -13,19 +13,21 @@
 // gravar qualquer um deles: um arquétipo que nomeia personagem sem ficha é
 // rejeitado na borda, não descoberto pelo teste depois.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { loadCharacters } from '@buer/gi-data';
 import type { RawMeta, RawTeamArchetype } from '../src/types.js';
 import { readRawMeta } from '../src/load.js';
 import { validateMeta } from '../src/validate.js';
+import {
+  DATA_DIR, characterCatalog, characterSlugs, checkTargets, currentGameVersion, describeUnknownTargets,
+} from './catalog.js';
 import { computeGaps } from './gaps.js';
 import { createClient, describeApiError } from './research/client.js';
 import {
   researchArchetypes, extractArchetypes, buildArchetypeDrafts, archetypeCompositionKey,
   type ArchetypeClaims, type ArchetypeRefusal,
 } from './research/archetype.js';
+import { writeResearchText } from './research/write.js';
 import { parseArgs, estimateCostUsd, formatBatchReport, withUnresolvedTracking, type BatchReport } from './research-characters.js';
 
 export interface ArchetypeBatchDeps {
@@ -36,12 +38,15 @@ export interface ArchetypeBatchDeps {
     readonly text: string;
     readonly urls: readonly string[];
     readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
+    readonly truncated: boolean;
   }>;
   readonly extract: (subject: string, text: string) => Promise<{
     readonly claims: ArchetypeClaims;
     readonly refused: readonly ArchetypeRefusal[];
     readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
   }>;
+  /** Grava o texto bruto da pesquisa, ANTES de qualquer recusa. Ver `runBatch`. */
+  readonly writeResearch: (subject: string, text: string) => void;
   readonly write: (archetype: RawTeamArchetype) => void;
   readonly onProgress?: (line: string) => void;
 }
@@ -50,6 +55,7 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
   const written: string[] = [];
   const refused: { slug: string; because: readonly string[] }[] = [];
   const failed: { slug: string; error: string }[] = [];
+  const truncated: string[] = [];
   let inputTokens = 0;
   let outputTokens = 0;
 
@@ -65,6 +71,16 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
       const research = await deps.research(subject);
       inputTokens += research.usage.inputTokens;
       outputTokens += research.usage.outputTokens;
+
+      // Mesmo motivo do lote de personagens: a chamada já foi paga, e o texto
+      // é o artefato que o revisor humano lê. Ele não pode depender de o
+      // arquétipo ser aceito.
+      deps.writeResearch(subject, research.text);
+
+      if (research.truncated) {
+        truncated.push(subject);
+        deps.onProgress?.('  pesquisa truncada: o teto de retomadas foi atingido com o turno pausado');
+      }
 
       // A extração é a SEGUNDA chamada de API, não uma continuação grátis da
       // primeira — mesmo motivo do lote de personagens.
@@ -85,7 +101,8 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
         claims: extracted.claims,
         subject,
         gameVersion: deps.gameVersion,
-        sources: research.urls,
+        consultedUrls: research.urls,
+        truncated: research.truncated,
       });
 
       for (const r of draftResult.refused) {
@@ -165,15 +182,10 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
   const usage = { inputTokens, outputTokens };
   // Igual a `runBatch`: quem popula `unresolved` de verdade é
   // `withUnresolvedTracking`, na entrada de CLI — aqui fica sempre vazio.
-  return { written, refused, failed, unresolved: [], usage, estimatedCostUsd: estimateCostUsd(usage) };
-}
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const DATA = path.join(HERE, '..', 'data');
-
-function currentGameVersion(): string {
-  const file = path.join(DATA, 'game-version.json');
-  return (JSON.parse(readFileSync(file, 'utf8')) as { version: string }).version;
+  return {
+    written, refused, failed, unresolved: [], truncated, usage,
+    estimatedCostUsd: estimateCostUsd(usage),
+  };
 }
 
 const USAGE = 'uso: meta:research:archetypes (--only <slug,slug> | --all) [--limit N] [--dry-run]';
@@ -187,8 +199,12 @@ if (import.meta.main) {
     process.exitCode = 1;
   } else {
     const raw = readRawMeta();
-    const catalog = loadCharacters() as unknown as Record<string, { slug: string }>;
+    const catalog = characterCatalog();
     const gameVersion = currentGameVersion();
+
+    // Mesma guarda do lote de personagens: slug desconhecido é erro de uso,
+    // conferido antes de gastar as duas chamadas de API.
+    const unknownTargets = checkTargets(flags.only, characterSlugs());
 
     // `--all` pesquisa times para quem já tem ficha mas ainda não aparece em
     // nenhum arquétipo — a mesma lista que `meta:gaps` chama de "com ficha,
@@ -199,7 +215,11 @@ if (import.meta.main) {
         ? [...computeGaps({ catalog, raw, currentVersion: gameVersion }).withoutArchetype]
         : [];
 
-    if (targets.length === 0) {
+    if (unknownTargets.length > 0) {
+      console.error(describeUnknownTargets(unknownTargets));
+      console.error(USAGE);
+      process.exitCode = 1;
+    } else if (targets.length === 0) {
       console.error(USAGE);
       process.exitCode = 1;
     } else {
@@ -211,7 +231,7 @@ if (import.meta.main) {
         console.log('Nada foi chamado nem gravado (--dry-run).');
       } else {
         const client = createClient();
-        mkdirSync(path.join(DATA, 'archetypes'), { recursive: true });
+        mkdirSync(path.join(DATA_DIR, 'archetypes'), { recursive: true });
         const tracked = withUnresolvedTracking((subject, text, onUnresolved) =>
           extractArchetypes(subject, text, { client: client.messages, onUnresolved }),
         );
@@ -221,16 +241,18 @@ if (import.meta.main) {
           existing: raw,
           research: (subject) => researchArchetypes(subject, { client: client.messages }),
           extract: tracked.extract,
+          writeResearch: (subject, text) =>
+            writeResearchText(`times-${subject}`, `Pesquisa de times — ${subject}`, text),
           write: (archetype) => {
             writeFileSync(
-              path.join(DATA, 'archetypes', `${archetype.id}.json`),
+              path.join(DATA_DIR, 'archetypes', `${archetype.id}.json`),
               `${JSON.stringify(archetype, null, 2)}\n`,
               'utf8',
             );
           },
           onProgress: (line) => console.log(line),
         });
-        console.log(formatBatchReport({ ...report, unresolved: tracked.unresolved }));
+        console.log(formatBatchReport({ ...report, unresolved: tracked.unresolved }, 'archetypes'));
       }
     }
   }

@@ -8,18 +8,17 @@
 // nunca aborta o lote — perder 40 personagens porque o 41º deu 429 seria caro
 // de repetir.
 
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
-import { loadCharacters } from '@buer/gi-data';
 import type { RawMeta } from '../src/types.js';
 import { readRawMeta } from '../src/load.js';
+import {
+  characterCatalog, characterSlugs, checkTargets, currentGameVersion, describeUnknownTargets,
+} from './catalog.js';
 import { computeGaps } from './gaps.js';
-import { createClient, describeApiError, MODEL } from './research/client.js';
+import { createClient, describeApiError } from './research/client.js';
 import { researchCharacter, type ResearchOutput } from './research/search.js';
 import { extractClaims, type ExtractResult } from './research/extract.js';
 import { reconcileCharacter } from './research/reconcile.js';
-import { buildDraft, writeDraft, type DraftResult } from './research/write.js';
+import { buildDraft, writeDraft, writeResearchText, type DraftResult } from './research/write.js';
 
 /**
  * Preço de `claude-opus-5` por milhão de tokens, em dólar.
@@ -87,7 +86,14 @@ export interface BatchDeps {
   readonly existing: RawMeta;
   readonly research: (slug: string) => Promise<ResearchOutput>;
   readonly extract: (slug: string, text: string) => Promise<ExtractResult>;
-  readonly write: (draft: DraftResult, io: { researchText: string; existing: RawMeta }) => void;
+  /**
+   * Grava o texto bruto da pesquisa. Chamado ASSIM QUE a pesquisa volta —
+   * antes da extração, antes de `buildDraft`, antes de qualquer recusa. É
+   * `deps` e não uma chamada direta a `writeResearchText` para o teste poder
+   * observar a ordem sem tocar o disco.
+   */
+  readonly writeResearch: (slug: string, text: string) => void;
+  readonly write: (draft: DraftResult, io: { existing: RawMeta }) => void;
   readonly onProgress?: (line: string) => void;
 }
 
@@ -104,9 +110,25 @@ export interface BatchReport {
    * lotes (personagens e times) do mesmo jeito.
    */
   readonly unresolved: readonly { readonly slug: string; readonly names: readonly string[] }[];
+  /**
+   * Alvos cuja pesquisa saiu CORTADA por esgotar o teto de retomadas.
+   *
+   * Aparecer aqui não impede a gravação — o rascunho pode até estar completo
+   * —, mas significa que um campo ausente pode ser lacuna da busca e não da
+   * fonte, o que a reconciliação não tem como distinguir sozinha.
+   */
+  readonly truncated: readonly string[];
   readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
   readonly estimatedCostUsd: number;
 }
+
+/**
+ * Qual dos dois lotes produziu o relatório. `formatBatchReport` é
+ * compartilhado, e o rodapé dele afirmava coisas que só eram verdade para o
+ * lote de personagens — inclusive chamando de "ficha" o que, no lote de
+ * times, é uma lista de ids de ARQUÉTIPO.
+ */
+export type BatchKind = 'characters' | 'archetypes';
 
 /**
  * Envolve uma função de extração para acumular, por alvo, os nomes que ela
@@ -145,6 +167,7 @@ export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
   const written: string[] = [];
   const refused: { slug: string; because: readonly string[] }[] = [];
   const failed: { slug: string; error: string }[] = [];
+  const truncated: string[] = [];
   let inputTokens = 0;
   let outputTokens = 0;
 
@@ -154,6 +177,17 @@ export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
       const research = await deps.research(slug);
       inputTokens += research.usage.inputTokens;
       outputTokens += research.usage.outputTokens;
+
+      // O texto vai para o disco AQUI, antes da extração e de qualquer
+      // decisão de recusar. A chamada de pesquisa já foi paga; se o rascunho
+      // for recusado ou a extração falhar, o revisor humano ainda fica com o
+      // artefato que justifica a arquitetura de duas chamadas.
+      deps.writeResearch(slug, research.text);
+
+      if (research.truncated) {
+        truncated.push(slug);
+        deps.onProgress?.('  pesquisa truncada: o teto de retomadas foi atingido com o turno pausado');
+      }
 
       // A extração é a SEGUNDA chamada de API, não uma continuação grátis da
       // primeira. Somar só `research.usage` reportaria metade do custo real.
@@ -169,6 +203,9 @@ export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
         claims,
         gameVersion: deps.gameVersion,
         authoredAt: deps.authoredAt,
+        // As URLs CONSULTADAS pela busca, não as que a extração declarou.
+        consultedUrls: research.urls,
+        truncated: research.truncated,
       });
 
       if (!draft.profile) {
@@ -177,7 +214,7 @@ export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
         continue;
       }
 
-      deps.write(draft, { researchText: research.text, existing: deps.existing });
+      deps.write(draft, { existing: deps.existing });
       written.push(slug);
       deps.onProgress?.(`  gravado (confiança ${draft.profile.provenance.confidence})`);
     } catch (e) {
@@ -191,13 +228,27 @@ export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
   // `unresolved` sempre vazio aqui: quem descarta nomes é `deps.extract`, e
   // `runBatch` não tem visibilidade sobre o que ele reporta a `onUnresolved`
   // — isso é papel de `withUnresolvedTracking`, na entrada de CLI.
-  return { written, refused, failed, unresolved: [], usage, estimatedCostUsd: estimateCostUsd(usage) };
+  return {
+    written, refused, failed, unresolved: [], truncated, usage,
+    estimatedCostUsd: estimateCostUsd(usage),
+  };
 }
 
-export function formatBatchReport(report: BatchReport): string {
-  const lines = ['', 'Buer — lote de pesquisa concluído', ''];
+/**
+ * O relatório dos DOIS lotes. `kind` não tem valor padrão de propósito: o
+ * rodapé afirma origem, caminho de arquivo e caminho de promoção, e o padrão
+ * silencioso faria o lote de times herdar as três afirmações do lote de
+ * personagens — que era exatamente o defeito.
+ */
+export function formatBatchReport(report: BatchReport, kind: BatchKind): string {
+  const times = kind === 'archetypes';
+  const lines = [
+    '',
+    times ? 'Buer — lote de pesquisa de TIMES concluído' : 'Buer — lote de pesquisa de FICHAS concluído',
+    '',
+  ];
 
-  lines.push(`GRAVADOS (${report.written.length})`);
+  lines.push(times ? `GRAVADOS — arquétipos (${report.written.length})` : `GRAVADOS — fichas (${report.written.length})`);
   lines.push(report.written.length === 0 ? '  nenhum' : `  ${report.written.join(', ')}`);
   lines.push('');
 
@@ -216,22 +267,31 @@ export function formatBatchReport(report: BatchReport): string {
   else for (const u of report.unresolved) lines.push(`  ${u.slug}: ${u.names.join(', ')}`);
   lines.push('');
 
+  lines.push(`PESQUISA TRUNCADA — o teto de retomadas acabou antes da busca (${report.truncated.length})`);
+  lines.push(report.truncated.length === 0 ? '  nenhum' : `  ${report.truncated.join(', ')}`);
+  if (report.truncated.length > 0) {
+    lines.push('  um campo ausente nestes alvos pode ser lacuna da pesquisa, não da fonte');
+  }
+  lines.push('');
+
   lines.push(
     `tokens: ${report.usage.inputTokens} entrada / ${report.usage.outputTokens} saída · ` +
       `custo estimado US$ ${report.estimatedCostUsd.toFixed(2)}`,
   );
   lines.push('');
-  lines.push('Toda ficha gravada nasce com authoredBy "researched". Leia o texto da pesquisa em');
-  lines.push('data/research/<slug>.md antes de promover qualquer uma para "researched-reviewed".');
+
+  if (times) {
+    lines.push('Os ids acima são de ARQUÉTIPO (data/archetypes/<id>.json), não de ficha de personagem.');
+    lines.push('Todo arquétipo gravado nasce com provenance.authoredBy "researched" e confiança');
+    lines.push('derivada de quantas fontes citaram a composição — nunca "high".');
+    lines.push('Leia o texto da pesquisa em data/research/times-<slug>.md e confira a composição');
+    lines.push('slot a slot antes de tratar qualquer um deles como curadoria humana.');
+  } else {
+    lines.push('Toda ficha gravada nasce com authoredBy "researched". Leia o texto da pesquisa em');
+    lines.push('data/research/<slug>.md antes de promover qualquer uma para "researched-reviewed".');
+  }
 
   return lines.join('\n');
-}
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-
-function currentGameVersion(): string {
-  const file = path.join(HERE, '..', 'data', 'game-version.json');
-  return (JSON.parse(readFileSync(file, 'utf8')) as { version: string }).version;
 }
 
 const USAGE = 'uso: meta:research:characters (--only <slug,slug> | --all) [--limit N] [--dry-run]';
@@ -247,8 +307,13 @@ if (import.meta.main) {
     process.exitCode = 1;
   } else {
     const raw = readRawMeta();
-    const catalog = loadCharacters() as unknown as Record<string, { slug: string }>;
+    const catalog = characterCatalog();
     const gameVersion = currentGameVersion();
+
+    // `--only xianglin` (typo) virava alvo real: duas chamadas pagas, pesquisa
+    // sobre personagem inexistente, e só então `writeDraft` recusava. O
+    // catálogo já está carregado uma linha acima.
+    const unknownTargets = checkTargets(flags.only, characterSlugs());
 
     let targets = flags.only.length > 0
       ? [...flags.only]
@@ -256,7 +321,11 @@ if (import.meta.main) {
         ? [...computeGaps({ catalog, raw, currentVersion: gameVersion }).withoutProfile]
         : [];
 
-    if (targets.length === 0) {
+    if (unknownTargets.length > 0) {
+      console.error(describeUnknownTargets(unknownTargets));
+      console.error(USAGE);
+      process.exitCode = 1;
+    } else if (targets.length === 0) {
       console.error(USAGE);
       process.exitCode = 1;
     } else {
@@ -278,10 +347,11 @@ if (import.meta.main) {
           existing: raw,
           research: (slug) => researchCharacter(slug, { client: client.messages }),
           extract: tracked.extract,
+          writeResearch: (slug, text) => writeResearchText(slug, `Pesquisa — ${slug}`, text),
           write: (draft, io) => writeDraft(draft, io),
           onProgress: (line) => console.log(line),
         });
-        console.log(formatBatchReport({ ...report, unresolved: tracked.unresolved }));
+        console.log(formatBatchReport({ ...report, unresolved: tracked.unresolved }, 'characters'));
       }
     }
   }

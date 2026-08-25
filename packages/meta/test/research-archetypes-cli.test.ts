@@ -14,7 +14,6 @@ const usage = { inputTokens: 10, outputTokens: 10 };
 function nationalClaimsFor(subject: string, source: 'icy-veins' | 'game8'): ArchetypeClaims {
   return {
     subject,
-    sources: [`https://${source}.example/${subject}`],
     teams: [{
       id: `national-${subject}`,
       label: 'National',
@@ -33,12 +32,14 @@ describe('runArchetypeBatch — composição repetida ENTRE alvos (achado Import
   it('o segundo alvo que redescobre a mesma composição não falha o lote nem duplica', async () => {
     const progress: string[] = [];
     const written: string[] = [];
+    const pesquisasGravadas: string[] = [];
 
     const report = await runArchetypeBatch({
       targets: ['xiangling', 'bennett'],
       gameVersion: '7.0',
       existing: { profiles: raw.profiles, archetypes: [] },
-      research: async () => ({ text: 'pesquisa', urls: ['https://icy-veins.com/x'], usage }),
+      research: async () => ({ text: 'pesquisa', urls: ['https://icy-veins.com/x'], usage, truncated: false }),
+      writeResearch: (subject, text) => { pesquisasGravadas.push(`${subject}:${text}`); },
       extract: async (subject) => ({
         claims: nationalClaimsFor(subject, subject === 'xiangling' ? 'icy-veins' : 'game8'),
         refused: [],
@@ -59,6 +60,10 @@ describe('runArchetypeBatch — composição repetida ENTRE alvos (achado Import
 
     // ... e isso é visível no relatório, não silencioso.
     expect(progress.some((l) => l.includes('já conhecido'))).toBe(true);
+
+    // O texto da pesquisa dos DOIS alvos foi para o disco, inclusive o do
+    // segundo, que não gravou arquétipo nenhum: a chamada foi paga igual.
+    expect(pesquisasGravadas).toEqual(['xiangling:pesquisa', 'bennett:pesquisa']);
   });
 
   it('composição já existente no banco (de um lote anterior) também é reconhecida, não só a do mesmo lote', async () => {
@@ -85,7 +90,8 @@ describe('runArchetypeBatch — composição repetida ENTRE alvos (achado Import
       targets: ['xiangling'],
       gameVersion: '7.0',
       existing: { profiles: raw.profiles, archetypes: [existingArchetype] },
-      research: async () => ({ text: 'pesquisa', urls: [], usage }),
+      research: async () => ({ text: 'pesquisa', urls: [], usage, truncated: false }),
+      writeResearch: () => {},
       extract: async (subject) => ({
         claims: nationalClaimsFor(subject, 'icy-veins'),
         refused: [],
@@ -114,7 +120,6 @@ describe('runArchetypeBatch — arquétipo curado ambíguo (flex/multi) não sup
 
     const claims: ArchetypeClaims = {
       subject: 'razor',
-      sources: ['https://icy-veins.com/razor'],
       teams: [{
         id: 'trio-desconexo',
         label: 'Trio Desconexo',
@@ -134,7 +139,8 @@ describe('runArchetypeBatch — arquétipo curado ambíguo (flex/multi) não sup
       // O banco "existente" já tem os dois curados ambíguos — é o que a
       // dedupe teria que ler sem inventar composição para eles.
       existing: { profiles: raw.profiles, archetypes: [monoGeo, freeze] },
-      research: async () => ({ text: 'pesquisa', urls: [], usage }),
+      research: async () => ({ text: 'pesquisa', urls: [], usage, truncated: false }),
+      writeResearch: () => {},
       extract: async (subject) => ({ claims, refused: [], usage }),
       write: (archetype) => { written.push(archetype.id); },
       onProgress: (line) => progress.push(line),
