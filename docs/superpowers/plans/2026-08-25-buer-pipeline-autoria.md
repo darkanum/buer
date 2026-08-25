@@ -838,7 +838,7 @@ export function reconcileCharacter(claims: CharacterClaims): ReconcileResult {
 - [ ] **Step 5: Rodar os testes e confirmar que passam**
 
 Run: `pnpm --filter @buer/meta exec vitest run test/reconcile.test.ts`
-Expected: PASS (16 testes).
+Expected: PASS (15 testes).
 
 - [ ] **Step 6: Commit**
 
@@ -1409,7 +1409,7 @@ function fold(name: string): string {
   return name
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
@@ -1867,8 +1867,13 @@ export interface DraftIo {
 export function writeDraft(draft: DraftResult, io: DraftIo): void {
   if (!draft.profile) throw new Error('rascunho recusado; nada a gravar');
 
+  // SUBSTITUI a ficha deste personagem em vez de anexar: a regra de integridade
+  // que a Fase 2 acrescentou rejeita `character` duplicado entre fichas, e
+  // repesquisar alguem que ja tem ficha lancaria "duplicado" em vez de
+  // atualizar.
+  const outros = io.existing.profiles.filter((p) => p.character !== draft.profile!.character);
   const problems = validateMeta({
-    profiles: [...io.existing.profiles, draft.profile],
+    profiles: [...outros, draft.profile],
     archetypes: io.existing.archetypes,
   });
   if (problems.length > 0) {
@@ -2389,8 +2394,8 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
     const claims = {
       ...base,
       teams: [
-        time('t', ['a', 'b'], { strength: 'meta', citedBy: ['icy-veins'] }),
-        time('t2', ['a', 'b'], { strength: 'niche', citedBy: ['game8'] }),
+        time('t', ['xingqiu', 'b'], { strength: 'meta', citedBy: ['icy-veins'] }),
+        time('t2', ['xingqiu', 'b'], { strength: 'niche', citedBy: ['game8'] }),
       ],
     };
     const d = buildArchetypeDrafts({ claims, ...base });
@@ -2398,7 +2403,7 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
   });
 
   it('strength fora do vocabulário vira niche em vez de lançar', () => {
-    const claims = { ...base, teams: [time('t', ['a', 'b'], { strength: 'S-tier' })] };
+    const claims = { ...base, teams: [time('t', ['xingqiu', 'b'], { strength: 'S-tier' })] };
     expect(buildArchetypeDrafts({ claims, ...base }).archetypes[0]!.strength).toBe('niche');
   });
 
@@ -2406,9 +2411,9 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
     const claims = {
       ...base,
       teams: [
-        time('solo', ['a']),
-        time('ok', ['a', 'b', 'c']),
-        time('cinco', ['a', 'b', 'c', 'd', 'e']),
+        time('solo', ['xingqiu']),
+        time('ok', ['xingqiu', 'b', 'c']),
+        time('cinco', ['xingqiu', 'b', 'c', 'd', 'e']),
       ],
     };
     const d = buildArchetypeDrafts({ claims, ...base });
@@ -2417,7 +2422,7 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
   });
 
   it('RECUSA time em que algum membro voltou sem papel', () => {
-    const claims = { ...base, teams: [{ ...time('t', ['a', 'b']), members: [{ slug: 'a', role: [] }, { slug: 'b', role: ['sub-dps'] }] }] };
+    const claims = { ...base, teams: [{ ...time('t', ['xingqiu', 'b']), members: [{ slug: 'xingqiu', role: [] }, { slug: 'b', role: ['sub-dps'] }] }] };
     const d = buildArchetypeDrafts({ claims, ...base });
     expect(d.archetypes).toEqual([]);
     expect(d.refused[0]!.because.join(' ')).toMatch(/papel/i);
