@@ -29,3 +29,6 @@ extracao*.json
 .next-dev.log
 # relatórios scratch dos subagentes
 /*-report.md
+
+# workspace de execução do subagent-driven-development (scratch, não versionado)
+.superpowers/
