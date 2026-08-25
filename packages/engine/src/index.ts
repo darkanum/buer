@@ -18,3 +18,5 @@ export { matchArchetype } from './team/matching.js';
 export type { ArchetypeMatch, MatchOptions } from './team/matching.js';
 export { CuratedTeamEvaluator } from './team/evaluator.js';
 export type { TeamOption, TeamsForResult, CuratedTeamEvaluatorOptions } from './team/evaluator.js';
+export { CuratedRosterAdvisor } from './advisor/advisor.js';
+export type { CuratedRosterAdvisorOptions } from './advisor/advisor.js';
