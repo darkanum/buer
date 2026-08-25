@@ -26,6 +26,40 @@ function legalMainStats(): Readonly<Record<'sands' | 'goblet' | 'circlet', Reado
 }
 
 /**
+ * Todo StatKey que o jogo conhece, derivado do mesmo `property.json` que
+ * `legalMainStats` já usa (o `goodKey` não-nulo de cada property_type). É o
+ * vocabulário fechado contra o qual `substats`, `targets` e
+ * `targetOverrides` são validados — um nome inventado aqui não pode virar
+ * "alvo não verificado" em silêncio (spec §5.5).
+ */
+function legalStatKeys(): ReadonlySet<string> {
+  const property = loadProperty();
+  const keys = new Set<string>();
+  for (const entry of Object.values(property)) {
+    if (entry.goodKey) keys.add(entry.goodKey);
+  }
+  return keys;
+}
+
+/** Confere um StatTarget (targets[] ou targetOverrides[]) contra o vocabulário de StatKey. */
+function checkTargetStatKeys(
+  target: { kind: string; stat?: string; numerator?: string; denominator?: string },
+  legalStats: ReadonlySet<string>,
+  where: string,
+  problems: string[],
+): void {
+  if (target.stat !== undefined && !legalStats.has(target.stat)) {
+    problems.push(`${where}: "${target.stat}" não é uma StatKey conhecida`);
+  }
+  if (target.numerator !== undefined && !legalStats.has(target.numerator)) {
+    problems.push(`${where}: numerator "${target.numerator}" não é uma StatKey conhecida`);
+  }
+  if (target.denominator !== undefined && !legalStats.has(target.denominator)) {
+    problems.push(`${where}: denominator "${target.denominator}" não é uma StatKey conhecida`);
+  }
+}
+
+/**
  * Todas as regras da spec §5.5, num só lugar. Devolve a lista de problemas
  * em português — vazia significa íntegro. Coleta TUDO em vez de lançar no
  * primeiro erro: quem está autorando 120 fichas quer a lista inteira.
@@ -33,14 +67,30 @@ function legalMainStats(): Readonly<Record<'sands' | 'goblet' | 'circlet', Reado
 export function validateMeta(raw: RawMeta): string[] {
   const problems: string[] = [];
   const legal = legalMainStats();
+  const legalStats = legalStatKeys();
   const variantsByCharacter = new Map<string, Set<string>>();
+  // Chave de dedupe é a CharacterKey resolvida, não o slug cru — é a chave
+  // que `loadMeta()` de fato usa no Map, então é ali que uma colisão vira
+  // uma ficha sobrescrevendo outra em silêncio.
+  const seenCharacterKeys = new Map<string, string>();
 
   for (const profile of raw.profiles ?? []) {
     const where = `ficha "${profile.character}"`;
 
     if (profile.schemaVersion !== 1) problems.push(`${where}: schemaVersion deve ser 1`);
-    if (!resolveCharacter(profile.character)) {
+    const resolvedCharKey = resolveCharacter(profile.character);
+    if (!resolvedCharKey) {
       problems.push(`${where}: slug de personagem não existe no catálogo do gi-data`);
+    } else {
+      const firstSeenAs = seenCharacterKeys.get(resolvedCharKey);
+      if (firstSeenAs !== undefined) {
+        problems.push(
+          `${where}: personagem já tem ficha declarada em outro arquivo (também autorado como ` +
+            `"${firstSeenAs}") — chave resolvida "${resolvedCharKey}" duplicada`,
+        );
+      } else {
+        seenCharacterKeys.set(resolvedCharKey, profile.character);
+      }
     }
 
     const prov = profile.provenance;
@@ -98,10 +148,17 @@ export function validateMeta(raw: RawMeta): string[] {
         weaponRanks.add(option.rank);
       }
 
+      for (const stat of variant.substats ?? []) {
+        if (!legalStats.has(stat)) {
+          problems.push(`${vwhere}: substat "${stat}" não é uma StatKey conhecida`);
+        }
+      }
+
       for (const target of variant.targets ?? []) {
         if (!target.why || target.why.trim() === '') {
           problems.push(`${vwhere}: alvo ${target.kind} sem "why" — a explicação precisa dizer por quê`);
         }
+        checkTargetStatKeys(target, legalStats, `${vwhere}, alvo ${target.kind}`, problems);
       }
     }
     variantsByCharacter.set(profile.character, seenVariants);
@@ -134,6 +191,10 @@ export function validateMeta(raw: RawMeta): string[] {
         for (const role of slot.requires.withRole ?? []) {
           if (!isRoleTag(role)) problems.push(`${where}: papel "${role}" fora do vocabulário fechado`);
         }
+      }
+
+      for (const override of slot.targetOverrides ?? []) {
+        checkTargetStatKeys(override, legalStats, `${where}, targetOverrides ${override.kind}`, problems);
       }
     }
   }

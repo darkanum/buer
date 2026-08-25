@@ -4,8 +4,14 @@ import type {
 } from '@buer/core';
 
 // ---------------------------------------------------------------------------
-// Forma AUTORADA — o que está nos arquivos JSON. Chaves são slugs legíveis.
-// Tudo aqui é `string` cru de propósito: é a fronteira não-validada.
+// Forma AUTORADA — o que está nos arquivos JSON. Chaves de personagem, set e
+// arma são slugs legíveis, tipadas aqui como `string` cru de propósito: são
+// a fronteira não-validada, resolvida para id numérico só depois (resolve.ts)
+// e conferida contra o catálogo em validate.ts. `RawBuildVariant.targets` é
+// a exceção — usa o `StatTarget` já resolvido de @buer/core diretamente,
+// porque `StatKey` é a MESMA string nas duas formas (não é slug que vira
+// id); validateMeta ainda confere que cada `stat`/`numerator`/`denominator`
+// existe no catálogo, só não precisa de uma etapa de resolução separada.
 // ---------------------------------------------------------------------------
 
 export interface RawSetOption {

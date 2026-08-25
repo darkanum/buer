@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { loadMeta, validateMeta, readRawMeta } from '../src/index.js';
+import type { RawMeta } from '../src/index.js';
 
 describe('integridade do banco curado', () => {
   it('o banco commitado é íntegro (spec §5.5)', () => {
@@ -138,5 +139,134 @@ describe('integridade do banco curado', () => {
       archetypes: [],
     });
     expect(problems.join('\n')).toContain('sands');
+  });
+
+  it('rejeita ficha de personagem duplicada (mesma chave resolvida)', () => {
+    const profile = {
+      schemaVersion: 1 as const,
+      character: 'xiangling',
+      variants: [],
+      provenance: {
+        authoredBy: 'human', sources: [], authoredAt: '2026-08-24',
+        validatedForVersion: '7.0', confidence: 'high',
+      },
+    };
+    const problems = validateMeta({ profiles: [profile, profile], archetypes: [] });
+    expect(problems.join('\n')).toContain('xiangling');
+    expect(problems.join('\n')).toMatch(/duplicad/);
+  });
+
+  it('rejeita ficha duplicada do Traveler quando a chave composta (slug:elemento) colide', () => {
+    const profile = {
+      schemaVersion: 1 as const,
+      character: 'aether:anemo',
+      variants: [],
+      provenance: {
+        authoredBy: 'human', sources: [], authoredAt: '2026-08-24',
+        validatedForVersion: '7.0', confidence: 'high',
+      },
+    };
+    const problems = validateMeta({ profiles: [profile, profile], archetypes: [] });
+    expect(problems.join('\n')).toContain('aether:anemo');
+    expect(problems.join('\n')).toMatch(/duplicad/);
+  });
+
+  it('rejeita StatKey inventada em substats', () => {
+    const problems = validateMeta({
+      profiles: [
+        {
+          schemaVersion: 1,
+          character: 'xiangling',
+          variants: [
+            {
+              id: 'x', label: 'X', roles: ['sub-dps'], scalesOn: 'atk',
+              sets: [], mainStats: { sands: [], goblet: [], circlet: [] },
+              substats: ['statKeyInventada'], weapons: [], targets: [],
+            },
+          ],
+          provenance: {
+            authoredBy: 'human', sources: [], authoredAt: '2026-08-24',
+            validatedForVersion: '7.0', confidence: 'high',
+          },
+        },
+      ],
+      archetypes: [],
+    });
+    expect(problems.join('\n')).toContain('statKeyInventada');
+  });
+
+  it('rejeita StatKey inventada em targets (stat, numerator e denominator)', () => {
+    const problems = validateMeta({
+      profiles: [
+        {
+          schemaVersion: 1,
+          character: 'xiangling',
+          variants: [
+            {
+              id: 'x', label: 'X', roles: ['sub-dps'], scalesOn: 'atk',
+              sets: [], mainStats: { sands: [], goblet: [], circlet: [] },
+              substats: [], weapons: [],
+              targets: [
+                { kind: 'min', stat: 'statKeyInventada', value: 1, hard: true, why: 'teste' },
+                {
+                  kind: 'ratio', numerator: 'outraStatInventada', denominator: 'critRate_',
+                  min: 1, max: 2, why: 'teste',
+                },
+              ],
+            },
+          ],
+          provenance: {
+            authoredBy: 'human', sources: [], authoredAt: '2026-08-24',
+            validatedForVersion: '7.0', confidence: 'high',
+          },
+        },
+      ],
+      archetypes: [],
+      // "stat"/"numerator" abaixo são inventados de propósito (é o que o
+      // teste verifica) — RawMeta tipa targets com o StatTarget já
+      // resolvido, então StatKey precisa do cast pra aceitar o valor inválido.
+    } as unknown as RawMeta);
+    expect(problems.join('\n')).toContain('statKeyInventada');
+    expect(problems.join('\n')).toContain('outraStatInventada');
+  });
+
+  it('rejeita StatKey inventada em targetOverrides de slot de arquétipo', () => {
+    const problems = validateMeta({
+      profiles: [
+        {
+          schemaVersion: 1,
+          character: 'xiangling',
+          variants: [
+            {
+              id: 'national-er', label: 'National', roles: ['sub-dps'], scalesOn: 'atk',
+              sets: [], mainStats: { sands: [], goblet: [], circlet: [] },
+              substats: [], weapons: [], targets: [],
+            },
+          ],
+          provenance: {
+            authoredBy: 'human', sources: [], authoredAt: '2026-08-24',
+            validatedForVersion: '7.0', confidence: 'high',
+          },
+        },
+      ],
+      archetypes: [
+        {
+          schemaVersion: 1, id: 'teste', label: 'Teste',
+          gameVersionAdded: '7.0', strength: 'meta', tags: [], sources: [],
+          slots: [
+            {
+              role: ['sub-dps'], substitutable: false,
+              requires: { kind: 'character', anyOf: ['xiangling'] },
+              variant: 'national-er',
+              targetOverrides: [
+                { kind: 'min', stat: 'statKeyInventadaNoOverride', value: 1, hard: true, why: 'teste' },
+              ],
+            },
+          ],
+        },
+      ],
+      // "stat" acima é inventado de propósito — mesmo cast do teste anterior.
+    } as unknown as RawMeta);
+    expect(problems.join('\n')).toContain('statKeyInventadaNoOverride');
   });
 });
