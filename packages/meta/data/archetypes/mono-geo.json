@@ -25,9 +25,9 @@
       "substitutable": true
     },
     {
-      "role": ["buffer"],
-      "requires": { "kind": "character", "anyOf": [] },
-      "substitutable": true
+      "role": ["buffer", "shielder"],
+      "requires": { "kind": "character", "anyOf": ["zhongli", "yun-jin", "xilonen", "chiori"] },
+      "substitutable": false
     }
   ]
 }

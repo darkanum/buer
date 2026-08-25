@@ -269,4 +269,54 @@ describe('integridade do banco curado', () => {
     } as unknown as RawMeta);
     expect(problems.join('\n')).toContain('statKeyInventadaNoOverride');
   });
+  it('rejeita slot de personagem com anyOf vazio (o buraco que pôs geo num time de bloom)', () => {
+    const problems = validateMeta({
+      profiles: [],
+      archetypes: [
+        {
+          schemaVersion: 1, id: 'teste', label: 'Teste',
+          gameVersionAdded: '7.0', strength: 'meta', tags: [], sources: [],
+          slots: [
+            { role: ['buffer', 'healer'], substitutable: true, requires: { kind: 'character', anyOf: [] } },
+            { role: ['sub-dps'], substitutable: true, requires: { kind: 'element', element: 'electro', withRole: ['sub-dps'] } },
+          ],
+        },
+      ],
+    });
+    expect(problems.join('\n')).toMatch(/anyOf" vazio/);
+  });
+
+  it('rejeita requires.element que não é um dos 7 elementos do jogo', () => {
+    const problems = validateMeta({
+      profiles: [],
+      archetypes: [
+        {
+          schemaVersion: 1, id: 'teste', label: 'Teste',
+          gameVersionAdded: '7.0', strength: 'meta', tags: [], sources: [],
+          slots: [
+            { role: ['sub-dps'], substitutable: true, requires: { kind: 'element', element: 'eletro', withRole: ['sub-dps'] } },
+            { role: ['sub-dps'], substitutable: false, requires: { kind: 'character', anyOf: ['xiangling'] } },
+          ],
+        },
+      ],
+    });
+    expect(problems.join('\n')).toContain('eletro');
+  });
+
+  it('rejeita schemaVersion de arquétipo diferente de 1, como já faz com a ficha', () => {
+    const problems = validateMeta({
+      profiles: [],
+      archetypes: [
+        {
+          schemaVersion: 2, id: 'teste', label: 'Teste',
+          gameVersionAdded: '7.0', strength: 'meta', tags: [], sources: [],
+          slots: [
+            { role: ['sub-dps'], substitutable: false, requires: { kind: 'character', anyOf: ['xiangling'] } },
+            { role: ['buffer'], substitutable: false, requires: { kind: 'character', anyOf: ['bennett'] } },
+          ],
+        },
+      ],
+    });
+    expect(problems.join('\n')).toMatch(/schemaVersion deve ser 1/);
+  });
 });

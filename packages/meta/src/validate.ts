@@ -7,6 +7,9 @@ const SCALES_ON = new Set(['atk', 'hp', 'def', 'eleMas']);
 const AUTHORED_BY = new Set(['human', 'researched', 'researched-reviewed']);
 const CONFIDENCE = new Set(['high', 'medium', 'low']);
 const STRENGTH = new Set(['meta', 'strong', 'niche']);
+/** Os 7 elementos do jogo. Um typo em `requires.element` passava batido e
+ *  virava um slot que nunca casa — em silêncio, que é o pior modo de falhar. */
+const ELEMENTS = new Set(['pyro', 'hydro', 'cryo', 'electro', 'anemo', 'geo', 'dendro']);
 const SLOT_ID = { sands: 3, goblet: 4, circlet: 5 } as const;
 
 /** StatKeys legais por slot, derivados de gi-data (slot-main × property). */
@@ -169,6 +172,7 @@ export function validateMeta(raw: RawMeta): string[] {
     const where = `arquétipo "${archetype.id}"`;
     if (seenArchetypes.has(archetype.id)) problems.push(`${where}: id duplicado`);
     seenArchetypes.add(archetype.id);
+    if (archetype.schemaVersion !== 1) problems.push(`${where}: schemaVersion deve ser 1`);
     if (!STRENGTH.has(archetype.strength)) problems.push(`${where}: strength inválido`);
     if (archetype.slots.length < 2 || archetype.slots.length > 4) {
       problems.push(`${where}: um time tem de 2 a 4 slots, veio com ${archetype.slots.length}`);
@@ -179,6 +183,17 @@ export function validateMeta(raw: RawMeta): string[] {
         if (!isRoleTag(role)) problems.push(`${where}: papel "${role}" fora do vocabulário fechado`);
       }
       if (slot.requires.kind === 'character') {
+        // `anyOf` vazio degenera, junto com `substitutable: true`, em "qualquer
+        // um cuja ficha declare um dos papéis do slot" — sem filtro de elemento
+        // e sem nome, o que já pôs geo dentro de um time de bloom. Um slot que
+        // não nomeia ninguém não é um slot de personagem: é um slot de
+        // elemento mal escrito, e o schema tem a forma certa para ele.
+        if (slot.requires.anyOf.length === 0) {
+          problems.push(
+            `${where}: slot de personagem com "anyOf" vazio — nomeie os candidatos, ` +
+              `ou use requires.kind "element" se o slot é por elemento + papel`,
+          );
+        }
         for (const slug of slot.requires.anyOf) {
           if (!resolveCharacter(slug)) problems.push(`${where}: personagem "${slug}" não existe no catálogo`);
           if (slot.variant && !variantsByCharacter.get(slug)?.has(slot.variant)) {
@@ -188,6 +203,9 @@ export function validateMeta(raw: RawMeta): string[] {
           }
         }
       } else {
+        if (!ELEMENTS.has(slot.requires.element)) {
+          problems.push(`${where}: "${slot.requires.element}" não é um dos 7 elementos do jogo`);
+        }
         for (const role of slot.requires.withRole ?? []) {
           if (!isRoleTag(role)) problems.push(`${where}: papel "${role}" fora do vocabulário fechado`);
         }

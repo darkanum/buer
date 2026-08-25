@@ -18,7 +18,11 @@ const roster = rosterFromHoyolab(raw, { capturedAt: '2026-08-24T00:00:00.000Z', 
 const bank = loadMeta();
 const evaluator = new CuratedTeamEvaluator({ bank, resolver: new ObservedStatResolver() });
 const XIANGLING = '10000023' as CharacterKey;
-const BARBARA = '10000014' as CharacterKey;
+// Tighnari: DENDRO, com ficha no banco, e nomeado em arquétipo nenhum —
+// nenhum slot de elemento do banco pede dendro e nenhum `anyOf` o cita.
+// (Era a Barbara aqui; ela virou candidata legítima do slot de buffer/healer
+// do Hyperbloom quando esse slot deixou de ser um `anyOf` vazio.)
+const TIGHNARI = '10000069' as CharacterKey;
 
 describe('CuratedTeamEvaluator.teamsFor', () => {
   it('lista o National como time jogável para Xiangling', async () => {
@@ -53,7 +57,7 @@ describe('CuratedTeamEvaluator.teamsFor', () => {
   });
 
   it('personagem sem arquétipo nenhum devolve as duas listas vazias, sem inventar time', async () => {
-    const r = await evaluator.teamsFor(BARBARA, roster);
+    const r = await evaluator.teamsFor(TIGHNARI, roster);
     expect(r.playable).toHaveLength(0);
     expect(r.blocked).toHaveLength(0);
   });

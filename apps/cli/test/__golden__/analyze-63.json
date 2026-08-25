@@ -1,6 +1,6 @@
 {
   "scope": "account",
-  "datasetSha": "ed959bfd518c75d7",
+  "datasetSha": "ac9480621fbfbf10",
   "characters": [
     {
       "key": "10000003",
@@ -400,7 +400,7 @@
             "10000067",
             "10000025",
             "10000031",
-            "10000055"
+            "10000043"
           ],
           "variantId": "sub-dps-er",
           "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige.",
@@ -449,9 +449,9 @@
               "actual": 105.8
             },
             {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
             }
           ]
         },
@@ -661,7 +661,7 @@
             "10000067",
             "10000025",
             "10000031",
-            "10000055"
+            "10000043"
           ],
           "variantId": "off-field-electro",
           "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Sub-DPS de electro off-field (Oz)\", a única variante da ficha.",
@@ -710,9 +710,9 @@
               "actual": 105.8
             },
             {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
             }
           ]
         }
@@ -815,74 +815,10 @@
       },
       "playableTeams": [
         {
-          "archetypeId": "hyperbloom",
-          "archetypeLabel": "Hyperbloom",
-          "strength": "meta",
-          "rankedBy": "strength",
-          "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000032"
-          ],
-          "variantId": "buffer-er",
-          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Buffer de ATQ (ER alto)\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
-            },
-            {
-              "check": "mainStats",
-              "status": "off-target",
-              "credit": 0.3333333333333333,
-              "summary": "Main-stat fora do alvo: sands vazio; circlet vazio."
-            },
-            {
-              "check": "targets",
-              "status": "blocking",
-              "credit": 0.7694444444444445,
-              "summary": "Fora do alvo: enerRech_ 138.5 (alvo 180).",
-              "why": "o buff de ATQ vem do campo do burst; sem 180% de ER o campo fica com buraco entre rotações e o time inteiro perde o buff"
-            },
-            {
-              "check": "weapon",
-              "status": "off-target",
-              "credit": 0.5,
-              "summary": "Arma 11417 não está na ficha; a de rank 1 é 11501."
-            },
-            {
-              "check": "substats",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "0 de 9 rolls (0%) nas stats prioritárias: enerRech_, hp_, atk_."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000025",
-              "required": 180,
-              "actual": 100
-            },
-            {
-              "of": "10000031",
-              "required": 120,
-              "actual": 105.8
-            },
-            {
-              "of": "10000032",
-              "required": 180,
-              "actual": 138.5
-            }
-          ]
-        },
-        {
           "archetypeId": "national",
           "archetypeLabel": "National",
           "strength": "meta",
-          "rankedBy": "targets",
+          "rankedBy": "strength",
           "members": [
             "10000023",
             "10000032",
@@ -948,72 +884,7 @@
           ]
         }
       ],
-      "blockedTeams": [
-        {
-          "archetypeId": "mono-geo",
-          "archetypeLabel": "Mono Geo",
-          "strength": "niche",
-          "rankedBy": "strength",
-          "members": [
-            "10000034",
-            "10000055",
-            null,
-            "10000032"
-          ],
-          "variantId": "buffer-er",
-          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra \"Buffer de ATQ (ER alto)\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
-            },
-            {
-              "check": "mainStats",
-              "status": "off-target",
-              "credit": 0.3333333333333333,
-              "summary": "Main-stat fora do alvo: sands vazio; circlet vazio."
-            },
-            {
-              "check": "targets",
-              "status": "blocking",
-              "credit": 0.7694444444444445,
-              "summary": "Fora do alvo: enerRech_ 138.5 (alvo 180).",
-              "why": "o buff de ATQ vem do campo do burst; sem 180% de ER o campo fica com buraco entre rotações e o time inteiro perde o buff"
-            },
-            {
-              "check": "weapon",
-              "status": "off-target",
-              "credit": 0.5,
-              "summary": "Arma 11417 não está na ficha; a de rank 1 é 11501."
-            },
-            {
-              "check": "substats",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "0 de 9 rolls (0%) nas stats prioritárias: enerRech_, hp_, atk_."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000034",
-              "required": 130,
-              "actual": 100
-            },
-            {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
-            },
-            {
-              "of": "10000032",
-              "required": 180,
-              "actual": 138.5
-            }
-          ]
-        }
-      ],
+      "blockedTeams": [],
       "acquisitions": [],
       "coverageGaps": []
     },
@@ -1041,150 +912,11 @@
         "cryo_dmg_": 0,
         "physical_dmg_": 0
       },
-      "playableTeams": [
-        {
-          "archetypeId": "hyperbloom",
-          "archetypeLabel": "Hyperbloom",
-          "strength": "meta",
-          "rankedBy": "strength",
-          "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000034"
-          ],
-          "variantId": "def-carry",
-          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Main-DPS de DEF (geo, escudo próprio)\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "Conjunto fora da ficha: 2pc de 15001 + 2pc de 10005."
-            },
-            {
-              "check": "mainStats",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Main-stats conforme a ficha."
-            },
-            {
-              "check": "targets",
-              "status": "acceptable",
-              "credit": 0.6346153846153846,
-              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 130); critDMG_/critRate_ = 2.64 (faixa 1.5–2.5).",
-              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
-            },
-            {
-              "check": "weapon",
-              "status": "off-target",
-              "credit": 0.5,
-              "summary": "Arma 12302 não está na ficha; a de rank 1 é 12402."
-            },
-            {
-              "check": "substats",
-              "status": "off-target",
-              "credit": 0.43859649122807015,
-              "summary": "5 de 19 rolls (26%) nas stats prioritárias: critRate_, critDMG_, def_, enerRech_.",
-              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000025",
-              "required": 180,
-              "actual": 100
-            },
-            {
-              "of": "10000031",
-              "required": 120,
-              "actual": 105.8
-            },
-            {
-              "of": "10000034",
-              "required": 130,
-              "actual": 100
-            }
-          ]
-        }
-      ],
-      "blockedTeams": [
-        {
-          "archetypeId": "mono-geo",
-          "archetypeLabel": "Mono Geo",
-          "strength": "niche",
-          "rankedBy": "strength",
-          "members": [
-            "10000034",
-            "10000055",
-            null,
-            "10000043"
-          ],
-          "variantId": "def-carry",
-          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra a variante \"Main-DPS de DEF (geo, escudo próprio)\", que este time exige.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "Conjunto fora da ficha: 2pc de 15001 + 2pc de 10005."
-            },
-            {
-              "check": "mainStats",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Main-stats conforme a ficha."
-            },
-            {
-              "check": "targets",
-              "status": "acceptable",
-              "credit": 0.6346153846153846,
-              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 130); critDMG_/critRate_ = 2.64 (faixa 1.5–2.5).",
-              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa; crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
-            },
-            {
-              "check": "weapon",
-              "status": "off-target",
-              "credit": 0.5,
-              "summary": "Arma 12302 não está na ficha; a de rank 1 é 12402."
-            },
-            {
-              "check": "substats",
-              "status": "off-target",
-              "credit": 0.43859649122807015,
-              "summary": "5 de 19 rolls (26%) nas stats prioritárias: critRate_, critDMG_, def_, enerRech_.",
-              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000034",
-              "required": 130,
-              "actual": 100
-            },
-            {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
-            },
-            {
-              "of": "10000043",
-              "required": 160,
-              "actual": 141.5
-            }
-          ]
-        }
-      ],
+      "playableTeams": [],
+      "blockedTeams": [],
       "acquisitions": [],
-      "coverageGaps": [
-        {
-          "description": "Falta um personagem de geo que cumpra sub-dps. Nenhum personagem com ficha cobre esse papel ainda.",
-          "severity": "minor",
-          "blockedArchetypes": [
-            "mono-geo"
-          ]
-        }
-      ]
+      "coverageGaps": [],
+      "note": "Ainda sem time curado que inclua este personagem."
     },
     {
       "key": "10000035",
@@ -1532,70 +1264,6 @@
               "actual": 141.5
             }
           ]
-        },
-        {
-          "archetypeId": "mono-geo",
-          "archetypeLabel": "Mono Geo",
-          "strength": "niche",
-          "rankedBy": "strength",
-          "members": [
-            "10000034",
-            "10000055",
-            null,
-            "10000043"
-          ],
-          "variantId": "em-driver",
-          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Conjunto 4pc rank 1 da ficha."
-            },
-            {
-              "check": "mainStats",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Main-stats conforme a ficha."
-            },
-            {
-              "check": "targets",
-              "status": "blocking",
-              "credit": 0.9421875,
-              "summary": "Fora do alvo: enerRech_ 141.5 (alvo 160).",
-              "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação"
-            },
-            {
-              "check": "weapon",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Arma 14403, rank 1 da ficha."
-            },
-            {
-              "check": "substats",
-              "status": "acceptable",
-              "credit": 0.7936507936507936,
-              "summary": "20 de 42 rolls (48%) nas stats prioritárias: eleMas, enerRech_, atk_."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000034",
-              "required": 130,
-              "actual": 100
-            },
-            {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
-            },
-            {
-              "of": "10000043",
-              "required": 160,
-              "actual": 141.5
-            }
-          ]
         }
       ],
       "acquisitions": [],
@@ -1753,148 +1421,11 @@
         "cryo_dmg_": 0,
         "physical_dmg_": 0
       },
-      "playableTeams": [
-        {
-          "archetypeId": "hyperbloom",
-          "archetypeLabel": "Hyperbloom",
-          "strength": "meta",
-          "rankedBy": "strength",
-          "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000055"
-          ],
-          "variantId": "geo-support",
-          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Suporte geo (buff de DEF/RES, ER alto)\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Conjunto 4pc rank 1 da ficha."
-            },
-            {
-              "check": "mainStats",
-              "status": "off-target",
-              "credit": 0.3333333333333333,
-              "summary": "Main-stat fora do alvo: goblet com electro_dmg_ (a ficha pede def_); circlet com atk_ (a ficha pede def_)."
-            },
-            {
-              "check": "targets",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Alvos cumpridos: enerRech_ 217.3 (alvo 180)."
-            },
-            {
-              "check": "weapon",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Arma 15401, rank 1 da ficha."
-            },
-            {
-              "check": "substats",
-              "status": "off-target",
-              "credit": 0.31746031746031744,
-              "summary": "4 de 21 rolls (19%) nas stats prioritárias: enerRech_, def_, critRate_.",
-              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000025",
-              "required": 180,
-              "actual": 100
-            },
-            {
-              "of": "10000031",
-              "required": 120,
-              "actual": 105.8
-            },
-            {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
-            }
-          ]
-        }
-      ],
-      "blockedTeams": [
-        {
-          "archetypeId": "mono-geo",
-          "archetypeLabel": "Mono Geo",
-          "strength": "niche",
-          "rankedBy": "strength",
-          "members": [
-            "10000034",
-            "10000055",
-            null,
-            "10000043"
-          ],
-          "variantId": "geo-support",
-          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra a variante \"Suporte geo (buff de DEF/RES, ER alto)\", que este time exige.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Conjunto 4pc rank 1 da ficha."
-            },
-            {
-              "check": "mainStats",
-              "status": "off-target",
-              "credit": 0.3333333333333333,
-              "summary": "Main-stat fora do alvo: goblet com electro_dmg_ (a ficha pede def_); circlet com atk_ (a ficha pede def_)."
-            },
-            {
-              "check": "targets",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Alvos cumpridos: enerRech_ 217.3 (alvo 180)."
-            },
-            {
-              "check": "weapon",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Arma 15401, rank 1 da ficha."
-            },
-            {
-              "check": "substats",
-              "status": "off-target",
-              "credit": 0.31746031746031744,
-              "summary": "4 de 21 rolls (19%) nas stats prioritárias: enerRech_, def_, critRate_.",
-              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000034",
-              "required": 130,
-              "actual": 100
-            },
-            {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
-            },
-            {
-              "of": "10000043",
-              "required": 160,
-              "actual": 141.5
-            }
-          ]
-        }
-      ],
+      "playableTeams": [],
+      "blockedTeams": [],
       "acquisitions": [],
-      "coverageGaps": [
-        {
-          "description": "Falta um personagem de geo que cumpra sub-dps. Nenhum personagem com ficha cobre esse papel ainda.",
-          "severity": "minor",
-          "blockedArchetypes": [
-            "mono-geo"
-          ]
-        }
-      ]
+      "coverageGaps": [],
+      "note": "Ainda sem time curado que inclua este personagem."
     },
     {
       "key": "10000061",
@@ -2266,72 +1797,7 @@
         "geo_dmg_": 0,
         "physical_dmg_": 0
       },
-      "playableTeams": [
-        {
-          "archetypeId": "hyperbloom",
-          "archetypeLabel": "Hyperbloom",
-          "strength": "meta",
-          "rankedBy": "strength",
-          "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000090"
-          ],
-          "variantId": "overload-support",
-          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Suporte de overload (HP alto)\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "Conjunto fora da ficha: 2pc de 15017 + 2pc de 15003."
-            },
-            {
-              "check": "mainStats",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Main-stats conforme a ficha."
-            },
-            {
-              "check": "targets",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Alvos cumpridos: enerRech_ 174.2 (alvo 160)."
-            },
-            {
-              "check": "weapon",
-              "status": "acceptable",
-              "credit": 0.85,
-              "summary": "Arma 13303, rank 2 da ficha."
-            },
-            {
-              "check": "substats",
-              "status": "acceptable",
-              "credit": 0.813953488372093,
-              "summary": "21 de 43 rolls (49%) nas stats prioritárias: hp_, enerRech_, def_.",
-              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000025",
-              "required": 180,
-              "actual": 100
-            },
-            {
-              "of": "10000031",
-              "required": 120,
-              "actual": 105.8
-            },
-            {
-              "of": "10000090",
-              "required": 160,
-              "actual": 174.2
-            }
-          ]
-        }
-      ],
+      "playableTeams": [],
       "blockedTeams": [
         {
           "archetypeId": "overload-chevreuse",
@@ -2389,70 +1855,6 @@
               "of": "10000031",
               "required": 120,
               "actual": 105.8
-            }
-          ]
-        },
-        {
-          "archetypeId": "mono-geo",
-          "archetypeLabel": "Mono Geo",
-          "strength": "niche",
-          "rankedBy": "strength",
-          "members": [
-            "10000034",
-            "10000055",
-            null,
-            "10000090"
-          ],
-          "variantId": "overload-support",
-          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra \"Suporte de overload (HP alto)\", a única variante da ficha.",
-          "findings": [
-            {
-              "check": "set",
-              "status": "off-target",
-              "credit": 0,
-              "summary": "Conjunto fora da ficha: 2pc de 15017 + 2pc de 15003."
-            },
-            {
-              "check": "mainStats",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Main-stats conforme a ficha."
-            },
-            {
-              "check": "targets",
-              "status": "on-target",
-              "credit": 1,
-              "summary": "Alvos cumpridos: enerRech_ 174.2 (alvo 160)."
-            },
-            {
-              "check": "weapon",
-              "status": "acceptable",
-              "credit": 0.85,
-              "summary": "Arma 13303, rank 2 da ficha."
-            },
-            {
-              "check": "substats",
-              "status": "acceptable",
-              "credit": 0.813953488372093,
-              "summary": "21 de 43 rolls (49%) nas stats prioritárias: hp_, enerRech_, def_.",
-              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
-            }
-          ],
-          "energy": [
-            {
-              "of": "10000034",
-              "required": 130,
-              "actual": 100
-            },
-            {
-              "of": "10000055",
-              "required": 180,
-              "actual": 217.3
-            },
-            {
-              "of": "10000090",
-              "required": 160,
-              "actual": 174.2
             }
           ]
         }

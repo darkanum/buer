@@ -23,10 +23,24 @@ describe('cobertura da primeira leva curada', () => {
     // Se um arquétipo sai "too-far" na conta que tem 63 personagens, quase
     // sempre é slot autorado errado (papel que ninguém declara, ou minCons
     // alto demais), não escassez de roster.
+    //
+    // A exceção é NOMEADA, nunca genérica — a lista abaixo é curta de
+    // propósito: qualquer arquétipo NOVO caindo em "too-far" continua
+    // derrubando este teste.
+    //
+    // `mono-geo`: os dois únicos personagens geo com ficha no banco (noelle,
+    // gorou) estão fixados nos slots 1 e 2, então os slots 3 (geo sub-dps,
+    // flex — flex exige ficha) e 4 (geo buffer/shielder, nomeado — a conta
+    // não tem nenhum dos nomes) não têm de onde sair. É lacuna de COBERTURA
+    // DO BANCO (spec §14.2), não slot autorado errado: o time de fato não é
+    // formável, e dizer que ele está "a um slot" seria a mentira. Sai da
+    // lista assim que o banco ganhar uma ficha geo de sub-dps.
+    const KNOWN_BANK_GAPS = ['mono-geo'];
+
     const tooFar = bank.archetypes
       .map((a) => ({ id: a.id, status: matchArchetype(a, roster, bank).status }))
       .filter((x) => x.status === 'too-far');
-    expect(tooFar).toEqual([]);
+    expect(tooFar.map((x) => x.id).sort()).toEqual(KNOWN_BANK_GAPS);
   });
 
   it('todo slot flex do banco casa com pelo menos um personagem com ficha', () => {
