@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runBatch, parseArgs, estimateCostUsd, formatBatchReport } from '../scripts/research-characters.js';
+import { runBatch, parseArgs, estimateCostUsd, formatBatchReport, withUnresolvedTracking } from '../scripts/research-characters.js';
 import type { CharacterClaims } from '../scripts/research/claims.js';
 
 const emptyMeta = { profiles: [], archetypes: [] };
@@ -158,5 +158,38 @@ describe('runBatch', () => {
     expect(texto).toContain('incompleto');
     expect(texto).toMatch(/recusad/i);
     expect(texto).toMatch(/US\$|custo/i);
+  });
+});
+
+describe('withUnresolvedTracking — o mecanismo de descarte fica ligado, não só disponível', () => {
+  it('acumula os nomes descartados por alvo, sem mudar a forma que runBatch espera de `extract`', async () => {
+    const tracked = withUnresolvedTracking(async (slug: string, _text: string, onUnresolved) => {
+      if (slug === 'xiangling') onUnresolved('game8', ['Conjunto Que Não Existe']);
+      return { claims: claimsFor(slug, true), usage: { inputTokens: 1, outputTokens: 1 } };
+    });
+
+    await tracked.extract('xiangling', 'texto');
+    await tracked.extract('bennett', 'texto'); // não descarta nada — não deve aparecer
+
+    expect(tracked.unresolved).toEqual([{ slug: 'xiangling', names: ['Conjunto Que Não Existe'] }]);
+  });
+
+  it('o nome descartado chega ao relatório final, numa seção própria', async () => {
+    const { deps: d } = deps(['xiangling']);
+    const report = await runBatch(d);
+    const texto = formatBatchReport({
+      ...report,
+      unresolved: [{ slug: 'xiangling', names: ['Conjunto Que Não Existe'] }],
+    });
+    expect(texto).toMatch(/NÃO RECONHECIDOS/);
+    expect(texto).toContain('Conjunto Que Não Existe');
+  });
+
+  it('sem nomes descartados, a seção diz "nenhum" — não fica em branco nem some', () => {
+    const texto = formatBatchReport({
+      written: [], refused: [], failed: [], unresolved: [],
+      usage: { inputTokens: 0, outputTokens: 0 }, estimatedCostUsd: 0,
+    });
+    expect(texto).toMatch(/NÃO RECONHECIDOS \(descartados\) \(0\)/);
   });
 });

@@ -95,8 +95,50 @@ export interface BatchReport {
   readonly written: readonly string[];
   readonly refused: readonly { readonly slug: string; readonly because: readonly string[] }[];
   readonly failed: readonly { readonly slug: string; readonly error: string }[];
+  /**
+   * Nomes descartados por não resolverem no catálogo (conjunto, arma, papel,
+   * ou — no lote de times — o próprio personagem), por alvo. `runBatch` não
+   * enxerga isso sozinho: quem popula é `withUnresolvedTracking`, que envolve
+   * `deps.extract` na entrada de CLI. Um campo aqui, mesmo que `runBatch`
+   * sempre devolva `[]`, é o que permite `formatBatchReport` mostrar os dois
+   * lotes (personagens e times) do mesmo jeito.
+   */
+  readonly unresolved: readonly { readonly slug: string; readonly names: readonly string[] }[];
   readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
   readonly estimatedCostUsd: number;
+}
+
+/**
+ * Envolve uma função de extração para acumular, por alvo, os nomes que ela
+ * descartou por não resolverem no catálogo — sem mudar a forma que `runBatch`
+ * espera de `BatchDeps.extract` (`(slug, text) => Promise<{claims; usage}>`).
+ *
+ * Existe porque o mecanismo `onUnresolved` (Task 4/7) tinha comprador nenhum:
+ * a função existia, mas nenhuma entrada de CLI a ligava — o descarte era
+ * 100% silencioso em produção, sem log e sem linha de relatório. Devolver um
+ * `extract` já instrumentado, mais o acumulador que ele escreve, deixa a
+ * ligação testável sem precisar rodar a CLI inteira.
+ */
+export function withUnresolvedTracking<T>(
+  extract: (
+    slug: string,
+    text: string,
+    onUnresolved: (source: string, names: readonly string[]) => void,
+  ) => Promise<T>,
+): {
+  readonly extract: (slug: string, text: string) => Promise<T>;
+  readonly unresolved: readonly { readonly slug: string; readonly names: readonly string[] }[];
+} {
+  const unresolved: { slug: string; names: string[] }[] = [];
+  return {
+    unresolved,
+    extract: async (slug, text) => {
+      const names: string[] = [];
+      const result = await extract(slug, text, (_source, ns) => names.push(...ns));
+      if (names.length > 0) unresolved.push({ slug, names });
+      return result;
+    },
+  };
 }
 
 export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
@@ -146,7 +188,10 @@ export async function runBatch(deps: BatchDeps): Promise<BatchReport> {
   }
 
   const usage = { inputTokens, outputTokens };
-  return { written, refused, failed, usage, estimatedCostUsd: estimateCostUsd(usage) };
+  // `unresolved` sempre vazio aqui: quem descarta nomes é `deps.extract`, e
+  // `runBatch` não tem visibilidade sobre o que ele reporta a `onUnresolved`
+  // — isso é papel de `withUnresolvedTracking`, na entrada de CLI.
+  return { written, refused, failed, unresolved: [], usage, estimatedCostUsd: estimateCostUsd(usage) };
 }
 
 export function formatBatchReport(report: BatchReport): string {
@@ -164,6 +209,11 @@ export function formatBatchReport(report: BatchReport): string {
   lines.push(`FALHARAM (${report.failed.length})`);
   if (report.failed.length === 0) lines.push('  nenhum');
   else for (const f of report.failed) lines.push(`  ${f.slug}: ${f.error}`);
+  lines.push('');
+
+  lines.push(`NOMES NÃO RECONHECIDOS (descartados) (${report.unresolved.length})`);
+  if (report.unresolved.length === 0) lines.push('  nenhum');
+  else for (const u of report.unresolved) lines.push(`  ${u.slug}: ${u.names.join(', ')}`);
   lines.push('');
 
   lines.push(
@@ -218,17 +268,20 @@ if (import.meta.main) {
         console.log('Nada foi chamado nem gravado (--dry-run).');
       } else {
         const client = createClient();
+        const tracked = withUnresolvedTracking((slug, text, onUnresolved) =>
+          extractClaims(slug, text, { client: client.messages, onUnresolved }),
+        );
         const report = await runBatch({
           targets,
           gameVersion,
           authoredAt: new Date().toISOString().slice(0, 10),
           existing: raw,
           research: (slug) => researchCharacter(slug, { client: client.messages }),
-          extract: (slug, text) => extractClaims(slug, text, { client: client.messages }),
+          extract: tracked.extract,
           write: (draft, io) => writeDraft(draft, io),
           onProgress: (line) => console.log(line),
         });
-        console.log(formatBatchReport(report));
+        console.log(formatBatchReport({ ...report, unresolved: tracked.unresolved }));
       }
     }
   }

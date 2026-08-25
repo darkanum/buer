@@ -48,9 +48,15 @@ export interface ArchetypeDraftDeps {
   readonly sources: readonly string[];
 }
 
+/** Forma compartilhada de recusa: por que um time não virou arquétipo. */
+export interface ArchetypeRefusal {
+  readonly id: string;
+  readonly because: readonly string[];
+}
+
 export interface ArchetypeDraftResult {
   readonly archetypes: readonly RawTeamArchetype[];
-  readonly refused: readonly { readonly id: string; readonly because: readonly string[] }[];
+  readonly refused: readonly ArchetypeRefusal[];
 }
 
 export function buildArchetypePrompt(subject: string): string {
@@ -79,6 +85,23 @@ export function buildArchetypePrompt(subject: string): string {
 /** Identidade de uma composição: o CONJUNTO de membros, sem ordem. */
 function compositionKey(team: TeamOption): string {
   return [...team.members.map((m) => m.slug)].sort().join('|');
+}
+
+/**
+ * A mesma identidade de composição, mas para um `RawTeamArchetype` já
+ * montado (gravado ou recém-rascunhado) — usada pelo lote de CLI para
+ * reconhecer que dois alvos diferentes redescobriram o mesmo time (achado
+ * Important da revisão: "composições idênticas se fundem" hoje só vale
+ * DENTRO de uma chamada de `buildArchetypeDrafts`; o lote precisa da mesma
+ * regra ENTRE alvos). Todo slot aqui é `kind: 'character'` com `anyOf` de um
+ * elemento só — é o único formato que este pipeline emite (slots nomeados,
+ * nunca flex) — por isso não há caso de slot `element` a considerar.
+ */
+export function archetypeCompositionKey(archetype: RawTeamArchetype): string {
+  return archetype.slots
+    .flatMap((s) => (s.requires.kind === 'character' ? s.requires.anyOf : []))
+    .sort()
+    .join('|');
 }
 
 function mostConservativeStrength(teams: readonly TeamOption[]): string {
@@ -273,6 +296,16 @@ const SOURCE_URL_BY_ID: Readonly<Record<SourceId, string>> = {
 
 export interface ExtractArchetypesResult {
   readonly claims: ArchetypeClaims;
+  /**
+   * Times inteiros descartados NESTA extração — hoje só por membro cujo nome
+   * não resolveu no catálogo de personagens. Achado Critical da revisão: um
+   * membro que não resolve muda a IDENTIDADE do time (`compositionKey` é o
+   * conjunto de membros), não é um item de lista opcional como conjunto ou
+   * arma — remontar o time sem quem faltou gravaria uma composição que
+   * nenhuma fonte descreveu. Por isso o time inteiro sai daqui, nunca
+   * encolhido.
+   */
+  readonly refused: readonly ArchetypeRefusal[];
   readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
 }
 
@@ -313,36 +346,61 @@ export async function extractArchetypes(
   }
 
   const catalog = buildCharacterCatalog();
+  const teams: TeamOption[] = [];
+  const refused: ArchetypeRefusal[] = [];
 
-  const teams: TeamOption[] = parsed.data.teams.map((raw) => {
-    const unresolved: string[] = [];
+  for (const raw of parsed.data.teams) {
+    const id = fold(raw.name);
+    const missingMembers: string[] = [];
+    const unresolvedRoles: string[] = [];
+    const members: { slug: string; role: readonly string[] }[] = [];
 
-    const members = raw.members.flatMap((m) => {
+    for (const m of raw.members) {
       const slug = catalog.get(fold(m.slug));
       if (slug === undefined) {
-        unresolved.push(m.slug);
-        return [];
+        // Não remonta sem quem faltou — o membro que não resolve é motivo
+        // para descartar o TIME, não só o nome dele. Ver comentário de
+        // `ExtractArchetypesResult.refused`.
+        missingMembers.push(m.slug);
+        continue;
       }
       const role = (m.role ?? []).filter((r) => {
         const known = ROLE_SET.has(r);
-        if (!known) unresolved.push(`papel "${r}" de ${m.slug}`);
+        if (!known) unresolvedRoles.push(`papel "${r}" de ${m.slug}`);
         return known;
       });
-      return [{ slug, role }];
-    });
-
-    if (unresolved.length > 0) {
-      for (const source of raw.citedBy) deps.onUnresolved?.(source, unresolved);
+      members.push({ slug, role });
     }
 
-    return {
-      id: fold(raw.name),
+    // Relata os dois tipos de descarte via `onUnresolved` — inclusive o
+    // membro que vai derrubar o time inteiro: é o achado Important #2 da
+    // revisão (a CLI precisa mostrar o que foi jogado fora, não só recusar
+    // em silêncio).
+    const unresolvedNames = [...missingMembers, ...unresolvedRoles];
+    if (unresolvedNames.length > 0) {
+      for (const source of raw.citedBy) deps.onUnresolved?.(source, unresolvedNames);
+    }
+
+    if (missingMembers.length > 0) {
+      refused.push({
+        id,
+        because: [
+          `personagem${missingMembers.length > 1 ? 's' : ''} "${missingMembers.join('", "')}" ` +
+            `não existe${missingMembers.length > 1 ? 'm' : ''} no catálogo do gi-data — ` +
+            'o time foi descartado inteiro, não remontado sem quem faltou',
+        ],
+      });
+      continue;
+    }
+
+    teams.push({
+      id,
       label: raw.name,
       members,
       ...(raw.strength === undefined ? {} : { strength: raw.strength }),
       citedBy: raw.citedBy,
-    };
-  });
+    });
+  }
 
   const claims: ArchetypeClaims = {
     subject,
@@ -352,6 +410,7 @@ export async function extractArchetypes(
 
   return {
     claims,
+    refused,
     usage: {
       inputTokens: response.usage?.input_tokens ?? 0,
       outputTokens: response.usage?.output_tokens ?? 0,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildArchetypeDrafts, buildArchetypePrompt } from '../scripts/research/archetype.js';
+import { buildArchetypeDrafts, buildArchetypePrompt, extractArchetypes, archetypeCompositionKey } from '../scripts/research/archetype.js';
 import { validateMeta } from '../src/validate.js';
 import { readRawMeta } from '../src/load.js';
 
@@ -130,5 +130,85 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
     };
     const d = buildArchetypeDrafts({ claims, ...base });
     expect(validateMeta({ profiles: raw.profiles, archetypes: d.archetypes })).toEqual([]);
+  });
+});
+
+describe('extractArchetypes — membro que não resolve derruba o TIME inteiro (achado Critical)', () => {
+  it('"Childe" não resolve, e o time some inteiro — não vira um trio que ninguém descreveu', async () => {
+    const client = {
+      async parse() {
+        return {
+          parsed_output: {
+            teams: [
+              {
+                name: 'Freeze',
+                members: [
+                  { slug: 'Childe', role: ['sub-dps'] },
+                  { slug: 'kaeya', role: ['sub-dps'] },
+                  { slug: 'xingqiu', role: ['enabler'] },
+                ],
+                citedBy: ['icy-veins'],
+              },
+              {
+                name: 'National',
+                members: [
+                  { slug: 'xiangling', role: ['sub-dps'] },
+                  { slug: 'bennett', role: ['buffer'] },
+                  { slug: 'xingqiu', role: ['sub-dps'] },
+                ],
+                citedBy: ['game8'],
+              },
+            ],
+          },
+        };
+      },
+    };
+
+    const { claims, refused } = await extractArchetypes('xingqiu', 'texto da pesquisa', { client });
+
+    // O time do "Childe" some por inteiro — não vira um trio válido sem ele.
+    expect(claims.teams.map((t) => t.label)).toEqual(['National']);
+    expect(claims.teams[0]!.members.map((m) => m.slug)).toEqual(['xiangling', 'bennett', 'xingqiu']);
+
+    // ... e a recusa nomeia quem faltou.
+    expect(refused).toHaveLength(1);
+    expect(refused[0]!.id).toBe('freeze');
+    expect(refused[0]!.because.join(' ')).toMatch(/Childe/);
+  });
+
+  it('nome que não resolve é reportado via onUnresolved, mesmo derrubando o time', async () => {
+    const client = {
+      async parse() {
+        return {
+          parsed_output: {
+            teams: [{
+              name: 'Freeze',
+              members: [
+                { slug: 'Childe', role: ['sub-dps'] },
+                { slug: 'kaeya', role: ['sub-dps'] },
+              ],
+              citedBy: ['icy-veins'],
+            }],
+          },
+        };
+      },
+    };
+
+    const reports: { source: string; names: readonly string[] }[] = [];
+    await extractArchetypes('xingqiu', 'texto', {
+      client,
+      onUnresolved: (source, names) => reports.push({ source, names }),
+    });
+
+    expect(reports).toEqual([{ source: 'icy-veins', names: ['Childe'] }]);
+  });
+});
+
+describe('archetypeCompositionKey', () => {
+  it('mesma composição, ordem de slot diferente — mesma chave', () => {
+    const raw = readRawMeta();
+    const nationalLikeA = raw.archetypes[0]!;
+    const reordered = { ...nationalLikeA, slots: [...nationalLikeA.slots].reverse() };
+    expect(archetypeCompositionKey(reordered)).toBe(archetypeCompositionKey(nationalLikeA));
   });
 });

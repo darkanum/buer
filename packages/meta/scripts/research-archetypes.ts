@@ -22,8 +22,11 @@ import { readRawMeta } from '../src/load.js';
 import { validateMeta } from '../src/validate.js';
 import { computeGaps } from './gaps.js';
 import { createClient, describeApiError } from './research/client.js';
-import { researchArchetypes, extractArchetypes, buildArchetypeDrafts, type ArchetypeClaims } from './research/archetype.js';
-import { parseArgs, estimateCostUsd, formatBatchReport, type BatchReport } from './research-characters.js';
+import {
+  researchArchetypes, extractArchetypes, buildArchetypeDrafts, archetypeCompositionKey,
+  type ArchetypeClaims, type ArchetypeRefusal,
+} from './research/archetype.js';
+import { parseArgs, estimateCostUsd, formatBatchReport, withUnresolvedTracking, type BatchReport } from './research-characters.js';
 
 export interface ArchetypeBatchDeps {
   readonly targets: readonly string[];
@@ -36,6 +39,7 @@ export interface ArchetypeBatchDeps {
   }>;
   readonly extract: (subject: string, text: string) => Promise<{
     readonly claims: ArchetypeClaims;
+    readonly refused: readonly ArchetypeRefusal[];
     readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
   }>;
   readonly write: (archetype: RawTeamArchetype) => void;
@@ -68,6 +72,15 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
       inputTokens += extracted.usage.inputTokens;
       outputTokens += extracted.usage.outputTokens;
 
+      // Times inteiros que a EXTRAÇÃO já descartou (hoje: membro cujo nome
+      // não resolveu no catálogo) entram no relatório do mesmo jeito que os
+      // recusados por `buildArchetypeDrafts` — para quem lê o lote, as duas
+      // recusas têm a mesma forma, só a origem muda.
+      for (const r of extracted.refused) {
+        refused.push({ slug: `${subject}:${r.id}`, because: r.because });
+        deps.onProgress?.(`  recusado ${r.id}: ${r.because.join('; ')}`);
+      }
+
       const draftResult = buildArchetypeDrafts({
         claims: extracted.claims,
         subject,
@@ -85,11 +98,38 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
         continue;
       }
 
-      // Valida TODOS os arquétipos deste alvo contra o banco inteiro ANTES
-      // de gravar qualquer um deles.
+      // Composições idênticas se FUNDEM dentro de uma chamada de
+      // `buildArchetypeDrafts` (um alvo só), mas nada garantia isso ENTRE
+      // alvos: Xiangling, Bennett e Xingqiu redescobrem o mesmo "National"
+      // com ids diferentes, e o segundo alvo batia em "id duplicado" no
+      // `validateMeta` — falha de forma segura, mas derrubava o lote inteiro
+      // daquele alvo por uma composição que já estava no banco. Aqui a
+      // identidade é a COMPOSIÇÃO (`archetypeCompositionKey`), não o id: o
+      // que já existe fica como está, o resto segue para validação.
+      const knownCompositions = new Set(knownArchetypes.map(archetypeCompositionKey));
+      const freshArchetypes: RawTeamArchetype[] = [];
+      for (const archetype of draftResult.archetypes) {
+        const key = archetypeCompositionKey(archetype);
+        if (knownCompositions.has(key)) {
+          deps.onProgress?.(
+            `  já conhecido (mesma composição de um arquétipo existente, não regravado): ${archetype.id}`,
+          );
+          continue;
+        }
+        knownCompositions.add(key); // não regrava a mesma composição duas vezes dentro do próprio alvo
+        freshArchetypes.push(archetype);
+      }
+
+      if (freshArchetypes.length === 0) {
+        deps.onProgress?.('  nenhum arquétipo novo (todos já conhecidos ou recusados)');
+        continue;
+      }
+
+      // Valida TODOS os arquétipos NOVOS deste alvo contra o banco inteiro
+      // ANTES de gravar qualquer um deles.
       const problems = validateMeta({
         profiles: deps.existing.profiles,
-        archetypes: [...knownArchetypes, ...draftResult.archetypes],
+        archetypes: [...knownArchetypes, ...freshArchetypes],
       });
       if (problems.length > 0) {
         failed.push({ slug: subject, error: `arquétipos inválidos: ${problems.join('; ')}` });
@@ -97,12 +137,12 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
         continue;
       }
 
-      for (const archetype of draftResult.archetypes) {
+      for (const archetype of freshArchetypes) {
         deps.write(archetype);
         written.push(archetype.id);
         deps.onProgress?.(`  gravado ${archetype.id} (${archetype.strength})`);
       }
-      knownArchetypes = [...knownArchetypes, ...draftResult.archetypes];
+      knownArchetypes = [...knownArchetypes, ...freshArchetypes];
     } catch (e) {
       const error = describeApiError(e);
       failed.push({ slug: subject, error });
@@ -111,7 +151,9 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
   }
 
   const usage = { inputTokens, outputTokens };
-  return { written, refused, failed, usage, estimatedCostUsd: estimateCostUsd(usage) };
+  // Igual a `runBatch`: quem popula `unresolved` de verdade é
+  // `withUnresolvedTracking`, na entrada de CLI — aqui fica sempre vazio.
+  return { written, refused, failed, unresolved: [], usage, estimatedCostUsd: estimateCostUsd(usage) };
 }
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -158,12 +200,15 @@ if (import.meta.main) {
       } else {
         const client = createClient();
         mkdirSync(path.join(DATA, 'archetypes'), { recursive: true });
+        const tracked = withUnresolvedTracking((subject, text, onUnresolved) =>
+          extractArchetypes(subject, text, { client: client.messages, onUnresolved }),
+        );
         const report = await runArchetypeBatch({
           targets,
           gameVersion,
           existing: raw,
           research: (subject) => researchArchetypes(subject, { client: client.messages }),
-          extract: (subject, text) => extractArchetypes(subject, text, { client: client.messages }),
+          extract: tracked.extract,
           write: (archetype) => {
             writeFileSync(
               path.join(DATA, 'archetypes', `${archetype.id}.json`),
@@ -173,7 +218,7 @@ if (import.meta.main) {
           },
           onProgress: (line) => console.log(line),
         });
-        console.log(formatBatchReport(report));
+        console.log(formatBatchReport({ ...report, unresolved: tracked.unresolved }));
       }
     }
   }
