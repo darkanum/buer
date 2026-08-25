@@ -13,8 +13,10 @@
     "meta:gaps": "tsx scripts/gaps.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@buer/core": "workspace:*",
-    "@buer/gi-data": "workspace:*"
+    "@buer/gi-data": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",
