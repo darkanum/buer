@@ -2,9 +2,42 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import type { CharacterKey } from '@buer/core';
+import { charKey, propKey, type CharacterKey, type Element, type StatKey } from '@buer/core';
 import { loadArtifactSets } from '@buer/gi-data';
 import { rosterFromHoyolab, equippedBuild } from '../src/roster/from-hoyolab.js';
+
+// Mesmo mapa pos->slot que from-hoyolab.ts usa internamente — duplicado aqui
+// só para reconstruir, a partir do payload cru, a chave (dono, slot) que
+// identifica uma peça, e comparar o `times` cru contra o `tiers.length` que
+// o montador produziu.
+const SLOT_BY_POS: Readonly<Record<number, string>> = {
+  1: 'flower', 2: 'plume', 3: 'sands', 4: 'goblet', 5: 'circlet',
+};
+const ELEMENTS = new Set(['pyro', 'hydro', 'cryo', 'electro', 'anemo', 'geo', 'dendro']);
+
+/**
+ * dono+slot+StatKey -> `times` cru do HoYoLAB, direto do payload (sem passar
+ * pelo montador). Usado para provar que `tiers.length === times + 1` de
+ * verdade, e não só ">= 1" (que o caminho degradado passaria mesmo devolvendo
+ * sempre 1 tier fixo).
+ */
+function rawTimesByOwnerSlotStat(): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const entry of raw.detail.list as Record<string, any>[]) {
+    const base = entry['base'] as Record<string, any>;
+    const rawElement = String(base['element'] ?? '').toLowerCase();
+    const element = ELEMENTS.has(rawElement) ? (rawElement as Element) : undefined;
+    const owner = charKey(base['id'] as number, element);
+    for (const relic of (entry['relics'] ?? []) as Record<string, any>[]) {
+      const slot = SLOT_BY_POS[relic['pos'] as number];
+      for (const sub of (relic['sub_property_list'] ?? []) as Record<string, any>[]) {
+        const statKey = propKey(sub['property_type'] as number);
+        out.set(`${owner}::${slot}::${statKey}`, sub['times'] as number);
+      }
+    }
+  }
+  return out;
+}
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const raw = JSON.parse(
@@ -45,16 +78,26 @@ describe('rosterFromHoyolab', () => {
 
   it('cada peça de artefato tem fingerprint, dono e substats com contagem de rolls', () => {
     const roster = rosterFromHoyolab(raw, OPTS);
-    // Contagem EXATA, verificada na fixture: 156 peças em 32 dos 63
-    // personagens (os outros 31 estão sem artefato nenhum). Exato e não
-    // "maior que N" de propósito: prova que nenhuma peça é descartada.
-    expect(roster.artifacts.length).toBe(156);
+    // Contagem EXATA, verificada na fixture: 156 relíquias no payload, mas 3
+    // são 1★/2★ (nível 0, personagem 10000015, slots flower/goblet/circlet)
+    // e são rejeitadas na borda — `interfaces.ts` diz `rarity: 3 | 4 | 5`
+    // ("1/2 rejeitados na borda"), e o montador É a borda. 156 - 3 = 153.
+    // Exato e não "maior que N" de propósito: prova que nenhuma OUTRA peça é
+    // descartada por engano.
+    expect(roster.artifacts.length).toBe(153);
+    const rawTimes = rawTimesByOwnerSlotStat();
     for (const piece of roster.artifacts) {
       expect(piece.fingerprint).toMatch(/\S/);
       expect(piece.equippedBy).not.toBeNull();
       expect(['flower', 'plume', 'sands', 'goblet', 'circlet']).toContain(piece.slot);
+      // Regressão que "tiers.length >= 1" não pegaria: o caminho degradado
+      // (raridade sem tabela de tier verificada) tem que preservar a
+      // contagem REAL de rolls, não devolver sempre 1 tier fixo.
+      expect(piece.rarity).toBeGreaterThanOrEqual(3);
       for (const sub of piece.substats) {
-        expect(sub.tiers.length).toBeGreaterThanOrEqual(1);
+        const times = rawTimes.get(`${piece.equippedBy}::${piece.slot}::${sub.key}`);
+        expect(times).toBeDefined();
+        expect(sub.tiers.length).toBe((times as number) + 1);
       }
     }
   });

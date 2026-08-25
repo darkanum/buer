@@ -85,44 +85,56 @@ function tiersOf(rarity: 3 | 4 | 5, key: StatKey, value: number, rolls: number):
   }
 }
 
+/**
+ * `ArtifactPiece.rarity` é `3 | 4 | 5` por contrato (`interfaces.ts`: "GOOD
+ * aceita 3-5; 1/2 rejeitados na borda"). A conta real tem 3 peças 1★/2★
+ * (fodder de nível 0, sem uso analítico) — rejeitadas aqui, na borda, em vez
+ * de alargar o tipo para acomodá-las.
+ */
+function isRankedRarity(rarity: number): rarity is 3 | 4 | 5 {
+  return rarity === 3 || rarity === 4 || rarity === 5;
+}
+
 function piecesOf(entry: Record<string, unknown>, owner: CharacterKey): ArtifactPiece[] {
   const relics = Array.isArray(entry['relics']) ? (entry['relics'] as Record<string, any>[]) : [];
-  return relics.map((relic): ArtifactPiece => {
-    const rarity = relic['rarity'] as 3 | 4 | 5;
-    const subs: [number, number, 1 | 2 | 3 | 4][] = [];
-    const substats: Substat[] = [];
+  return relics
+    .filter((relic) => isRankedRarity(relic['rarity'] as number))
+    .map((relic): ArtifactPiece => {
+      const rarity = relic['rarity'] as 3 | 4 | 5;
+      const subs: [number, number, 1 | 2 | 3 | 4][] = [];
+      const substats: Substat[] = [];
 
-    for (const sub of (relic['sub_property_list'] ?? []) as Record<string, any>[]) {
-      const key = propKey(sub['property_type'] as number);
-      const value = Number.parseFloat(String(sub['value']).replace('%', ''));
-      const rolls = (sub['times'] as number) + 1;
-      const tiers = tiersOf(rarity, key, value, rolls);
-      subs.push([sub['property_type'] as number, value, tiers[tiers.length - 1]!]);
-      substats.push({ key, tiers, value, source: 'reconstructed' });
-    }
+      for (const sub of (relic['sub_property_list'] ?? []) as Record<string, any>[]) {
+        const key = propKey(sub['property_type'] as number);
+        const value = Number.parseFloat(String(sub['value']).replace('%', ''));
+        const rolls = (sub['times'] as number) + 1;
+        const tiers = tiersOf(rarity, key, value, rolls);
+        subs.push([sub['property_type'] as number, value, tiers[tiers.length - 1]!]);
+        substats.push({ key, tiers, value, source: 'reconstructed' });
+      }
 
-    const mainValue = Number.parseFloat(String(relic['main_property']['value']));
-    const base = {
-      slot: relic['pos'] as 1 | 2 | 3 | 4 | 5,
-      set: relic['set']['id'] as number,
-      lvl: relic['level'] as number,
-      rarity,
-      main: [relic['main_property']['property_type'] as number, mainValue] as [number, number],
-      subs,
-    };
+      const mainValue = Number.parseFloat(String(relic['main_property']['value']));
+      const base = {
+        slot: relic['pos'] as 1 | 2 | 3 | 4 | 5,
+        set: relic['set']['id'] as number,
+        lvl: relic['level'] as number,
+        rarity,
+        main: [relic['main_property']['property_type'] as number, mainValue] as [number, number],
+        subs,
+      };
 
-    return {
-      fingerprint: artifactFingerprint(base),
-      setKey: artifactSetKeyFromHoyolab(base.set),
-      slot: SLOT_BY_POS[base.slot]!,
-      rarity,
-      level: base.lvl,
-      mainStatKey: propKey(base.main[0]),
-      substats,
-      locked: false,
-      equippedBy: owner,
-    };
-  });
+      return {
+        fingerprint: artifactFingerprint(base),
+        setKey: artifactSetKeyFromHoyolab(base.set),
+        slot: SLOT_BY_POS[base.slot]!,
+        rarity,
+        level: base.lvl,
+        mainStatKey: propKey(base.main[0]),
+        substats,
+        locked: false,
+        equippedBy: owner,
+      };
+    });
 }
 
 /**
