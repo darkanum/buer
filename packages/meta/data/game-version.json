@@ -1,0 +1,4 @@
+{
+  "version": "7.0",
+  "note": "Patch corrente do jogo. Atualize ao rodar o sync do gi-data com dado de um patch novo — é o que faz `meta:gaps` detectar ficha atrasada."
+}

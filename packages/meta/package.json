@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "meta:gaps": "tsx scripts/gaps.ts"
   },
   "dependencies": {
     "@buer/core": "workspace:*",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.20.1",
+    "tsx": "^4.23.12",
     "typescript": "^5.6",
     "vitest": "^2"
   }
