@@ -8,15 +8,28 @@ import {
   type HoyolabSession,
 } from '@buer/cookies';
 import { HoyolabClient, DEFAULT_LANG, type FetchAllResult } from '@buer/hoyolab';
-import { IngestEnvelope, PROTOCOL_VERSION, normalize } from '@buer/core';
+import { IngestEnvelope, PROTOCOL_VERSION, normalize, type NormalizedSnapshot } from '@buer/core';
 import { readConfig as readConfigReal, type Config } from '../config.js';
 import { postIngest as postIngestReal, saveFailedPayload, type PostIngestResult } from '../api.js';
 import { CLI_VERSION } from '../version.js';
 import { defaultFirefoxProfileDir } from '../firefox-profile.js';
+import { redact } from '../redact.js';
 
 export interface SyncFlags {
   /** Path to also write the locally-normalized snapshot to (convenience only — the server is the authority). */
   out?: string;
+  /**
+   * Path to dump the RAW HoYoLAB payload (`list`/`detail`/`account`, exactly
+   * what `client.fetchAll()` returned) to — independent of `normalize()`,
+   * written immediately after the fetch and before normalization runs.
+   * This is what lets a real-account extraction survive even though
+   * `normalize()` isn't ready for real payloads yet (flat HP/ATK/DEF/EM
+   * substats, unmapped `property_type`s — a known Fase-1 boundary): see
+   * `SyncResult.normalized`. Never contains the session cookie — the
+   * cookie only ever lives in the request headers, never in `fetchAll()`'s
+   * result.
+   */
+  rawOut?: string;
   /** Do everything except send to the Buer API. */
   dryRun?: boolean;
   /** Which browser's cookie store to read. Only `'firefox'` is supported so far. */
@@ -50,6 +63,17 @@ export interface SyncResult {
   characters: number;
   changed: number;
   sent: boolean;
+  /** Path the raw payload was written to, if `--raw-out` was given. */
+  rawSaved?: string;
+  /**
+   * Whether `normalize()` succeeded. `false` means the extraction itself
+   * still succeeded (raw payload saved when `--raw-out` was given) but
+   * normalization — and therefore upload — was skipped, because
+   * `normalize()` can't yet handle this payload. Only ever `false` when
+   * `rawOut` was set; without it, a `normalize()` failure still propagates
+   * as an error (old behavior, unchanged).
+   */
+  normalized?: boolean;
 }
 
 export interface BuildProvidersOptions {
@@ -104,32 +128,60 @@ export async function runSync(deps: SyncDeps, flags: SyncFlags = {}): Promise<Sy
   const client = deps.makeClient(session);
   const raw = await client.fetchAll();
 
-  const normalized = normalize({ list: raw.list, detail: raw.detail });
-  const characters = normalized.characters.length;
-
-  // `IngestEnvelope.parse` both validates the envelope (region enum,
-  // non-pt-br lang, etc.) and gives back a properly-typed value — the
-  // candidate below is untyped on purpose since `raw.account.region` is a
-  // plain `string` from the HoYoLAB client, wider than the protocol's enum.
-  const envelope = IngestEnvelope.parse({
-    protocolVersion: PROTOCOL_VERSION,
-    cliVersion: CLI_VERSION,
-    takenAt: new Date().toISOString(),
-    account: {
-      gameUid: raw.account.gameUid,
-      region: raw.account.region,
-      nickname: raw.account.nickname ?? null,
-      lang: DEFAULT_LANG,
-    },
-    raw: { list: raw.list, detail: raw.detail },
-  });
-
-  if (flags.out) {
-    writeFileSync(flags.out, JSON.stringify(normalized, null, 2), 'utf8');
+  // Dump the raw payload FIRST, independent of normalize() — this is what
+  // lets a real extraction survive even though normalize() isn't ready for
+  // real-account data yet. `raw` is exactly `fetchAll()`'s result (list /
+  // detail / account) — it never contains the session cookie, which only
+  // ever lives in the request headers the client already sent.
+  if (flags.rawOut) {
+    writeFileSync(flags.rawOut, JSON.stringify(raw, null, 2), 'utf8');
+    console.log(`Payload cru da extração salvo em ${flags.rawOut}.`);
   }
 
+  let normalized: NormalizedSnapshot;
+  let envelope: IngestEnvelope;
+  try {
+    normalized = normalize({ list: raw.list, detail: raw.detail });
+
+    // `IngestEnvelope.parse` both validates the envelope (region enum,
+    // non-pt-br lang, etc.) and gives back a properly-typed value — the
+    // candidate below is untyped on purpose since `raw.account.region` is a
+    // plain `string` from the HoYoLAB client, wider than the protocol's enum.
+    envelope = IngestEnvelope.parse({
+      protocolVersion: PROTOCOL_VERSION,
+      cliVersion: CLI_VERSION,
+      takenAt: new Date().toISOString(),
+      account: {
+        gameUid: raw.account.gameUid,
+        region: raw.account.region,
+        nickname: raw.account.nickname ?? null,
+        lang: DEFAULT_LANG,
+      },
+      raw: { list: raw.list, detail: raw.detail },
+    });
+
+    if (flags.out) {
+      writeFileSync(flags.out, JSON.stringify(normalized, null, 2), 'utf8');
+    }
+  } catch (err) {
+    // Without `--raw-out` there's nothing to fall back to — preserve the
+    // old behavior (propagate) so existing callers/tests aren't surprised.
+    if (!flags.rawOut) throw err;
+
+    const reason = redact(err instanceof Error ? err.message : String(err));
+    console.error(
+      `extração OK (raw salvo em ${flags.rawOut}); normalização falhou ` +
+        `(esperado nesta fase com dados reais): ${reason}`,
+    );
+    // Never uploads when normalization was skipped — there's no valid
+    // envelope to send.
+    return { characters: 0, changed: 0, sent: false, rawSaved: flags.rawOut, normalized: false };
+  }
+
+  const characters = normalized.characters.length;
+
   if (flags.dryRun) {
-    return { characters, changed: 0, sent: false };
+    return { characters, changed: 0, sent: false, rawSaved: flags.rawOut, normalized: true };
   }
 
   const cfg = deps.readConfig();
@@ -139,7 +191,7 @@ export async function runSync(deps: SyncDeps, flags: SyncFlags = {}): Promise<Sy
 
   try {
     const { changedChars } = await deps.postIngest(envelope, cfg.apiToken, cfg.apiBaseUrl);
-    return { characters, changed: changedChars, sent: true };
+    return { characters, changed: changedChars, sent: true, rawSaved: flags.rawOut, normalized: true };
   } catch (err) {
     const savedPath = saveFailedPayload(envelope);
     const reason = err instanceof Error ? err.message : String(err);

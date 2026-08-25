@@ -86,6 +86,7 @@ export async function main(argv: string[]): Promise<void> {
       const { runSync, createSyncDeps } = await import('./commands/sync.js');
       const syncFlags: SyncFlags = {
         out: flagString(flags, 'out'),
+        rawOut: flagString(flags, 'raw-out'),
         dryRun: flagBoolean(flags, 'dry-run'),
         browser: flagString(flags, 'browser'),
         login: flagBoolean(flags, 'login'),
