@@ -54,13 +54,28 @@ describe('matchArchetype', () => {
     expect(m.status).toBe('too-far');
   });
 
-  it('slot flex casa por papel declarado na ficha, não por nome', () => {
-    // O 4º slot do National é flex: anemo com driver/debuffer. Nenhum anemo
-    // com ficha => o slot não fecha, mesmo tendo anemos no roster.
+  it('slot flex é preenchido por quem tem o papel declarado na ficha (sucrose)', () => {
+    // O 4º slot do National é flex: anemo com driver/debuffer. sucrose.json
+    // declara papel driver, então é ela quem fecha o slot.
+    const SUCROSE = '10000043' as CharacterKey;
     const m = matchArchetype(national, roster, bank, { require: XIANGLING });
     const flexIndex = national.slots.findIndex((s) => s.substitutable);
     expect(flexIndex).toBeGreaterThanOrEqual(0);
-    // Depende de haver ficha de anemo; a Task 11 adiciona sucrose.
-    expect(typeof m.fills[flexIndex]).not.toBe('undefined');
+    expect(m.fills[flexIndex]).toBe(SUCROSE);
+  });
+
+  it('personagem sem ficha não ocupa slot flex, mesmo tendo o elemento certo', () => {
+    // A conta tem outros anemos além de sucrose (varka, prune,
+    // yumemizuki-mizuki, jean, ifa, jahoda, lan-yan, lynette, sayu) — nenhum
+    // deles com ficha no banco curado. Removendo só a sucrose, o slot flex
+    // não pode ser fechado por nenhum desses, mesmo satisfazendo o elemento.
+    const withoutSucrose = {
+      ...roster,
+      characters: new Map([...roster.characters].filter(([k]) => k !== '10000043')),
+    };
+    const m = matchArchetype(national, withoutSucrose, bank, { require: XIANGLING });
+    const flexIndex = national.slots.findIndex((s) => s.substitutable);
+    expect(m.fills[flexIndex]).toBeNull();
+    expect(m.status).toBe('blocked-by-one');
   });
 });
