@@ -2768,7 +2768,7 @@ Junta as cinco verificações num avaliador que satisfaz o contrato da §6.4 da 
 - Produces:
   - `assess(build, variant, stats, weights): CuratedAssessment` onde `CuratedAssessment = { findings; value; breakdown; violated; blocked }`
   - `selectVariant(profile, build, stats, weights, opts): VariantChoice` com `VariantChoice = { variant; reason: 'pinned'|'archetype'|'only'|'best-match'; explanation }`
-  - `class CuratedBuildEvaluator implements BuildEvaluator` — construtor `{ bank, resolver, pinnedVariants? }`
+  - `class CuratedBuildEvaluator implements BuildEvaluator` — construtor `{ bank, resolver, archetypeVariants? }`
   - `class DefaultEvaluatorRegistry implements EvaluatorRegistry`
 
 - [ ] **Step 1: Escrever o teste que falha**
@@ -3144,7 +3144,7 @@ export interface CuratedBuildEvaluatorOptions {
   readonly bank: MetaBank;
   readonly resolver: StatResolver;
   /** Variante exigida por slot de arquétipo, por personagem. */
-  readonly pinnedVariants?: ReadonlyMap<CharacterKey, string>;
+  readonly archetypeVariants?: ReadonlyMap<CharacterKey, string>;
 }
 
 /** Acha, dentro do contexto, a build do personagem que está sendo avaliado. */
@@ -3187,7 +3187,7 @@ export class CuratedBuildEvaluator implements BuildEvaluator {
   }
 
   async prepare(ctx: EvaluationContext): Promise<PreparedEvaluator> {
-    const { bank, resolver, pinnedVariants } = this.opts;
+    const { bank, resolver, archetypeVariants } = this.opts;
     const subject = ctx.subject;
     const profile = subject === undefined ? undefined : bank.profiles.get(subject);
     const gameVersion = ctx.gameVersion ?? ('7.0' as const);
@@ -3199,9 +3199,9 @@ export class CuratedBuildEvaluator implements BuildEvaluator {
       if (!profile) return null;
       const stats = await resolver.resolve(build);
       const choice = selectVariant(profile, build, stats, bank.scoring, {
-        ...(pinnedVariants?.get(profile.character) === undefined
+        ...(archetypeVariants?.get(profile.character) === undefined
           ? {}
-          : { fromArchetype: pinnedVariants.get(profile.character)! }),
+          : { fromArchetype: archetypeVariants.get(profile.character)! }),
       });
       return { assessment: assess(build, choice.variant, stats, bank.scoring), choice };
     };
