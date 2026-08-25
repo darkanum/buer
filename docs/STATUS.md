@@ -107,6 +107,33 @@ Elemento, raridade, tipo de arma, nível e constelação foram verificados contr
 
 Consequência de produto enquanto isso não existe: a lacuna reportada é sobre o **banco de fichas**, não sobre o roster, e a frase atual não deixa isso claro o bastante — ver item 1 dos pendentes.
 
+### Pipeline de autoria assistida — IMPLEMENTADO (falta a primeira rodada real)
+
+**Plano:** `docs/superpowers/plans/2026-08-25-buer-pipeline-autoria.md` · 7 tarefas de código, todas revisadas e fechadas.
+
+Ferramenta offline em `packages/meta/scripts/`, nunca importada por runtime. Quatro estágios por alvo, e a fronteira entre eles é o desenho: **pesquisa** e **extração** chamam a API; **reconciliação** e **escrita** são TypeScript puro. A parte cara e não-determinística fica isolada; a parte que decide é testável sem chave de API.
+
+```bash
+pnpm --filter @buer/meta run meta:gaps
+pnpm --filter @buer/meta run meta:research:characters -- --only <slugs> --dry-run
+pnpm --filter @buer/meta run meta:research:archetypes  -- --only <slugs>
+```
+
+- **A confiança sai de concordância entre fontes computada em código**, não de um prompt. Campo de **lista** (conjuntos, armas, substats, main-stats) divergindo é **alternativa** — une e ranqueia, nada é descartado. Campo de **valor único** (limiar de ER, o atributo que escala) divergindo é **contradição** — maioria decide, sem maioria fica ausente, e derruba a confiança.
+- **Um personagem tem vários times.** Composições diferentes viram arquétipos separados; idênticas se fundem. Quem ordena para o usuário é o motor, por conta.
+- **`confidence` nunca é `high`** — isso exige revisão humana. Rascunho nasce `authoredBy: 'researched'`.
+- **A borda recusa**: pesquisa sem conjunto, papel, `scalesOn` ou main-stat vira relatório, não arquivo. Time com membro que não resolve é recusado **inteiro** — encolher a composição criaria um time que ninguém descreveu.
+- **`sources` traz as URLs realmente consultadas pela busca**, não as que o modelo declarou; as declaradas e não confirmadas vão para `notes`.
+- 140 testes no `@buer/meta`, 307+ no monorepo. Nenhum toca a rede nem exige credencial.
+
+**Falta a Task 8: a primeira rodada real.** Exige `ANTHROPIC_API_KEY` (ou `ant auth login`) e gasta dinheiro — é decisão do dono do projeto. Alvos: os 12 personagens dos três times da seção acima. Estimativa: ~US$ 4, em duas levas com leitura do relatório entre elas. O passo a passo está na Task 8 do plano.
+
+### Débito registrado do pipeline
+
+1. **Atribuição de `sources` dentro de um domínio é grosseira** — se o Game8 foi consultado em três URLs e citou o time X, as três viram `sources` de X. Melhor que o uniforme anterior, mas não é "só as fontes que o descreveram" no sentido estrito.
+2. **`confidence` ainda não chega à tela.** A terceira defesa da §14.3 continua incompleta: nem a CLI nem o golden imprimem `confidence`. O que se fechou nesta fase foi a **fabricação** do valor (o motor derivava a confiança do time da taxa de preenchimento do roster), não a exibição.
+3. **Uma variante por ficha.** Reconciliar variantes entre fontes exige julgamento que o pipeline não tem — casar "Xiangling ER" do Icy Veins com "Xiangling Vaporize" do Game8. Uma variante bem fundamentada é melhor que três inventadas; o revisor humano divide.
+
 ### Fontes para a curadoria (decidido 2026-08-25)
 
 O pipeline de autoria deve pesquisar e **citar** fontes de referência da comunidade, preenchendo `MetaProvenance.sources` com URLs. Preferência do dono do projeto, nesta ordem:
