@@ -164,6 +164,7 @@ function buildSingleCharArchetype(
     strength: 'niche',
     tags: [],
     sources: [],
+    provenance: { authoredBy: 'human', confidence: 'medium' },
     slots: [
       {
         role: ['sub-dps'],

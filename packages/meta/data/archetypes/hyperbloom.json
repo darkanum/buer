@@ -6,6 +6,7 @@
   "strength": "meta",
   "tags": ["abyss", "overworld", "f2p"],
   "sources": [],
+  "provenance": { "authoredBy": "human", "confidence": "medium" },
   "slots": [
     {
       "role": ["enabler"],

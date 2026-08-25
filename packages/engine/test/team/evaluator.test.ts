@@ -200,6 +200,7 @@ describe('CuratedTeamEvaluator.teamsFor — cenários sintéticos (achados da re
       gameVersionAdded: '5.0',
       strength: 'meta',
       tags: [],
+      provenance: { authoredBy: 'human', confidence: 'medium' },
       slots: [
         {
           role: ['main-dps'],
@@ -221,6 +222,7 @@ describe('CuratedTeamEvaluator.teamsFor — cenários sintéticos (achados da re
       gameVersionAdded: '5.0',
       strength: 'meta',
       tags: [],
+      provenance: { authoredBy: 'human', confidence: 'medium' },
       slots: [
         {
           role: ['main-dps'],
@@ -298,5 +300,41 @@ describe('CuratedTeamEvaluator.teamsFor — cenários sintéticos (achados da re
     expect(r.playable.map((t) => t.match.archetype.id)).toContain('role-only');
     const team = r.playable.find((t) => t.match.archetype.id === 'role-only')!;
     expect(team.match.fills).toContain(CHAR);
+  });
+
+  // ---------------------------------------------------------------------------
+  // A confiança do time vem da PROVENIÊNCIA do arquétipo, não do status do
+  // match. Quantos slots esta conta preenche é fato sobre o roster do jogador;
+  // não é evidência sobre a qualidade da curadoria do time.
+  // ---------------------------------------------------------------------------
+
+  it('time jogável rascunhado por máquina NÃO vira confidence high só por caber na conta', async () => {
+    const roster = makeRoster(50);
+    const rascunho: TeamArchetypeData = {
+      ...archetypeWithHardCrit('rascunho', 10),
+      provenance: { authoredBy: 'researched', confidence: 'low' },
+    };
+    const bank = makeBank([rascunho]);
+    const ev = new CuratedTeamEvaluator({ bank, resolver: new ObservedStatResolver() });
+
+    const r = await ev.teamsFor(CHAR, roster);
+    const team = r.playable.find((t) => t.match.archetype.id === 'rascunho')!;
+    expect(team.match.status).toBe('playable');
+    expect(team.assessment.score.provenance.confidence).toBe('low');
+    expect(team.assessment.score.provenance.assumptions.join(' ')).toContain('researched');
+  });
+
+  it('arquétipo humano de confiança high continua high, mesmo com o time completo', async () => {
+    const roster = makeRoster(50);
+    const curado: TeamArchetypeData = {
+      ...archetypeWithHardCrit('curado', 10),
+      provenance: { authoredBy: 'researched-reviewed', confidence: 'high' },
+    };
+    const bank = makeBank([curado]);
+    const ev = new CuratedTeamEvaluator({ bank, resolver: new ObservedStatResolver() });
+
+    const r = await ev.teamsFor(CHAR, roster);
+    const team = r.playable.find((t) => t.match.archetype.id === 'curado')!;
+    expect(team.assessment.score.provenance.confidence).toBe('high');
   });
 });

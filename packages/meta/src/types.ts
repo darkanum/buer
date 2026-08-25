@@ -67,6 +67,25 @@ export interface RawArchetypeSlot {
   substitutable: boolean;
 }
 
+/**
+ * Proveniência de um ARQUÉTIPO. Obrigatória.
+ *
+ * Existe pelo mesmo motivo que `RawMetaProvenance` existe para a ficha, e por
+ * um motivo a mais: sem ela, o arquivo que `meta:research:archetypes` grava é
+ * indistinguível de um arquétipo escrito à mão, e o motor o servia como
+ * `confidence: 'high'` derivada do status do match. As três defesas da §14.3
+ * valiam para a ficha de personagem e nenhuma para o time.
+ *
+ * `authoredBy`/`confidence` são `string` crua aqui, como em
+ * `RawMetaProvenance`: este é o formato AUTORADO, lido de JSON sem validação.
+ * Quem confere o vocabulário — e proíbe `researched` + `high` — é
+ * `validateMeta`; quem estreita para a união é `resolveArchetype`, depois.
+ */
+export interface RawArchetypeProvenance {
+  authoredBy: string;
+  confidence: string;
+}
+
 export interface RawTeamArchetype {
   schemaVersion: number;
   id: string;
@@ -77,6 +96,7 @@ export interface RawTeamArchetype {
   tags: string[];
   slots: RawArchetypeSlot[];
   sources: string[];
+  provenance: RawArchetypeProvenance;
 }
 
 export interface RawMeta {
@@ -154,6 +174,19 @@ export interface TeamArchetypeData {
   readonly tags: readonly string[];
   readonly slots: readonly ArchetypeSlotData[];
   readonly sources: readonly string[];
+  /**
+   * Quem autorou este time e com que confiança — a mesma pergunta que
+   * `MetaProvenance` responde para a ficha. O `CuratedTeamEvaluator` lê DAQUI
+   * a confiança que publica, em vez de derivá-la do quanto do time o jogador
+   * consegue preencher: quantos slots você tem é fato sobre a SUA conta, não
+   * evidência sobre a qualidade da curadoria.
+   */
+  readonly provenance: ArchetypeProvenance;
+}
+
+export interface ArchetypeProvenance {
+  readonly authoredBy: 'human' | 'researched' | 'researched-reviewed';
+  readonly confidence: 'high' | 'medium' | 'low';
 }
 
 /**

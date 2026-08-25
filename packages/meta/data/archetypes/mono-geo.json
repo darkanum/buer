@@ -6,6 +6,7 @@
   "strength": "niche",
   "tags": ["overworld", "f2p"],
   "sources": [],
+  "provenance": { "authoredBy": "human", "confidence": "medium" },
   "slots": [
     {
       "role": ["main-dps", "shielder", "healer"],

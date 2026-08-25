@@ -113,6 +113,57 @@ describe('buildArchetypeDrafts — vários times, nada descartado', () => {
     expect(d.archetypes[1]!.tags).toContain('citado-por:game8');
   });
 
+  // ---------------------------------------------------------------------------
+  // Proveniência: o rascunho se declara MÁQUINA, e a confiança sai de quantas
+  // fontes independentes citaram a composição — nunca de quão bom o time é.
+  // ---------------------------------------------------------------------------
+
+  it('o rascunho nasce authoredBy "researched" — nunca indistinguível de curadoria humana', () => {
+    const claims = { ...base, teams: [time('t', ['xingqiu', 'bennett'])] };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes[0]!.provenance.authoredBy).toBe('researched');
+  });
+
+  it('UMA fonte citando a composição → confiança low', () => {
+    const claims = { ...base, teams: [time('t', ['xingqiu', 'bennett'], { citedBy: ['icy-veins'] })] };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes[0]!.provenance.confidence).toBe('low');
+  });
+
+  it('DUAS fontes citando a mesma composição → confiança medium', () => {
+    const claims = {
+      ...base,
+      teams: [
+        time('t', ['xingqiu', 'bennett'], { citedBy: ['icy-veins'] }),
+        time('t-alt', ['bennett', 'xingqiu'], { citedBy: ['game8'] }),
+      ],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes).toHaveLength(1);
+    expect(d.archetypes[0]!.provenance.confidence).toBe('medium');
+  });
+
+  it('NUNCA "high", nem com as três fontes citando — high exige revisão humana', () => {
+    const claims = {
+      ...base,
+      teams: [
+        time('t', ['xingqiu', 'bennett'], { citedBy: ['icy-veins', 'game8', 'genshin-builds'] }),
+      ],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes[0]!.provenance.confidence).not.toBe('high');
+    // ... e `validateMeta` recusaria a combinação se algum dia saísse.
+    expect(
+      validateMeta({
+        profiles: [],
+        archetypes: [{
+          ...d.archetypes[0]!,
+          provenance: { authoredBy: 'researched', confidence: 'high' },
+        }],
+      }).join(' '),
+    ).toMatch(/"high" é proibido/);
+  });
+
   it('o arquétipo montado passa no validateMeta, dadas as fichas dos membros', () => {
     const raw = readRawMeta();
     const claims = {

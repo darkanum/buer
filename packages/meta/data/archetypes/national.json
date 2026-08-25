@@ -6,6 +6,7 @@
   "strength": "meta",
   "tags": ["abyss", "f2p", "no-5star"],
   "sources": [],
+  "provenance": { "authoredBy": "human", "confidence": "medium" },
   "slots": [
     {
       "role": ["sub-dps"],

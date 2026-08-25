@@ -234,9 +234,18 @@ export class CuratedTeamEvaluator {
       kind: 'curated',
       gameVersion: match.archetype.gameVersionAdded,
       datasetSha: bank.datasetSha,
-      confidence: match.status === 'playable' ? 'high' : 'medium',
+      // A confiança sai da PROVENIÊNCIA do arquétipo, nunca do status do
+      // match. Antes vinha de `match.status === 'playable' ? 'high' : 'medium'`
+      // — isto é, de quantos slots ESTA conta consegue preencher, que é fato
+      // sobre o roster do jogador e não evidência nenhuma sobre a qualidade da
+      // curadoria do time. O efeito era duplo: um arquétipo rascunhado por
+      // máquina era publicado como `high` só por o jogador ter os quatro
+      // personagens, e um arquétipo humano de confiança `high` era rebaixado a
+      // `medium` por faltar alguém na conta.
+      confidence: match.archetype.provenance.confidence,
       assumptions: [
         'arquétipo CURADO: a força relativa é dado autoral, não fórmula',
+        `arquétipo autorado por: ${match.archetype.provenance.authoredBy}`,
         'saída ORDINAL: serve para comparar times, não para prever dano',
         `resolver de stats: ${resolver.id}`,
       ],

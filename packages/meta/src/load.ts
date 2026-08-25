@@ -82,6 +82,10 @@ function resolveArchetype(raw: RawTeamArchetype): TeamArchetypeData {
     tags: raw.tags,
     slots,
     sources: raw.sources,
+    // Estreitar aqui é seguro porque `validateMeta` já rodou em `loadMeta()` e
+    // recusa authoredBy/confidence fora do vocabulário — mesmo contrato do
+    // `rawProfile.provenance as CharacterProfile['provenance']` logo abaixo.
+    provenance: raw.provenance as TeamArchetypeData['provenance'],
     ...(raw.gameVersionRetired === undefined
       ? {}
       : { gameVersionRetired: raw.gameVersionRetired as TeamArchetypeData['gameVersionAdded'] }),

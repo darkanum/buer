@@ -6,6 +6,7 @@
   "strength": "strong",
   "tags": ["abyss", "overworld"],
   "sources": [],
+  "provenance": { "authoredBy": "human", "confidence": "medium" },
   "slots": [
     {
       "role": ["sub-dps", "enabler"],

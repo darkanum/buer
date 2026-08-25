@@ -170,6 +170,16 @@ export function buildArchetypeDrafts(deps: ArchetypeDraftDeps): ArchetypeDraftRe
       label: primary.label,
       gameVersionAdded: deps.gameVersion,
       strength: mostConservativeStrength(variants),
+      // Proveniência de MÁQUINA, declarada como tal. `authoredBy` é sempre
+      // 'researched' e a confiança sai da mesma pergunta que a da ficha
+      // responde — quantas fontes INDEPENDENTES sustentam isto —, nunca do
+      // quanto o time parece bom nem do quanto o jogador consegue preenchê-lo.
+      // 'high' é inalcançável por aqui de propósito: exige revisão humana, e
+      // `validateMeta` recusa a combinação.
+      provenance: {
+        authoredBy: 'researched',
+        confidence: citedBy.length >= 2 ? 'medium' : 'low',
+      },
       // A citação vira tag em vez de virar força: quantas fontes mencionam um
       // time é fato verificável; o quanto ele é bom é julgamento, e misturar os
       // dois faria um número contável se passar por opinião curada.

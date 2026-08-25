@@ -6,6 +6,7 @@
   "strength": "strong",
   "tags": ["abyss", "f2p"],
   "sources": [],
+  "provenance": { "authoredBy": "human", "confidence": "medium" },
   "slots": [
     {
       "role": ["buffer", "healer", "debuffer"],

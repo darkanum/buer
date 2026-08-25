@@ -23,6 +23,7 @@ const raw: RawMeta = {
     {
       schemaVersion: 1, id: 'national', label: 'National', gameVersionAdded: '1.0',
       strength: 'meta', tags: [], sources: [],
+      provenance: { authoredBy: 'human', confidence: 'medium' },
       slots: [{ role: ['sub-dps'], requires: { kind: 'character', anyOf: ['xiangling'] }, substitutable: false }],
     },
   ],

@@ -70,6 +70,7 @@ describe('runArchetypeBatch — composição repetida ENTRE alvos (achado Import
       strength: 'meta',
       tags: [],
       sources: [],
+      provenance: { authoredBy: 'human', confidence: 'medium' },
       slots: [
         { role: ['sub-dps'], requires: { kind: 'character' as const, anyOf: ['xiangling'] }, substitutable: false },
         { role: ['buffer'], requires: { kind: 'character' as const, anyOf: ['bennett'] }, substitutable: false },

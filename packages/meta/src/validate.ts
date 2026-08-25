@@ -191,6 +191,24 @@ export function validateMeta(raw: ValidatableMeta): string[] {
       problems.push(`${where}: um time tem de 2 a 4 slots, veio com ${archetype.slots.length}`);
     }
 
+    // As MESMAS três regras de proveniência que a ficha já tinha. Sem elas o
+    // arquivo que `meta:research:archetypes` grava era indistinguível de
+    // curadoria humana, e a proibição de `researched` + `high` — que é o que
+    // impede uma máquina de se declarar revisada — só existia de um lado.
+    const aprov = archetype.provenance;
+    if (!aprov || !AUTHORED_BY.has(aprov.authoredBy)) {
+      problems.push(`${where}: provenance.authoredBy inválido ou ausente`);
+    }
+    if (!aprov || !CONFIDENCE.has(aprov.confidence)) {
+      problems.push(`${where}: provenance.confidence inválido ou ausente`);
+    }
+    if (aprov?.authoredBy === 'researched' && aprov.confidence === 'high') {
+      problems.push(
+        `${where}: confidence "high" é proibido com authoredBy "researched" — ` +
+          `promova para "researched-reviewed" só depois de revisar (spec §5.5)`,
+      );
+    }
+
     for (const slot of archetype.slots) {
       for (const role of slot.role ?? []) {
         if (!isRoleTag(role)) problems.push(`${where}: papel "${role}" fora do vocabulário fechado`);
