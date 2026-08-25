@@ -13,3 +13,8 @@ export type { CuratedBuildEvaluatorOptions } from './curated/evaluator.js';
 export { statusFor } from './curated/findings.js';
 export type { Finding, FindingStatus, CheckId } from './curated/findings.js';
 export { DefaultEvaluatorRegistry } from './registry.js';
+export { reactionsFor, resonanceFor } from './team/rules.js';
+export { matchArchetype } from './team/matching.js';
+export type { ArchetypeMatch, MatchOptions } from './team/matching.js';
+export { CuratedTeamEvaluator } from './team/evaluator.js';
+export type { TeamOption, TeamsForResult, CuratedTeamEvaluatorOptions } from './team/evaluator.js';
