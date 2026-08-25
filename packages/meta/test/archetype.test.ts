@@ -204,11 +204,34 @@ describe('extractArchetypes — membro que não resolve derruba o TIME inteiro (
   });
 });
 
-describe('archetypeCompositionKey', () => {
-  it('mesma composição, ordem de slot diferente — mesma chave', () => {
-    const raw = readRawMeta();
-    const nationalLikeA = raw.archetypes[0]!;
-    const reordered = { ...nationalLikeA, slots: [...nationalLikeA.slots].reverse() };
-    expect(archetypeCompositionKey(reordered)).toBe(archetypeCompositionKey(nationalLikeA));
+describe('archetypeCompositionKey — recusa opinar sobre arquétipo curado ambíguo', () => {
+  const raw = readRawMeta();
+  const byId = (id: string) => raw.archetypes.find((a) => a.id === id)!;
+
+  it('slot flex (kind: element) → null, nunca uma chave inventada', () => {
+    const freeze = byId('freeze'); // tem slots kind: 'element'
+    expect(freeze.slots.some((s) => s.requires.kind === 'element')).toBe(true);
+    expect(archetypeCompositionKey(freeze)).toBeNull();
+  });
+
+  it('slot character com MÚLTIPLAS alternativas (mono-geo.json) → null', () => {
+    const monoGeo = byId('mono-geo'); // último slot: anyOf de 4 nomes (OR, não 4 membros)
+    const multiSlot = monoGeo.slots.find((s) => s.requires.kind === 'character' && s.requires.anyOf.length > 1);
+    expect(multiSlot).toBeDefined();
+    expect(archetypeCompositionKey(monoGeo)).toBeNull();
+  });
+
+  it('composição de slots nomeados de um membro só — a chave bate independente da ordem', () => {
+    const nationalLike = {
+      ...byId('national'),
+      slots: [
+        { role: ['sub-dps'], requires: { kind: 'character' as const, anyOf: ['xiangling'] }, substitutable: false },
+        { role: ['buffer'], requires: { kind: 'character' as const, anyOf: ['bennett'] }, substitutable: false },
+        { role: ['sub-dps'], requires: { kind: 'character' as const, anyOf: ['xingqiu'] }, substitutable: false },
+      ],
+    };
+    const reordered = { ...nationalLike, slots: [...nationalLike.slots].reverse() };
+    expect(archetypeCompositionKey(nationalLike)).not.toBeNull();
+    expect(archetypeCompositionKey(reordered)).toBe(archetypeCompositionKey(nationalLike));
   });
 });

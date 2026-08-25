@@ -93,15 +93,32 @@ function compositionKey(team: TeamOption): string {
  * reconhecer que dois alvos diferentes redescobriram o mesmo time (achado
  * Important da revisão: "composições idênticas se fundem" hoje só vale
  * DENTRO de uma chamada de `buildArchetypeDrafts`; o lote precisa da mesma
- * regra ENTRE alvos). Todo slot aqui é `kind: 'character'` com `anyOf` de um
- * elemento só — é o único formato que este pipeline emite (slots nomeados,
- * nunca flex) — por isso não há caso de slot `element` a considerar.
+ * regra ENTRE alvos).
+ *
+ * Devolve `null` — "não sei dizer" — quando o arquétipo tem QUALQUER slot
+ * `kind: 'element'` (flex) ou QUALQUER slot `character` cujo `anyOf` lista
+ * mais de um nome (alternativas OR para um papel, não membros simultâneos).
+ * Essa premissa vale para os rascunhos que ESTE pipeline produz — sempre
+ * slot nomeado de um membro só —, mas `archetypeCompositionKey` também é
+ * chamada sobre `knownArchetypes`, isto é, o banco CURADO já em disco, onde
+ * a premissa é falsa: os arquétipos existentes têm slot flex e slot com
+ * várias alternativas (ex.: `data/archetypes/mono-geo.json`). Achatar esses
+ * casos como se fossem membros simultâneos inventaria uma composição — e um
+ * rascunho novo, genuinamente diferente, poderia colidir com essa chave
+ * inventada e ser descartado como "já conhecido" sem nunca ser gravado, sem
+ * erro visível além de uma linha de progresso. Um `null` aqui faz a dedupe
+ * (achado Important #3) PULAR o arquétipo em vez de adivinhar sua
+ * composição — na pior das hipóteses um rascunho legítimo é gravado de novo
+ * e o humano revisa um arquivo a mais; na outra direção, um rascunho
+ * legítimo sumiria em silêncio.
  */
-export function archetypeCompositionKey(archetype: RawTeamArchetype): string {
-  return archetype.slots
-    .flatMap((s) => (s.requires.kind === 'character' ? s.requires.anyOf : []))
-    .sort()
-    .join('|');
+export function archetypeCompositionKey(archetype: RawTeamArchetype): string | null {
+  const members: string[] = [];
+  for (const slot of archetype.slots) {
+    if (slot.requires.kind !== 'character' || slot.requires.anyOf.length !== 1) return null;
+    members.push(slot.requires.anyOf[0]!);
+  }
+  return members.sort().join('|');
 }
 
 function mostConservativeStrength(teams: readonly TeamOption[]): string {

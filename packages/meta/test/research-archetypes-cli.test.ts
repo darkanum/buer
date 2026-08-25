@@ -100,3 +100,49 @@ describe('runArchetypeBatch — composição repetida ENTRE alvos (achado Import
     expect(progress.some((l) => l.includes('já conhecido'))).toBe(true);
   });
 });
+
+describe('runArchetypeBatch — arquétipo curado ambíguo (flex/multi) não suprime rascunho genuinamente novo', () => {
+  it('mono-geo.json (slot de 4 alternativas) e freeze.json (slot flex) presentes no banco não impedem a gravação de um rascunho sem relação nenhuma com eles', async () => {
+    const monoGeo = raw.archetypes.find((a) => a.id === 'mono-geo')!;
+    const freeze = raw.archetypes.find((a) => a.id === 'freeze')!;
+    expect(monoGeo).toBeDefined();
+    expect(freeze).toBeDefined();
+
+    const written: string[] = [];
+    const progress: string[] = [];
+
+    const claims: ArchetypeClaims = {
+      subject: 'razor',
+      sources: ['https://icy-veins.com/razor'],
+      teams: [{
+        id: 'trio-desconexo',
+        label: 'Trio Desconexo',
+        members: [
+          { slug: 'razor', role: ['main-dps'] },
+          { slug: 'sucrose', role: ['enabler'] },
+          { slug: 'tighnari', role: ['sub-dps'] },
+        ],
+        strength: 'niche',
+        citedBy: ['icy-veins'],
+      }],
+    };
+
+    const report = await runArchetypeBatch({
+      targets: ['razor'],
+      gameVersion: '7.0',
+      // O banco "existente" já tem os dois curados ambíguos — é o que a
+      // dedupe teria que ler sem inventar composição para eles.
+      existing: { profiles: raw.profiles, archetypes: [monoGeo, freeze] },
+      research: async () => ({ text: 'pesquisa', urls: [], usage }),
+      extract: async (subject) => ({ claims, refused: [], usage }),
+      write: (archetype) => { written.push(archetype.id); },
+      onProgress: (line) => progress.push(line),
+    });
+
+    expect(report.failed).toEqual([]);
+    // O rascunho novo é gravado — não some por causa de mono-geo/freeze.
+    expect(written).toEqual(['trio-desconexo']);
+    expect(report.written).toEqual(['trio-desconexo']);
+    expect(progress.some((l) => l.includes('já conhecido'))).toBe(false);
+  });
+});

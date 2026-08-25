@@ -106,17 +106,29 @@ export async function runArchetypeBatch(deps: ArchetypeBatchDeps): Promise<Batch
       // daquele alvo por uma composição que já estava no banco. Aqui a
       // identidade é a COMPOSIÇÃO (`archetypeCompositionKey`), não o id: o
       // que já existe fica como está, o resto segue para validação.
-      const knownCompositions = new Set(knownArchetypes.map(archetypeCompositionKey));
+      //
+      // `archetypeCompositionKey` devolve `null` para um arquétipo curado
+      // flex ou de múltiplas alternativas — o banco em disco tem os dois
+      // casos (ex.: mono-geo.json). `null` nunca entra no Set nem é
+      // comparado contra si mesmo: tratar dois `null` como "a mesma
+      // composição" descartaria rascunhos genuinamente diferentes só porque
+      // nenhum dos dois lados sabe dizer sua composição — o oposto do que
+      // esta dedupe existe para fazer. Um arquétipo sem chave conhecida
+      // nunca é considerado "já visto", nem pelo banco nem por outro
+      // rascunho do mesmo lote.
+      const knownCompositions = new Set(
+        knownArchetypes.map(archetypeCompositionKey).filter((k): k is string => k !== null),
+      );
       const freshArchetypes: RawTeamArchetype[] = [];
       for (const archetype of draftResult.archetypes) {
         const key = archetypeCompositionKey(archetype);
-        if (knownCompositions.has(key)) {
+        if (key !== null && knownCompositions.has(key)) {
           deps.onProgress?.(
             `  já conhecido (mesma composição de um arquétipo existente, não regravado): ${archetype.id}`,
           );
           continue;
         }
-        knownCompositions.add(key); // não regrava a mesma composição duas vezes dentro do próprio alvo
+        if (key !== null) knownCompositions.add(key); // não regrava a mesma composição duas vezes dentro do próprio alvo
         freshArchetypes.push(archetype);
       }
 
