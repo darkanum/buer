@@ -5,14 +5,16 @@
       { "pos":1,"set":{"id":15025},"level":20,"rarity":5,
         "main_property":{"property_type":5,"value":"4780"},
         "sub_property_list":[
-          {"property_type":20,"value":"3.1%","times":1},
-          {"property_type":22,"value":"14.8%","times":2},
-          {"property_type":23,"value":"4.5%","times":1} ] },
+          {"property_type":20,"value":"2.7%","times":0},
+          {"property_type":22,"value":"11.7%","times":1},
+          {"property_type":23,"value":"4.5%","times":0},
+          {"property_type":2,"value":"209","times":0} ] },
       { "pos":4,"set":{"id":15025},"level":20,"rarity":5,
         "main_property":{"property_type":42,"value":"46.6%"},
         "sub_property_list":[
-          {"property_type":20,"value":"6.2%","times":2},
-          {"property_type":22,"value":"7.0%","times":1} ] }
+          {"property_type":20,"value":"6.6%","times":1},
+          {"property_type":22,"value":"5.4%","times":0},
+          {"property_type":8,"value":"16","times":0} ] }
     ],
     "skills": [
       {"skill_id":10097,"level_current":10,"skill_type":1},
@@ -25,7 +27,7 @@
     "relics": [
       { "pos":3,"set":{"id":15009},"level":20,"rarity":5,
         "main_property":{"property_type":2,"value":"311"},
-        "sub_property_list":[ {"property_type":22,"value":"5.4%","times":1} ] } ],
-    "skills": [ {"skill_id":10351,"level_current":8,"skill_type":1} ],
+        "sub_property_list":[ {"property_type":22,"value":"5.4%","times":0} ] } ],
+    "skills": [ {"skill_id":10351,"level":8,"skill_type":1} ],
     "constellations": [] }
 ] }

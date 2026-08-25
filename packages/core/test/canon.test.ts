@@ -21,4 +21,23 @@ describe('canon', () => {
     expect(s).not.toMatch(/: /);
     expect(s.indexOf('"asc"')).toBeLessThan(s.indexOf('"char"'));
   });
+
+  it('formata cada valor de substat na precisão da SUA property (plano=0 casas, % =1 casa)', () => {
+    const withArtifact = {
+      ...doc,
+      artifacts: [{
+        slot: 1 as const, set: 15025, lvl: 20, rarity: 5 as const,
+        main: [2, 209] as [number, number], // 2 = flat HP (0 decimais)
+        subs: [
+          [2, 269, 3] as [number, number, 1|2|3|4],   // flat HP: inteiro
+          [20, 6.6, 2] as [number, number, 1|2|3|4],  // critRate_: 1 casa
+        ],
+        fp: 'fp-test',
+      }],
+    };
+    const s = new TextDecoder().decode(canonBytes(withArtifact));
+    expect(s).toContain('"main":[2,209]'); // não "209.0"
+    expect(s).toContain('[2,269,3]');      // não "269.0"
+    expect(s).toContain('[20,6.6,2]');     // percentual mantém 1 casa
+  });
 });

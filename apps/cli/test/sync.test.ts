@@ -34,9 +34,9 @@ describe('runSync', () => {
 /**
  * Um "personagem" no formato bruto real da HoYoLAB, com um único substat
  * cujo `property_type` é o parâmetro — controla se o `normalize()` real
- * (importado de @buer/core, nunca mockado aqui) aceita (mapeado no PROP de
- * normalize.ts, ex.: 20 = critRate_) ou lança (ex.: 9999, desconhecido —
- * o mesmo tipo de gap que dados de conta real batem hoje).
+ * (importado de @buer/core, nunca mockado aqui) aceita (mapeado no esquema
+ * FightProp via @buer/gi-data, ex.: 20 = critRate_) ou lança (ex.: 9999,
+ * genuinely desconhecido — nenhum id real do jogo cai fora do mapa hoje).
  */
 function detailEntry(subPropertyType: number) {
   return {

@@ -17,6 +17,7 @@
     "vitest": "^2"
   },
   "dependencies": {
+    "@buer/gi-data": "workspace:*",
     "zod": "^4.4.3"
   }
 }

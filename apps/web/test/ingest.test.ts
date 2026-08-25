@@ -61,8 +61,9 @@ const PROVISIONAL_CHAR = {
   constellations: [],
 };
 
-/** `property_type: 9999` is not in @buer/core's normalize.ts PROP subset
- * — a syntactically valid envelope whose raw content core's normalize()
+/** `property_type: 9999` is not a real FightProp id, so it's not in
+ * @buer/gi-data's property map @buer/core's normalize() resolves against —
+ * a syntactically valid envelope whose raw content core's normalize()
  * cannot handle. Exercises the review-round-1 "400, not an uncaught 500"
  * boundary for untrusted `raw` content. */
 const UNMAPPED_PROP_CHAR = {

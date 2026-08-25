@@ -26,4 +26,21 @@ describe('normalize', () => {
     const c = normalize(raw).characters.find(c => c.doc.artifacts.length > 0);
     if (c) for (const s of c.doc.artifacts[0]!.subs) expect(s[2]).toBeGreaterThanOrEqual(1);
   });
+  it('reconstrói substat plano (flat) pelo valor inteiro exibido (property_type 2 = HP)', () => {
+    const c = normalize(raw).characters.find(ch => ch.charKey === '10000089')!;
+    const flatHp = c.doc.artifacts[0]!.subs.find(s => s[0] === 2)!;
+    expect(flatHp).toBeDefined();
+    expect(flatHp[1]).toBe(209); // valor exibido, sem decimal espúrio
+    expect(flatHp[2]).toBe(1);   // 209 = tier 1 exato (209.13 → 1 roll)
+  });
+  it('usa `skills[].level` quando `level_current` não existe (payload real da HoYoLAB)', () => {
+    const c = normalize(raw).characters.find(ch => ch.charKey === '10000046')!;
+    expect(c.doc.talents).toEqual([[10351, 8]]);
+  });
+  it('mapeia property_type pelo esquema FightProp correto (6=ATK%, não ATK)', () => {
+    const c = normalize(raw).characters.find(ch => ch.charKey === '10000089')!;
+    // property_type 20 = critRate_ (não ATK/HP como no mapa antigo e errado).
+    const critRate = c.doc.artifacts[0]!.subs.find(s => s[0] === 20)!;
+    expect(critRate[1]).toBe(2.7);
+  });
 });

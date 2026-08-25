@@ -22,12 +22,13 @@ export interface SyncFlags {
    * Path to dump the RAW HoYoLAB payload (`list`/`detail`/`account`, exactly
    * what `client.fetchAll()` returned) to — independent of `normalize()`,
    * written immediately after the fetch and before normalization runs.
-   * This is what lets a real-account extraction survive even though
-   * `normalize()` isn't ready for real payloads yet (flat HP/ATK/DEF/EM
-   * substats, unmapped `property_type`s — a known Fase-1 boundary): see
-   * `SyncResult.normalized`. Never contains the session cookie — the
-   * cookie only ever lives in the request headers, never in `fetchAll()`'s
-   * result.
+   * `normalize()` now handles real-account payloads (FightProp property map,
+   * flat HP/ATK/DEF/EM substats, times+1 roll reconstruction — see
+   * @buer/core's normalize-hardening report), so this is now mainly a safety
+   * net for a genuinely unmapped `property_type` (a future game update
+   * adding a new one) rather than a known gap: see `SyncResult.normalized`.
+   * Never contains the session cookie — the cookie only ever lives in the
+   * request headers, never in `fetchAll()`'s result.
    */
   rawOut?: string;
   /** Do everything except send to the Buer API. */
@@ -180,10 +181,11 @@ export async function runSync(deps: SyncDeps, flags: SyncFlags = {}): Promise<Sy
   const raw = await client.fetchAll({ uid: flags.uid, region: flags.region });
 
   // Dump the raw payload FIRST, independent of normalize() — this is what
-  // lets a real extraction survive even though normalize() isn't ready for
-  // real-account data yet. `raw` is exactly `fetchAll()`'s result (list /
-  // detail / account) — it never contains the session cookie, which only
-  // ever lives in the request headers the client already sent.
+  // lets a real extraction survive even a normalize() failure (now expected
+  // to be rare — see SyncFlags.rawOut). `raw` is exactly `fetchAll()`'s
+  // result (list / detail / account) — it never contains the session
+  // cookie, which only ever lives in the request headers the client already
+  // sent.
   if (flags.rawOut) {
     writeFileSync(flags.rawOut, JSON.stringify(raw, null, 2), 'utf8');
     console.log(`Payload cru da extração salvo em ${flags.rawOut}.`);

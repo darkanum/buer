@@ -135,6 +135,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@buer/gi-data':
+        specifier: workspace:*
+        version: link:../gi-data
       zod:
         specifier: ^4.4.3
         version: 4.4.3
