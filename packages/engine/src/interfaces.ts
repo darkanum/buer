@@ -11,19 +11,26 @@
 // @buer/core (Marco 1) — importados daqui, não redefinidos, para evitar duplicidade
 // entre o branded-type de core e uma cópia local.
 import type { ArtifactSetKey, CharacterKey, Element, StatKey, WeaponKey } from '@buer/core';
+import type {
+  ArtifactSlot,
+  GameVersion,
+  ObservedStats,
+  RoleTag,
+  SchemaVersion,
+  StatTarget,
+} from '@buer/core';
+
+// Re-exportados para que todo consumidor existente de @buer/engine continue
+// funcionando sem mudar import — a mudança é de ONDE o tipo mora, não de
+// quem pode usá-lo.
+export type { ArtifactSlot, GameVersion, ObservedStats, RoleTag, SchemaVersion, StatTarget };
 
 // ---------------------------------------------------------------------------
 // §6.1 Núcleo
 // ---------------------------------------------------------------------------
 
-export type SchemaVersion = 1;
-export type GameVersion = `${number}.${number}`;
-
-// unions ABERTAS: o domínio muda a cada patch
+// união ABERTA: o domínio muda a cada patch
 export type ReactionKey = string;
-export type RoleTag = string;
-
-export type ArtifactSlot = 'flower' | 'plume' | 'sands' | 'goblet' | 'circlet';
 
 export interface Substat {
   readonly key: StatKey;
@@ -66,6 +73,12 @@ export interface Roster {
   readonly characters: ReadonlyMap<CharacterKey, CharacterInstance>;
   readonly artifacts: readonly ArtifactPiece[];
   readonly weapons: readonly WeaponInstance[];
+  /**
+   * Stats finais por personagem, como capturados. Mapa irmão de
+   * `characters` em vez de campo de `CharacterInstance`: os stats são função
+   * do CONJUNTO EQUIPADO, não do personagem (spec §4.1).
+   */
+  readonly observedStats: ReadonlyMap<CharacterKey, ObservedStats>;
   readonly provenance: {
     readonly source: 'hoyolab' | 'good-import' | 'enka' | 'manual' | 'merged';
     readonly completeness: 'full' | 'showcase-only' | 'partial';
@@ -84,6 +97,8 @@ export interface Build {
   readonly weapon: WeaponInstance;
   readonly artifacts: Readonly<Record<ArtifactSlot, ArtifactPiece | null>>;
   readonly conditionals: ConditionalState;
+  /** Presente só na build capturada; ausente em toda build hipotética. */
+  readonly observedStats?: ObservedStats;
 }
 
 // Endereçável por string e serializável. NUNCA inferir automaticamente.
@@ -400,7 +415,7 @@ export interface TeamAssessment {
   readonly archetype: { readonly id: string; readonly label: string; readonly matchConfidence: number } | null;
   readonly reactions: readonly ReactionAvailability[];
   readonly resonance: readonly ResonanceEffect[];
-  readonly roleCoverage: Readonly<Record<RoleTag, 'missing' | 'weak' | 'covered'>>;
+  readonly roleCoverage: Readonly<Partial<Record<RoleTag, 'missing' | 'weak' | 'covered'>>>;
   readonly energyFeasibility: readonly {
     readonly of: CharacterKey;
     readonly required: number;
@@ -434,6 +449,9 @@ export interface TeamArchetype {
   readonly schemaVersion: SchemaVersion;
   readonly id: string;
   readonly label: string;
+  /** Força relativa CURADA, com fonte — não computada. Evita o peso mágico. */
+  readonly strength: 'meta' | 'strong' | 'niche';
+  readonly tags: readonly string[];
   readonly gameVersionAdded: GameVersion;
   readonly gameVersionRetired?: GameVersion;
   readonly slots: readonly ArchetypeSlot[];
@@ -443,6 +461,10 @@ export interface TeamArchetype {
 }
 export interface ArchetypeSlot {
   readonly role: readonly RoleTag[];
+  /** Qual variante da ficha este slot exige. Ausente = qualquer uma. */
+  readonly variant?: string;
+  /** Sobrescreve alvos da ficha para ESTE arquétipo (generaliza erThresholds). */
+  readonly targetOverrides?: readonly StatTarget[];
   readonly requires:
     | { readonly kind: 'character'; readonly anyOf: readonly CharacterKey[] }
     | { readonly kind: 'element'; readonly element: Element; readonly withRole: readonly RoleTag[] };
