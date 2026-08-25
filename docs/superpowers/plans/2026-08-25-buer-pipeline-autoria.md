@@ -345,6 +345,7 @@ Nenhuma chamada de API. É esta função que decide o que a ficha afirma e com q
 
   interface Divergence {
     readonly field: string;                   // 'sets' | 'mainStats.sands' | 'erThreshold' | …
+    readonly kind: 'alternatives' | 'conflict';
     readonly bySource: Readonly<Record<string, string>>;  // fonte -> o que ela diz
   }
 
@@ -387,8 +388,8 @@ const three = (a: Partial<SourceClaim>, b: Partial<SourceClaim>, c: Partial<Sour
   ],
 });
 
-describe('reconcileCharacter — concordância', () => {
-  it('três fontes concordando produz o valor e confiança medium', () => {
+describe('reconcileCharacter — campos de LISTA: união e ranking, nunca descarte', () => {
+  it('três fontes com a mesma lista produz a lista, sem divergência', () => {
     const r = reconcileCharacter(three(
       { sets: ['emblem-of-severed-fate'] },
       { sets: ['emblem-of-severed-fate'] },
@@ -399,76 +400,110 @@ describe('reconcileCharacter — concordância', () => {
     expect(r.confidence).toBe('medium');
   });
 
-  it('maioria simples (2 de 3) vale, e a divergência FICA registrada', () => {
+  it('fontes com conjuntos DIFERENTES guardam os dois, o mais citado primeiro', () => {
     const r = reconcileCharacter(three(
       { sets: ['emblem-of-severed-fate'] },
       { sets: ['emblem-of-severed-fate'] },
       { sets: ['crimson-witch-of-flames'] },
     ));
-    expect(r.agreed.sets).toEqual(['emblem-of-severed-fate']);
-    expect(r.divergences.map((d) => d.field)).toContain('sets');
-    expect(r.divergences[0]!.bySource['genshin-builds']).toContain('crimson-witch-of-flames');
+    // nada é descartado: a ficha suporta alternativa ranqueada, e a segunda
+    // opção vira rank 2 em vez de sumir
+    expect(r.agreed.sets).toEqual(['emblem-of-severed-fate', 'crimson-witch-of-flames']);
   });
 
-  it('três respostas diferentes NÃO produz valor — o campo fica ausente', () => {
+  it('divergência de lista é `alternatives` e NÃO derruba a confiança', () => {
+    const r = reconcileCharacter(three(
+      { sets: ['a-set'] }, { sets: ['a-set'] }, { sets: ['b-set'] },
+    ));
+    const d = r.divergences.find((x) => x.field === 'sets')!;
+    expect(d.kind).toBe('alternatives');
+    expect(r.confidence).toBe('medium');
+  });
+
+  it('três listas totalmente diferentes viram três opções ranqueadas', () => {
     const r = reconcileCharacter(three(
       { sets: ['a-set'] }, { sets: ['b-set'] }, { sets: ['c-set'] },
     ));
-    expect(r.agreed.sets).toBeUndefined();
-    expect(r.divergences.map((d) => d.field)).toContain('sets');
+    expect(r.agreed.sets).toHaveLength(3);
+    // sem consenso em nenhum item, a ordem é determinística (alfabética)
+    expect(r.agreed.sets).toEqual(['a-set', 'b-set', 'c-set']);
   });
 
-  it('qualquer divergência derruba a confiança para low', () => {
+  it('item citado por mais fontes vence item citado em posição melhor por uma só', () => {
     const r = reconcileCharacter(three(
-      { sets: ['x'], erThreshold: 200 },
-      { sets: ['x'], erThreshold: 200 },
-      { sets: ['x'], erThreshold: 160 },
+      { weapons: ['engulfing-lightning', 'the-catch'] },
+      { weapons: ['the-catch'] },
+      { weapons: ['the-catch'] },
     ));
+    expect(r.agreed.weapons![0]).toBe('the-catch');
+  });
+
+  it('empate de apoio é desempatado pela posição média nas fontes', () => {
+    const r = reconcileCharacter(three(
+      { weapons: ['the-catch', 'dragon-s-bane'] },
+      { weapons: ['the-catch', 'dragon-s-bane'] },
+      {},
+    ));
+    expect(r.agreed.weapons).toEqual(['the-catch', 'dragon-s-bane']);
+    expect(r.divergences).toEqual([]);
+  });
+
+  it('main-stats reconciliam por slot, cada um com união e ranking', () => {
+    const r = reconcileCharacter(three(
+      { mainStats: { sands: ['enerRech_'], goblet: ['pyro_dmg_'] } },
+      { mainStats: { sands: ['enerRech_'], goblet: ['pyro_dmg_'] } },
+      { mainStats: { sands: ['atk_'], goblet: ['pyro_dmg_'] } },
+    ));
+    expect(r.agreed.mainStats?.sands).toEqual(['enerRech_', 'atk_']);
+    expect(r.agreed.mainStats?.goblet).toEqual(['pyro_dmg_']);
+    expect(r.divergences.map((d) => d.field)).toEqual(['mainStats.sands']);
+  });
+});
+
+describe('reconcileCharacter — campos de VALOR ÚNICO: aqui divergir é contradição', () => {
+  it('maioria simples decide o limiar de ER', () => {
+    const r = reconcileCharacter(three(
+      { erThreshold: 200 }, { erThreshold: 200 }, { erThreshold: 160 },
+    ));
+    expect(r.agreed.erThreshold).toBe(200);
+  });
+
+  it('contradição em campo escalar é `conflict` e DERRUBA a confiança', () => {
+    const r = reconcileCharacter(three(
+      { erThreshold: 200 }, { erThreshold: 200 }, { erThreshold: 160 },
+    ));
+    const d = r.divergences.find((x) => x.field === 'erThreshold')!;
+    expect(d.kind).toBe('conflict');
     expect(r.confidence).toBe('low');
   });
 
-  it('fonte que não cobre o campo não conta como divergência', () => {
+  it('sem maioria, o campo escalar fica AUSENTE — não escolhemos por desempate', () => {
     const r = reconcileCharacter(three(
-      { erThreshold: 200 }, { erThreshold: 200 }, {},
+      { scalesOn: 'atk' }, { scalesOn: 'hp' }, { scalesOn: 'def' },
     ));
+    expect(r.agreed.scalesOn).toBeUndefined();
+    expect(r.confidence).toBe('low');
+  });
+
+  it('fonte que não cobre o campo não vota nem diverge', () => {
+    const r = reconcileCharacter(three({ erThreshold: 200 }, { erThreshold: 200 }, {}));
     expect(r.agreed.erThreshold).toBe(200);
     expect(r.divergences).toEqual([]);
     expect(r.confidence).toBe('medium');
   });
+});
 
-  it('campo coberto por UMA fonte só entra, mas derruba a confiança', () => {
+describe('reconcileCharacter — confiança e proveniência', () => {
+  it('nada corroborado por 2+ fontes derruba para low, mesmo sem contradição', () => {
     const r = reconcileCharacter(three({ erThreshold: 200 }, {}, {}));
     expect(r.agreed.erThreshold).toBe(200);
     expect(r.confidence).toBe('low');
-    expect(r.divergences.map((d) => d.field)).toContain('erThreshold');
   });
 
   it('nenhuma fonte cobrindo nada devolve agreed vazio e low', () => {
     const r = reconcileCharacter(three({}, {}, {}));
     expect(r.agreed).toEqual({});
     expect(r.confidence).toBe('low');
-  });
-
-  it('ordem de lista importa: mesma lista em ordem diferente é DIVERGÊNCIA', () => {
-    // `sets` e `weapons` são ordenados por qualidade — a ordem É a informação.
-    const r = reconcileCharacter(three(
-      { weapons: ['the-catch', 'dragon-s-bane'] },
-      { weapons: ['dragon-s-bane', 'the-catch'] },
-      { weapons: ['the-catch', 'dragon-s-bane'] },
-    ));
-    expect(r.agreed.weapons).toEqual(['the-catch', 'dragon-s-bane']);
-    expect(r.divergences.map((d) => d.field)).toContain('weapons');
-  });
-
-  it('main-stats reconciliam por slot, não em bloco', () => {
-    const r = reconcileCharacter(three(
-      { mainStats: { sands: ['enerRech_'], goblet: ['pyro_dmg_'] } },
-      { mainStats: { sands: ['enerRech_'], goblet: ['pyro_dmg_'] } },
-      { mainStats: { sands: ['atk_'], goblet: ['pyro_dmg_'] } },
-    ));
-    expect(r.agreed.mainStats?.sands).toEqual(['enerRech_']);
-    expect(r.agreed.mainStats?.goblet).toEqual(['pyro_dmg_']);
-    expect(r.divergences.map((d) => d.field)).toEqual(['mainStats.sands']);
   });
 
   it('sources traz a URL de TODA fonte consultada, mesmo a que não cobriu nada', () => {
@@ -549,9 +584,26 @@ export interface CharacterClaims {
   readonly claims: readonly SourceClaim[];
 }
 
-/** Um campo em que as fontes não falaram a mesma coisa. Vai para `notes`. */
+/**
+ * Um campo em que as fontes não falaram a mesma coisa. Vai para `notes`.
+ *
+ * A distinção entre os dois tipos é a correção que este pipeline faz sobre a
+ * intuição óbvia:
+ *
+ * - `alternatives` — campo de LISTA ORDENADA (conjuntos, armas, substats,
+ *   main-stats). Fontes divergirem aqui NÃO é contradição: é o catálogo de
+ *   opções ficando maior. A ficha guarda todas, ranqueadas por quantas fontes
+ *   citaram cada uma e em que posição. Não derruba a confiança.
+ * - `conflict` — campo de valor ÚNICO (limiar de ER, o atributo que escala).
+ *   Aqui divergir é contradição: um personagem não tem dois limiares de ER.
+ *   Derruba a confiança.
+ *
+ * Tratar os dois do mesmo jeito descartaria opção boa por "maioria" — e é
+ * exatamente o que a ficha, com seus `rank`, foi desenhada para não fazer.
+ */
 export interface Divergence {
   readonly field: string;
+  readonly kind: 'alternatives' | 'conflict';
   readonly bySource: Readonly<Record<string, string>>;
 }
 
@@ -589,84 +641,35 @@ Criar `packages/meta/scripts/research/reconcile.ts`:
 //
 // É PURO de propósito, e essa é a decisão de projeto central do pipeline: a
 // concordância entre fontes é a única coisa que separa esta ficha de um chute,
-// então ela precisa ser testável sem chave de API, determinística entre
-// execuções, e auditável linha a linha. Se morasse num prompt, não seria
-// nenhuma das três.
+// então precisa ser testável sem chave de API, determinística entre execuções e
+// auditável linha a linha. Se morasse num prompt, não seria nenhuma das três.
+//
+// A segunda decisão, igualmente central: CAMPO DE LISTA E CAMPO ESCALAR
+// RECONCILIAM DE FORMAS DIFERENTES. Duas fontes recomendando conjuntos
+// distintos não estão se contradizendo — estão oferecendo alternativas, e a
+// ficha tem `rank` justamente para guardar as duas. Já duas fontes dando
+// limiares de ER diferentes se contradizem de verdade: um personagem não tem
+// dois. Tratar os dois casos igual descartaria opção boa por "maioria".
 
 import type {
   AgreedFields, CharacterClaims, Divergence, ReconcileResult, SourceClaim,
 } from './claims.js';
 
-/** Campos escalares e de lista que reconciliam do mesmo jeito. */
-const SIMPLE_FIELDS = ['sets', 'substats', 'weapons', 'erThreshold', 'roles', 'scalesOn'] as const;
+/** Listas ORDENADAS por qualidade: divergir aqui é ganhar opção, não perder. */
+const RANKED_FIELDS = ['sets', 'weapons', 'substats'] as const;
+/** Lista NÃO ordenada: união simples, sem ranking. */
+const SET_FIELDS = ['roles'] as const;
+/** Valor único: divergir aqui é contradição. */
+const SCALAR_FIELDS = ['erThreshold', 'scalesOn'] as const;
 const MAIN_STAT_SLOTS = ['sands', 'goblet', 'circlet'] as const;
 
-/**
- * Chave de comparação. Para lista, a ORDEM faz parte do valor: `sets` e
- * `weapons` são ordenados por qualidade, então ['a','b'] e ['b','a'] são
- * afirmações diferentes sobre qual é a melhor opção, não a mesma resposta
- * embaralhada.
- */
-function keyOf(value: unknown): string {
-  return JSON.stringify(value);
+interface Vote {
+  readonly source: string;
+  readonly value: unknown;
 }
 
-interface FieldOutcome {
-  readonly value: unknown | undefined;
-  readonly divergence: Divergence | undefined;
-}
-
-/**
- * Decide UM campo a partir do que cada fonte disse sobre ele.
- *
- * Regras, nesta ordem:
- *  - fonte que não cobre o campo é ignorada (não vota, não diverge);
- *  - ninguém cobriu -> campo ausente, sem divergência;
- *  - todos os que cobriram concordam -> valor, sem divergência;
- *  - maioria simples -> valor da maioria, COM divergência registrada;
- *  - sem maioria -> campo AUSENTE, com divergência. Não escolhemos por
- *    desempate arbitrário: um campo que ninguém confirma é melhor vazio.
- *  - cobertura de fonte única -> valor entra, mas conta como divergência,
- *    porque uma afirmação não confirmada não é concordância.
- */
-function decideField(field: string, votes: readonly { source: string; value: unknown }[]): FieldOutcome {
-  if (votes.length === 0) return { value: undefined, divergence: undefined };
-
-  const byKey = new Map<string, { value: unknown; sources: string[] }>();
-  for (const vote of votes) {
-    const key = keyOf(vote.value);
-    const entry = byKey.get(key) ?? { value: vote.value, sources: [] };
-    entry.sources.push(vote.source);
-    byKey.set(key, entry);
-  }
-
-  const bySource: Record<string, string> = {};
-  for (const vote of votes) bySource[vote.source] = keyOf(vote.value);
-  const divergence: Divergence = { field, bySource };
-
-  if (byKey.size === 1) {
-    const only = [...byKey.values()][0]!;
-    // Cobertura de fonte única: entra, mas não é concordância.
-    return only.sources.length === 1
-      ? { value: only.value, divergence }
-      : { value: only.value, divergence: undefined };
-  }
-
-  const ranked = [...byKey.values()].sort((a, b) => b.sources.length - a.sources.length);
-  const top = ranked[0]!;
-  const runnerUp = ranked[1]!;
-
-  // Empate no topo: ninguém tem maioria, então o campo fica ausente.
-  if (top.sources.length === runnerUp.sources.length) return { value: undefined, divergence };
-
-  return { value: top.value, divergence };
-}
-
-function votesFor(
-  claims: readonly SourceClaim[],
-  pick: (c: SourceClaim) => unknown,
-): { source: string; value: unknown }[] {
-  const out: { source: string; value: unknown }[] = [];
+function votesFor(claims: readonly SourceClaim[], pick: (c: SourceClaim) => unknown): Vote[] {
+  const out: Vote[] = [];
   for (const claim of claims) {
     const value = pick(claim);
     if (value === undefined) continue;
@@ -675,34 +678,158 @@ function votesFor(
   return out;
 }
 
+function bySourceOf(votes: readonly Vote[]): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const vote of votes) out[vote.source] = JSON.stringify(vote.value);
+  return out;
+}
+
+interface Outcome {
+  readonly value: unknown | undefined;
+  readonly divergence: Divergence | undefined;
+  /** Houve item/valor sustentado por 2+ fontes? Alimenta a confiança. */
+  readonly corroborated: boolean;
+}
+
+/**
+ * Campo de LISTA ORDENADA: une o que todas as fontes disseram e ranqueia.
+ *
+ * Ordem: mais fontes citando primeiro; empate desfeito pela posição média em
+ * que as fontes colocaram o item; empate persistente pela ordem alfabética,
+ * para a saída ser determinística entre execuções.
+ *
+ * Nada é descartado. Um conjunto citado por uma fonte só entra em último lugar
+ * e recebe crédito parcial na avaliação — bem melhor que sumir.
+ */
+function mergeRanked(field: string, votes: readonly Vote[]): Outcome {
+  if (votes.length === 0) return { value: undefined, divergence: undefined, corroborated: false };
+
+  const stats = new Map<string, { sources: Set<string>; positions: number[] }>();
+  for (const vote of votes) {
+    const list = vote.value as readonly string[];
+    list.forEach((item, index) => {
+      const entry = stats.get(item) ?? { sources: new Set<string>(), positions: [] };
+      entry.sources.add(vote.source);
+      entry.positions.push(index);
+      stats.set(item, entry);
+    });
+  }
+
+  const ranked = [...stats.entries()]
+    .map(([item, s]) => ({
+      item,
+      support: s.sources.size,
+      avgPosition: s.positions.reduce((a, b) => a + b, 0) / s.positions.length,
+    }))
+    .sort((a, b) => b.support - a.support || a.avgPosition - b.avgPosition || a.item.localeCompare(b.item))
+    .map((r) => r.item);
+
+  const first = JSON.stringify(votes[0]!.value);
+  const identical = votes.every((v) => JSON.stringify(v.value) === first);
+
+  return {
+    value: ranked,
+    divergence: identical ? undefined : { field, kind: 'alternatives', bySource: bySourceOf(votes) },
+    corroborated: [...stats.values()].some((s) => s.sources.size >= 2),
+  };
+}
+
+/** Lista não ordenada (papéis): união, ordenada só para ser determinística. */
+function mergeSet(field: string, votes: readonly Vote[]): Outcome {
+  if (votes.length === 0) return { value: undefined, divergence: undefined, corroborated: false };
+
+  const counts = new Map<string, number>();
+  for (const vote of votes) {
+    for (const item of vote.value as readonly string[]) counts.set(item, (counts.get(item) ?? 0) + 1);
+  }
+
+  const first = JSON.stringify(votes[0]!.value);
+  const identical = votes.every((v) => JSON.stringify(v.value) === first);
+
+  return {
+    value: [...counts.keys()].sort(),
+    divergence: identical ? undefined : { field, kind: 'alternatives', bySource: bySourceOf(votes) },
+    corroborated: [...counts.values()].some((n) => n >= 2),
+  };
+}
+
+/**
+ * Campo de VALOR ÚNICO: maioria simples decide, e discordar é contradição.
+ *
+ * Sem maioria (todas as fontes dizendo coisas diferentes), o campo fica
+ * AUSENTE. Não desempatamos por preferência de fonte: um número que ninguém
+ * confirma é melhor vazio do que escolhido a dedo.
+ */
+function decideScalar(field: string, votes: readonly Vote[]): Outcome {
+  if (votes.length === 0) return { value: undefined, divergence: undefined, corroborated: false };
+
+  const byKey = new Map<string, { value: unknown; sources: string[] }>();
+  for (const vote of votes) {
+    const key = JSON.stringify(vote.value);
+    const entry = byKey.get(key) ?? { value: vote.value, sources: [] };
+    entry.sources.push(vote.source);
+    byKey.set(key, entry);
+  }
+
+  if (byKey.size === 1) {
+    const only = [...byKey.values()][0]!;
+    return { value: only.value, divergence: undefined, corroborated: only.sources.length >= 2 };
+  }
+
+  const ranked = [...byKey.values()].sort((a, b) => b.sources.length - a.sources.length);
+  const top = ranked[0]!;
+  const runnerUp = ranked[1]!;
+  const divergence: Divergence = { field, kind: 'conflict', bySource: bySourceOf(votes) };
+
+  if (top.sources.length === runnerUp.sources.length) {
+    return { value: undefined, divergence, corroborated: false };
+  }
+  return { value: top.value, divergence, corroborated: top.sources.length >= 2 };
+}
+
 export function reconcileCharacter(claims: CharacterClaims): ReconcileResult {
   const agreed: Record<string, unknown> = {};
   const divergences: Divergence[] = [];
+  let corroborated = false;
 
-  for (const field of SIMPLE_FIELDS) {
-    const outcome = decideField(field, votesFor(claims.claims, (c) => c[field]));
-    if (outcome.value !== undefined) agreed[field] = outcome.value;
+  const absorb = (outcome: Outcome, key: string, into: Record<string, unknown>): void => {
+    if (outcome.value !== undefined) into[key] = outcome.value;
     if (outcome.divergence) divergences.push(outcome.divergence);
+    if (outcome.corroborated) corroborated = true;
+  };
+
+  for (const field of RANKED_FIELDS) {
+    absorb(mergeRanked(field, votesFor(claims.claims, (c) => c[field])), field, agreed);
+  }
+  for (const field of SET_FIELDS) {
+    absorb(mergeSet(field, votesFor(claims.claims, (c) => c[field])), field, agreed);
+  }
+  for (const field of SCALAR_FIELDS) {
+    absorb(decideScalar(field, votesFor(claims.claims, (c) => c[field])), field, agreed);
   }
 
   // Main-stats reconciliam POR SLOT: uma fonte pode acertar a ampulheta e
-  // discordar do cálice, e tratar o bloco inteiro como um valor só descartaria
-  // a parte em que todas concordam.
+  // divergir no cálice, e tratar o bloco como um valor só descartaria a parte
+  // em que todas concordam.
   const mainStats: Record<string, unknown> = {};
   for (const slot of MAIN_STAT_SLOTS) {
-    const outcome = decideField(`mainStats.${slot}`, votesFor(claims.claims, (c) => c.mainStats?.[slot]));
-    if (outcome.value !== undefined) mainStats[slot] = outcome.value;
-    if (outcome.divergence) divergences.push(outcome.divergence);
+    absorb(
+      mergeRanked(`mainStats.${slot}`, votesFor(claims.claims, (c) => c.mainStats?.[slot])),
+      slot,
+      mainStats,
+    );
   }
   if (Object.keys(mainStats).length > 0) agreed['mainStats'] = mainStats;
+
+  // Só CONTRADIÇÃO derruba a confiança — alternativa não. E sem nada
+  // corroborado por duas fontes, a ficha é single-sourced, o que também é
+  // `low`: uma afirmação não confirmada não é concordância.
+  const hasConflict = divergences.some((d) => d.kind === 'conflict');
 
   return {
     agreed: agreed as AgreedFields,
     divergences,
-    // Qualquer divergência derruba a confiança. É deliberadamente severo: o
-    // custo de uma ficha `low` é um aviso na tela; o custo de uma `medium`
-    // errada é o defeito da §14.3 da spec.
-    confidence: divergences.length === 0 && Object.keys(agreed).length > 0 ? 'medium' : 'low',
+    confidence: !hasConflict && corroborated ? 'medium' : 'low',
     sources: claims.claims.map((c) => c.url),
   };
 }
@@ -711,7 +838,7 @@ export function reconcileCharacter(claims: CharacterClaims): ReconcileResult {
 - [ ] **Step 5: Rodar os testes e confirmar que passam**
 
 Run: `pnpm --filter @buer/meta exec vitest run test/reconcile.test.ts`
-Expected: PASS (11 testes).
+Expected: PASS (16 testes).
 
 - [ ] **Step 6: Commit**
 
@@ -2159,9 +2286,13 @@ git commit -m "feat(meta): lote de pesquisa de personagens, com recusa, estimati
 
 ---
 
-## Task 7: Arquétipos — `meta:research:archetypes`
+## Task 7: Times — `meta:research:archetypes`, **vários por personagem**
 
-A mesma máquina, alvo diferente. Escopo deliberadamente menor: o pipeline autora slots **nomeados** (`anyOf` com `substitutable: false`), nunca slot flex. Decidir que um slot é flex é julgamento sobre o que o arquétipo tolera, e é exatamente o julgamento que produziu o defeito Critical da revisão final da Fase 2 — fica com o humano.
+A mesma máquina, alvo diferente, e uma diferença conceitual que vale explicitar: **um personagem não tem um time, tem vários.** Se o Icy Veins descreve uma composição e o Game8 descreve outra, isso não é divergência a resolver — são duas opções, e as duas vão para o banco. Descartar a segunda por "maioria" jogaria fora exatamente a informação que o usuário quer.
+
+Quem ordena a lista para o usuário é o **motor**, não o pipeline: `strength` curada primeiro, depois quanto as builds *daquele jogador* cumprem os alvos daquele time (spec §7.1). O ranking é por conta, não global — e é isso que faz o produto valer mais que uma tier list.
+
+Escopo deliberadamente menor num ponto: o pipeline autora somente slots **nomeados** (`anyOf`, `substitutable: false`), nunca flex. Decidir que um slot é flex — e quais elementos ele tolera — foi exatamente o julgamento que produziu o defeito Critical da revisão final da Fase 2 (geo entrando num Hyperbloom). Slot nomeado errado é visível na hora; slot flex mal autorado é silencioso. O humano converte depois de ler.
 
 **Files:**
 - Create: `packages/meta/scripts/research/archetype.ts`, `packages/meta/scripts/research-archetypes.ts`
@@ -2169,13 +2300,27 @@ A mesma máquina, alvo diferente. Escopo deliberadamente menor: o pipeline autor
 - Test: `packages/meta/test/archetype.test.ts`
 
 **Interfaces:**
-- Consumes: `SearchClient`/`SearchDeps` (Task 3), `ExtractClient` (Task 4), `buildCatalogs`/`normalizeClaim` (Task 4), `validateMeta`.
+- Consumes: `SearchDeps`/`ResearchOutput` (Task 3), `ExtractDeps` (Task 4), `validateMeta`, `SourceId` (Task 2).
 - Produces:
-  - `buildArchetypePrompt(name: string): string`
-  - `researchArchetype(name: string, deps: SearchDeps): Promise<ResearchOutput>`
-  - `extractArchetype(name: string, text: string, deps: ExtractDeps): Promise<ArchetypeClaims>`
-  - `buildArchetypeDraft(deps: ArchetypeDraftDeps): { archetype: RawTeamArchetype | null; refusedBecause: readonly string[] }` — **pura**
-  - `ArchetypeClaims = { id: string; label: string; members: readonly { slug: string; role: readonly string[] }[]; strength?: string; sources: readonly string[] }`
+  - `buildArchetypePrompt(subject: string): string`
+  - `researchArchetypes(subject: string, deps: SearchDeps): Promise<ResearchOutput>`
+  - `extractArchetypes(subject: string, text: string, deps: ExtractDeps): Promise<ArchetypeClaims>`
+  - `buildArchetypeDrafts(deps: ArchetypeDraftDeps): ArchetypeDraftResult` — **pura**
+  - tipos:
+    ```ts
+    interface TeamOption {
+      readonly id: string;
+      readonly label: string;
+      readonly members: readonly { readonly slug: string; readonly role: readonly string[] }[];
+      readonly strength?: string;
+      readonly citedBy: readonly SourceId[];
+    }
+    interface ArchetypeClaims { readonly subject: string; readonly teams: readonly TeamOption[]; readonly sources: readonly string[] }
+    interface ArchetypeDraftResult {
+      readonly archetypes: readonly RawTeamArchetype[];
+      readonly refused: readonly { readonly id: string; readonly because: readonly string[] }[];
+    }
+    ```
 
 - [ ] **Step 1: Escrever o teste que falha**
 
@@ -2183,75 +2328,137 @@ Criar `packages/meta/test/archetype.test.ts`:
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { buildArchetypeDraft, buildArchetypePrompt } from '../scripts/research/archetype.js';
+import { buildArchetypeDrafts, buildArchetypePrompt } from '../scripts/research/archetype.js';
 import { validateMeta } from '../src/validate.js';
+import { readRawMeta } from '../src/load.js';
 
-const base = {
-  gameVersion: '7.0',
-  sources: ['https://icy-veins.com/t', 'https://game8.co/t'],
-};
+const base = { subject: 'xingqiu', gameVersion: '7.0', sources: ['https://icy-veins.com/t', 'https://game8.co/t'] };
+
+const time = (id: string, membros: string[], over: Record<string, unknown> = {}) => ({
+  id,
+  label: id,
+  members: membros.map((slug) => ({ slug, role: ['sub-dps'] })),
+  citedBy: ['icy-veins'],
+  ...over,
+});
 
 describe('buildArchetypePrompt', () => {
-  it('pede a composição e o papel de cada membro, restrito às três fontes', () => {
-    const p = buildArchetypePrompt('hyperbloom');
-    expect(p).toContain('hyperbloom');
-    expect(p).toMatch(/icy-veins/);
+  it('pede VÁRIOS times, não o melhor', () => {
+    const p = buildArchetypePrompt('xingqiu');
+    expect(p).toContain('xingqiu');
+    expect(p).toMatch(/todos os times|vários times|cada time/i);
+    expect(p).not.toMatch(/o melhor time apenas|somente o melhor/i);
+  });
+
+  it('exige o papel de cada membro e proíbe deduzir', () => {
+    const p = buildArchetypePrompt('xingqiu');
     expect(p).toMatch(/papel/i);
     expect(p).toMatch(/não invente|omita/i);
   });
 });
 
-describe('buildArchetypeDraft', () => {
-  const claims = {
-    id: 'hyperbloom', label: 'Hyperbloom',
-    members: [
-      { slug: 'xingqiu', role: ['sub-dps'] },
-      { slug: 'fischl', role: ['sub-dps'] },
-      { slug: 'sucrose', role: ['driver'] },
-    ],
-    strength: 'meta',
-    sources: base.sources,
-  };
+describe('buildArchetypeDrafts — vários times, nada descartado', () => {
+  it('duas composições diferentes viram DOIS arquétipos', () => {
+    const claims = { ...base, teams: [time('national', ['xiangling', 'bennett', 'xingqiu']), time('freeze', ['xingqiu', 'kaeya', 'sucrose'])] };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes.map((a) => a.id)).toEqual(['national', 'freeze']);
+  });
+
+  it('fontes diferentes descrevendo a MESMA composição viram um arquétipo só', () => {
+    const claims = {
+      ...base,
+      teams: [
+        time('national', ['xiangling', 'bennett', 'xingqiu'], { citedBy: ['icy-veins'] }),
+        time('national-alt', ['bennett', 'xingqiu', 'xiangling'], { citedBy: ['game8'] }),
+      ],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes).toHaveLength(1);
+  });
 
   it('monta slots NOMEADOS, nunca flex', () => {
-    const d = buildArchetypeDraft({ claims, ...base });
-    expect(d.archetype!.slots).toHaveLength(3);
-    for (const slot of d.archetype!.slots) {
+    const claims = { ...base, teams: [time('national', ['xiangling', 'bennett', 'xingqiu'])] };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    for (const slot of d.archetypes[0]!.slots) {
       expect(slot.substitutable).toBe(false);
       expect(slot.requires.kind).toBe('character');
     }
   });
 
-  it('cada slot nomeia exatamente o personagem que a pesquisa deu', () => {
-    const d = buildArchetypeDraft({ claims, ...base });
-    const nomes = d.archetype!.slots.flatMap((s) =>
-      s.requires.kind === 'character' ? s.requires.anyOf : [],
-    );
-    expect(nomes).toEqual(['xingqiu', 'fischl', 'sucrose']);
-  });
-
-  it('RECUSA com menos de 2 membros — não existe time de um', () => {
-    const d = buildArchetypeDraft({ claims: { ...claims, members: [claims.members[0]!] }, ...base });
-    expect(d.archetype).toBeNull();
-    expect(d.refusedBecause.join(' ')).toMatch(/2 a 4|membros/i);
-  });
-
-  it('RECUSA com mais de 4 membros', () => {
-    const cinco = [...claims.members, { slug: 'bennett', role: ['buffer'] }, { slug: 'xiangling', role: ['sub-dps'] }];
-    const d = buildArchetypeDraft({ claims: { ...claims, members: cinco }, ...base });
-    expect(d.archetype).toBeNull();
+  it('strength discordante fica na MAIS CONSERVADORA — superestimar é pior', () => {
+    const claims = {
+      ...base,
+      teams: [
+        time('t', ['a', 'b'], { strength: 'meta', citedBy: ['icy-veins'] }),
+        time('t2', ['a', 'b'], { strength: 'niche', citedBy: ['game8'] }),
+      ],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes[0]!.strength).toBe('niche');
   });
 
   it('strength fora do vocabulário vira niche em vez de lançar', () => {
-    const d = buildArchetypeDraft({ claims: { ...claims, strength: 'S-tier' }, ...base });
-    expect(d.archetype!.strength).toBe('niche');
+    const claims = { ...base, teams: [time('t', ['a', 'b'], { strength: 'S-tier' })] };
+    expect(buildArchetypeDrafts({ claims, ...base }).archetypes[0]!.strength).toBe('niche');
+  });
+
+  it('RECUSA time com menos de 2 ou mais de 4 membros, sem derrubar os outros', () => {
+    const claims = {
+      ...base,
+      teams: [
+        time('solo', ['a']),
+        time('ok', ['a', 'b', 'c']),
+        time('cinco', ['a', 'b', 'c', 'd', 'e']),
+      ],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes.map((a) => a.id)).toEqual(['ok']);
+    expect(d.refused.map((r) => r.id).sort()).toEqual(['cinco', 'solo']);
+  });
+
+  it('RECUSA time em que algum membro voltou sem papel', () => {
+    const claims = { ...base, teams: [{ ...time('t', ['a', 'b']), members: [{ slug: 'a', role: [] }, { slug: 'b', role: ['sub-dps'] }] }] };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes).toEqual([]);
+    expect(d.refused[0]!.because.join(' ')).toMatch(/papel/i);
+  });
+
+  it('o time exigido não pode faltar o personagem pesquisado', () => {
+    const claims = { ...base, teams: [time('sem-o-sujeito', ['a', 'b', 'c'])] };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.refused[0]!.because.join(' ')).toMatch(/xingqiu/);
+  });
+
+  it('cada arquétipo cita só as fontes que o descreveram', () => {
+    const claims = {
+      ...base,
+      teams: [
+        time('a', ['xingqiu', 'b'], { citedBy: ['icy-veins'] }),
+        time('c', ['xingqiu', 'd'], { citedBy: ['game8', 'genshin-builds'] }),
+      ],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(d.archetypes[0]!.tags).toContain('citado-por:icy-veins');
+    expect(d.archetypes[1]!.tags).toContain('citado-por:game8');
   });
 
   it('o arquétipo montado passa no validateMeta, dadas as fichas dos membros', () => {
-    const { readRawMeta } = require('../src/load.js') as typeof import('../src/load.js');
     const raw = readRawMeta();
-    const d = buildArchetypeDraft({ claims, ...base });
-    expect(validateMeta({ profiles: raw.profiles, archetypes: [d.archetype!] })).toEqual([]);
+    const claims = {
+      subject: 'xingqiu',
+      sources: base.sources,
+      teams: [{
+        id: 'national-pesquisado', label: 'National',
+        members: [
+          { slug: 'xiangling', role: ['sub-dps'] },
+          { slug: 'bennett', role: ['buffer'] },
+          { slug: 'xingqiu', role: ['sub-dps'] },
+        ],
+        strength: 'meta', citedBy: ['icy-veins'] as const,
+      }],
+    };
+    const d = buildArchetypeDrafts({ claims, ...base });
+    expect(validateMeta({ profiles: raw.profiles, archetypes: d.archetypes })).toEqual([]);
   });
 });
 ```
@@ -2259,7 +2466,7 @@ describe('buildArchetypeDraft', () => {
 - [ ] **Step 2: Rodar e confirmar a falha**
 
 Run: `pnpm --filter @buer/meta exec vitest run test/archetype.test.ts`
-Expected: FAIL — import não resolve.
+Expected: FAIL — `Failed to resolve import "../scripts/research/archetype.js"`.
 
 - [ ] **Step 3: Escrever o arquétipo**
 
@@ -2268,92 +2475,157 @@ Criar `packages/meta/scripts/research/archetype.ts`:
 ```ts
 // packages/meta/scripts/research/archetype.ts
 //
-// Pesquisa e montagem de arquétipo de time.
+// Pesquisa e montagem de times.
 //
-// ESCOPO DELIBERADAMENTE MENOR que o de personagem: este pipeline autora
-// somente slots NOMEADOS (`anyOf`, `substitutable: false`). Decidir que um slot
-// é flex — e quais elementos ele tolera — foi exatamente o julgamento que
-// produziu o defeito Critical da revisão final da Fase 2 (geo entrando num
-// Hyperbloom). Um slot nomeado errado é visível na hora; um slot flex mal
-// autorado é silencioso. O humano converte para flex depois de ler.
+// A diferença conceitual em relação à ficha de personagem: um personagem NÃO
+// tem um time, tem vários. Fontes descrevendo composições diferentes não estão
+// se contradizendo — cada uma é uma opção, e todas vão para o banco. Resolver
+// isso por "maioria" descartaria justamente o que o usuário quer ver.
+//
+// Quem ordena a lista para o usuário é o MOTOR: força curada primeiro, depois
+// quanto as builds DAQUELE jogador cumprem os alvos daquele time (spec §7.1).
+// O ranking é por conta, não global.
+//
+// ESCOPO MENOR de propósito: só slots NOMEADOS. Decidir que um slot é flex, e
+// quais elementos ele tolera, foi o julgamento que colocou geo dentro de um
+// Hyperbloom na revisão final da Fase 2. Slot nomeado errado é visível na hora;
+// slot flex mal autorado é silencioso.
 
 import type { RawTeamArchetype } from '../../src/types.js';
 import { SOURCE_DOMAINS } from './client.js';
+import type { SourceId } from './claims.js';
 
-const STRENGTHS = new Set(['meta', 'strong', 'niche']);
+/** Da mais conservadora para a mais forte. Empate resolve para a primeira. */
+const STRENGTH_ORDER = ['niche', 'strong', 'meta'] as const;
+const STRENGTHS = new Set<string>(STRENGTH_ORDER);
 
-export interface ArchetypeClaims {
+export interface TeamOption {
   readonly id: string;
   readonly label: string;
   readonly members: readonly { readonly slug: string; readonly role: readonly string[] }[];
   readonly strength?: string;
+  readonly citedBy: readonly SourceId[];
+}
+
+export interface ArchetypeClaims {
+  readonly subject: string;
+  readonly teams: readonly TeamOption[];
   readonly sources: readonly string[];
 }
 
 export interface ArchetypeDraftDeps {
   readonly claims: ArchetypeClaims;
+  readonly subject: string;
   readonly gameVersion: string;
   readonly sources: readonly string[];
 }
 
-export function buildArchetypePrompt(name: string): string {
+export interface ArchetypeDraftResult {
+  readonly archetypes: readonly RawTeamArchetype[];
+  readonly refused: readonly { readonly id: string; readonly because: readonly string[] }[];
+}
+
+export function buildArchetypePrompt(subject: string): string {
   return [
-    `Pesquise a composição do time "${name}" de Genshin Impact nestes três sites, e SOMENTE neles:`,
+    `Pesquise **todos os times** em que o personagem "${subject}" de Genshin Impact é usado,`,
+    'nestes três sites e SOMENTE neles:',
     '',
     ...SOURCE_DOMAINS.map((d, i) => `${i + 1}. ${d}`),
     '',
-    'Relate, com a URL de cada fonte:',
-    '- quais personagens compõem o time na versão mais consensual;',
-    '- o papel de cada um (main dps, sub dps, buffer, debuffer, healer, shielder, battery, driver, enabler);',
-    '- se as fontes tratam o time como referência do meta, forte, ou de nicho.',
+    'Não escolha o melhor time. Liste **cada time** que as fontes descrevem — se uma fonte mostra',
+    'uma composição e outra mostra outra, as duas interessam. Elas são opções diferentes, não',
+    'versões concorrentes da mesma resposta.',
     '',
-    'Um time tem de 2 a 4 personagens. Se as fontes discordarem da composição, relate a mais citada',
-    'e diga quais foram as outras.',
+    'Para cada time, relate:',
+    '- um nome curto pelo qual ele é conhecido (ex.: "National", "Hyperbloom", "Freeze");',
+    '- os personagens que o compõem — de 2 a 4, incluindo obrigatoriamente o próprio ' + subject + ';',
+    '- o papel de cada membro (main dps, sub dps, buffer, debuffer, healer, shielder, battery, driver, enabler);',
+    '- se a fonte trata o time como referência do meta, forte, ou de nicho;',
+    '- **quais das três fontes** descrevem esse time, e a URL de cada uma.',
     '',
     'REGRA QUE NÃO PODE SER QUEBRADA: não invente membro nem papel. Se as fontes não deixam claro o',
     'papel de alguém, **omita o papel** dessa pessoa em vez de deduzir pelo elemento ou pela classe.',
   ].join('\n');
 }
 
-export function buildArchetypeDraft(
-  deps: ArchetypeDraftDeps,
-): { archetype: RawTeamArchetype | null; refusedBecause: readonly string[] } {
-  const { claims } = deps;
-  const refused: string[] = [];
+/** Identidade de uma composição: o CONJUNTO de membros, sem ordem. */
+function compositionKey(team: TeamOption): string {
+  return [...team.members.map((m) => m.slug)].sort().join('|');
+}
 
-  if (claims.members.length < 2 || claims.members.length > 4) {
-    refused.push(`um time tem de 2 a 4 membros; a pesquisa deu ${claims.members.length}`);
-  }
-  if (claims.members.some((m) => m.role.length === 0)) {
-    refused.push('algum membro voltou sem papel — o slot não teria como casar');
-  }
-  if (refused.length > 0) return { archetype: null, refusedBecause: refused };
+function mostConservativeStrength(teams: readonly TeamOption[]): string {
+  const declared = teams
+    .map((t) => t.strength)
+    .filter((s): s is string => s !== undefined && STRENGTHS.has(s));
+  if (declared.length === 0) return 'niche';
+  // Superestimar um time é conselho errado; subestimar é conselho tímido.
+  // A segunda falha é recuperável, a primeira não.
+  return STRENGTH_ORDER.find((s) => declared.includes(s)) ?? 'niche';
+}
 
-  return {
-    archetype: {
+export function buildArchetypeDrafts(deps: ArchetypeDraftDeps): ArchetypeDraftResult {
+  const archetypes: RawTeamArchetype[] = [];
+  const refused: { id: string; because: readonly string[] }[] = [];
+
+  // Fontes diferentes descrevendo a mesma composição são o MESMO time, ainda
+  // que a tenham nomeado diferente ou listado em outra ordem.
+  const grouped = new Map<string, TeamOption[]>();
+  for (const team of deps.claims.teams) {
+    const key = compositionKey(team);
+    grouped.set(key, [...(grouped.get(key) ?? []), team]);
+  }
+
+  for (const variants of grouped.values()) {
+    const primary = variants[0]!;
+    const because: string[] = [];
+
+    if (primary.members.length < 2 || primary.members.length > 4) {
+      because.push(`um time tem de 2 a 4 membros; a pesquisa deu ${primary.members.length}`);
+    }
+    if (primary.members.some((m) => m.role.length === 0)) {
+      because.push('algum membro voltou sem papel — o slot não teria como casar');
+    }
+    if (!primary.members.some((m) => m.slug === deps.subject)) {
+      because.push(`o time não inclui "${deps.subject}", que é o personagem pesquisado`);
+    }
+
+    if (because.length > 0) {
+      refused.push({ id: primary.id, because });
+      continue;
+    }
+
+    const citedBy = [...new Set(variants.flatMap((v) => v.citedBy))];
+
+    archetypes.push({
       schemaVersion: 1,
-      id: claims.id,
-      label: claims.label,
+      id: primary.id,
+      label: primary.label,
       gameVersionAdded: deps.gameVersion,
-      // Fora do vocabulário vira `niche`: subestimar um time é conselho ruim,
-      // superestimar é conselho errado, e a segunda falha é pior.
-      strength: claims.strength !== undefined && STRENGTHS.has(claims.strength) ? claims.strength : 'niche',
-      tags: [],
+      strength: mostConservativeStrength(variants),
+      // A citação vira tag em vez de virar força: quantas fontes mencionam um
+      // time é fato verificável; o quanto ele é bom é julgamento, e misturar os
+      // dois faria um número contável se passar por opinião curada.
+      tags: citedBy.map((s) => `citado-por:${s}`),
       sources: [...deps.sources],
-      slots: claims.members.map((m) => ({
+      slots: primary.members.map((m) => ({
         role: [...m.role],
         requires: { kind: 'character' as const, anyOf: [m.slug] },
         substitutable: false,
       })),
-    },
-    refusedBecause: [],
-  };
+    });
+  }
+
+  return { archetypes, refused };
 }
 ```
 
 - [ ] **Step 4: Escrever a entrada de CLI**
 
-Criar `packages/meta/scripts/research-archetypes.ts`, com a mesma forma do lote de personagens (`parseArgs`, `runBatch`, `formatBatchReport` reaproveitados por composição), trocando três coisas: `researchArchetype` no lugar de `researchCharacter`, `extractArchetype` no lugar de `extractClaims`, e `buildArchetypeDraft` no lugar de `buildDraft`. Grava em `data/archetypes/<id>.json`, e valida com `validateMeta({ profiles: raw.profiles, archetypes: [...raw.archetypes, novo] })` antes de escrever — um arquétipo que nomeia personagem sem ficha é rejeitado na borda, não descoberto pelo teste depois.
+Criar `packages/meta/scripts/research-archetypes.ts`, com a mesma forma do lote de personagens (`parseArgs`, `runBatch`, `formatBatchReport` reaproveitados por composição), trocando três coisas: `researchArchetypes` no lugar de `researchCharacter`, `extractArchetypes` no lugar de `extractClaims`, e `buildArchetypeDrafts` no lugar de `buildDraft`.
+
+Duas diferenças no laço, porque um alvo agora produz **N** saídas em vez de uma:
+- grava um arquivo por arquétipo em `data/archetypes/<id>.json`, e conta cada um separadamente no relatório;
+- valida com `validateMeta({ profiles: raw.profiles, archetypes: [...raw.archetypes, ...novos] })` **antes** de escrever qualquer um — um arquétipo que nomeia personagem sem ficha é rejeitado na borda, não descoberto pelo teste depois.
 
 Em `packages/meta/package.json`:
 
@@ -2370,7 +2642,7 @@ Expected: PASS. A suíte inteira do repositório continua verde — nada aqui é
 
 ```bash
 git add packages/meta/scripts/research/archetype.ts packages/meta/scripts/research-archetypes.ts packages/meta/package.json packages/meta/test/archetype.test.ts
-git commit -m "feat(meta): pesquisa de arquétipo, com slots nomeados e recusa de composição inválida"
+git commit -m "feat(meta): pesquisa de times — vários por personagem, slots nomeados, nada descartado"
 ```
 
 ---
@@ -2429,7 +2701,13 @@ Run:
 ```bash
 pnpm --filter @buer/cli run start:dev analyze --from "<caminho absoluto da extração>" --character sandrone
 ```
-Expected: a Sandrone deixa de dizer "ainda sem ficha curada" e passa a mostrar veredito de build. Ainda não terá time — os três arquétipos vêm da Task 7 rodada sobre `--only` com os nomes dos times.
+Expected: a Sandrone deixa de dizer "ainda sem ficha curada" e passa a mostrar veredito de build. Ainda nao tera time ate voce rodar o lote de arquetipos:
+
+```bash
+pnpm --filter @buer/meta run meta:research:archetypes -- --only sandrone,linnea,durin
+```
+
+Ele pesquisa TODOS os times de cada um dos tres — nao so o que voce me descreveu — entao espere mais de tres arquetipos na saida. Compare com os tres que voce nomeou em `docs/STATUS.md`: se o pipeline nao achar algum deles, isso e sinal sobre as fontes, nao sobre a sua conta.
 
 - [ ] **Step 6: Atualizar o STATUS e commitar**
 
@@ -2458,7 +2736,9 @@ git commit -m "feat(meta): primeira leva pesquisada — 12 personagens dos três
 | Revisão humana é o portão; promoção é diff de uma linha | 5 (nunca produz `high`) + 8 (Step 4 proíbe promover) |
 | Custa dinheiro e exige chave; é custo de autoria | 6 (estimativa, `--dry-run`) + 8 (duas levas, leia entre elas) |
 | A rodada não é reproduzível; a ficha commitada é | 5 (`authoredAt` injetado, nunca `new Date()` no caminho puro) |
-| **Decisão nova desta sessão:** confiança por concordância entre as três fontes | 2 (pura, 11 testes) |
+| **Decisão nova desta sessão:** confiança por concordância entre as três fontes | 2 (pura, 16 testes) |
+| **Correção do dono do projeto:** divergência em campo de LISTA é alternativa, não contradição | 2 (`mergeRanked`) |
+| **Correção do dono do projeto:** um personagem tem VÁRIOS times, e todos vão para o banco | 7 (`buildArchetypeDrafts`) |
 
 **Lacuna assumida:** o pipeline produz **uma variante** por ficha (`principal`), enquanto o schema suporta N. Reconciliar variantes entre fontes é um problema mais difícil — os três sites estruturam builds de formas diferentes, e casar "Xiangling ER" do Icy Veins com "Xiangling Vaporize" do Game8 exigiria julgamento que este pipeline não tem. Uma variante bem fundamentada é melhor que três inventadas; o revisor humano divide. Registrado aqui para não sumir.
 
