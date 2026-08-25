@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "character": "sucrose",
+  "variants": [
+    {
+      "id": "em-driver",
+      "label": "Driver de maestria",
+      "roles": ["driver", "debuffer", "buffer"],
+      "scalesOn": "eleMas",
+      "sets": [
+        { "kind": "4pc", "sets": ["viridescent-venerer"], "rank": 1 },
+        { "kind": "4pc", "sets": ["instructor"], "rank": 2, "condition": "sem Viridescent farmado; troca redução de RES por maestria de time" }
+      ],
+      "mainStats": {
+        "sands": ["eleMas", "enerRech_"],
+        "goblet": ["eleMas"],
+        "circlet": ["eleMas"]
+      },
+      "substats": ["eleMas", "enerRech_", "atk_"],
+      "weapons": [
+        { "weapon": "sacrificial-fragments", "rank": 1 },
+        { "weapon": "thrilling-tales-of-dragon-slayers", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "eleMas", "value": 700, "hard": false, "why": "a passiva converte 20% da maestria dela em maestria para o time; abaixo de ~700 o buff que ela dá aos outros deixa de compensar o slot" },
+        { "kind": "min", "stat": "enerRech_", "value": 160, "hard": true, "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação" }
+      ]
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}
