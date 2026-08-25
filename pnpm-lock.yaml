@@ -32,9 +32,15 @@ importers:
       '@buer/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@buer/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
       '@buer/hoyolab':
         specifier: workspace:*
         version: link:../../packages/hoyolab
+      '@buer/meta':
+        specifier: workspace:*
+        version: link:../../packages/meta
     devDependencies:
       '@types/node':
         specifier: ^22.20.1

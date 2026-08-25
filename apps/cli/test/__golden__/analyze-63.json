@@ -1,0 +1,3123 @@
+{
+  "scope": "account",
+  "datasetSha": "ed959bfd518c75d7",
+  "characters": [
+    {
+      "key": "10000003",
+      "slug": "jean",
+      "level": 40,
+      "constellation": 1,
+      "observed": {
+        "hp": 5908,
+        "atk": 119,
+        "def": 309,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000006",
+      "slug": "lisa",
+      "level": 40,
+      "constellation": 1,
+      "observed": {
+        "hp": 5373,
+        "atk": 206,
+        "def": 239,
+        "eleMas": 59,
+        "critRate_": 6.9,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000007:cryo",
+      "slug": "lumine:cryo",
+      "level": 90,
+      "constellation": 2,
+      "observed": {
+        "hp": 19156,
+        "atk": 1520,
+        "def": 1064,
+        "eleMas": 269,
+        "critRate_": 49.7,
+        "critDMG_": 131.6,
+        "heal_": 0,
+        "enerRech_": 111,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000014",
+      "slug": "barbara",
+      "level": 70,
+      "constellation": 4,
+      "observed": {
+        "hp": 11852,
+        "atk": 609,
+        "def": 693,
+        "eleMas": 121,
+        "critRate_": 5,
+        "critDMG_": 56.2,
+        "heal_": 0,
+        "enerRech_": 132.9,
+        "shield_": 0,
+        "hydro_dmg_": 34.8,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000015",
+      "slug": "kaeya",
+      "level": 21,
+      "constellation": 0,
+      "observed": {
+        "hp": 3760,
+        "atk": 199,
+        "def": 251,
+        "eleMas": 13,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 4.2,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000020",
+      "slug": "razor",
+      "level": 80,
+      "constellation": 6,
+      "observed": {
+        "hp": 16726,
+        "atk": 2480,
+        "def": 914,
+        "eleMas": 86,
+        "critRate_": 53.6,
+        "critDMG_": 80.3,
+        "heal_": 0,
+        "enerRech_": 117.5,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 80.8
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem time curado que inclua este personagem."
+    },
+    {
+      "key": "10000021",
+      "slug": "amber",
+      "level": 50,
+      "constellation": 0,
+      "observed": {
+        "hp": 5885,
+        "atk": 254,
+        "def": 367,
+        "eleMas": 10,
+        "critRate_": 7.5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 132.4,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000023",
+      "slug": "xiangling",
+      "level": 90,
+      "constellation": 4,
+      "observed": {
+        "hp": 13486,
+        "atk": 611,
+        "def": 706,
+        "eleMas": 113,
+        "critRate_": 13.6,
+        "critDMG_": 61,
+        "heal_": 0,
+        "enerRech_": 154.3,
+        "shield_": 0,
+        "pyro_dmg_": 7,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "national",
+          "archetypeLabel": "National",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000023",
+            "10000032",
+            "10000025",
+            "10000043"
+          ],
+          "variantId": "national-er",
+          "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra a variante \"National (ER alto)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.63575,
+              "summary": "Fora do alvo: enerRech_ 154.3 (alvo 200); critDMG_/critRate_ = 4.49 (faixa 1.5–2.5).",
+              "why": "Pyronado custa 80 de energia e Xiangling gera pouca partícula própria; abaixo de 200% de ER o burst não sai toda rotação e a build inteira deixa de funcionar crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 13509 não está na ficha; a de rank 1 é 13415."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.8771929824561403,
+              "summary": "10 de 19 rolls (53%) nas stats prioritárias: critRate_, critDMG_, enerRech_, atk_, eleMas.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000023",
+              "required": 200,
+              "actual": 154.3
+            },
+            {
+              "of": "10000032",
+              "required": 180,
+              "actual": 138.5
+            },
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [],
+      "acquisitions": []
+    },
+    {
+      "key": "10000024",
+      "slug": "beidou",
+      "level": 40,
+      "constellation": 1,
+      "observed": {
+        "hp": 5435,
+        "atk": 387,
+        "def": 270,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 119.9,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000025",
+      "slug": "xingqiu",
+      "level": 40,
+      "constellation": 5,
+      "observed": {
+        "hp": 4257,
+        "atk": 536,
+        "def": 316,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "hydro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000055"
+          ],
+          "variantId": "sub-dps-er",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Main-stat fora do alvo: sands vazio; goblet vazio; circlet vazio."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.5277777777777778,
+              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 180); critDMG_/critRate_ = 10.00 (faixa 1.5–2.5).",
+              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some crit desbalanceado desperdiça substats"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 11402 não está na ficha; a de rank 1 é 11403."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Nenhum substat para avaliar."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            }
+          ]
+        },
+        {
+          "archetypeId": "national",
+          "archetypeLabel": "National",
+          "strength": "meta",
+          "rankedBy": "targets",
+          "members": [
+            "10000023",
+            "10000032",
+            "10000025",
+            "10000043"
+          ],
+          "variantId": "sub-dps-er",
+          "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra \"Sub-DPS de hydro (ER alto)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Main-stat fora do alvo: sands vazio; goblet vazio; circlet vazio."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.5277777777777778,
+              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 180); critDMG_/critRate_ = 10.00 (faixa 1.5–2.5).",
+              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some crit desbalanceado desperdiça substats"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 11402 não está na ficha; a de rank 1 é 11403."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Nenhum substat para avaliar."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000023",
+              "required": 200,
+              "actual": 154.3
+            },
+            {
+              "of": "10000032",
+              "required": 180,
+              "actual": 138.5
+            },
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "freeze",
+          "archetypeLabel": "Freeze",
+          "strength": "strong",
+          "rankedBy": "strength",
+          "members": [
+            "10000025",
+            "10000015",
+            null,
+            "10000043"
+          ],
+          "variantId": "sub-dps-er",
+          "explanation": "Freeze (strong) — falta 1 slot para você jogar este time. Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Main-stat fora do alvo: sands vazio; goblet vazio; circlet vazio."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.5277777777777778,
+              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 180); critDMG_/critRate_ = 10.00 (faixa 1.5–2.5).",
+              "why": "as chuvas de espadas vêm do burst de 80 de energia; abaixo de 180% de ER ele não volta a cada rotação e a aplicação de hydro do time some crit desbalanceado desperdiça substats"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 11402 não está na ficha; a de rank 1 é 11403."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Nenhum substat para avaliar."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000027",
+      "slug": "ningguang",
+      "level": 20,
+      "constellation": 2,
+      "observed": {
+        "hp": 2721,
+        "atk": 82,
+        "def": 159,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "geo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000031",
+      "slug": "fischl",
+      "level": 90,
+      "constellation": 6,
+      "observed": {
+        "hp": 14746,
+        "atk": 1990,
+        "def": 853,
+        "eleMas": 242,
+        "critRate_": 12,
+        "critDMG_": 159.8,
+        "heal_": 0,
+        "enerRech_": 105.8,
+        "shield_": 0,
+        "electro_dmg_": 46.6,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000055"
+          ],
+          "variantId": "off-field-electro",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Sub-DPS de electro off-field (Oz)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 0.9166666666666666,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "acceptable",
+              "credit": 0.6908333333333333,
+              "summary": "Fora do alvo: enerRech_ 105.8 (alvo 120); critDMG_/critRate_ = 13.32 (faixa 1.5–2.5).",
+              "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80 crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 15402, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.753968253968254,
+              "summary": "19 de 42 rolls (45%) nas stats prioritárias: critRate_, critDMG_, atk_, enerRech_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "overload-chevreuse",
+          "archetypeLabel": "Overload (Chevreuse)",
+          "strength": "strong",
+          "rankedBy": "strength",
+          "members": [
+            "10000090",
+            "10000031",
+            null,
+            "10000111"
+          ],
+          "variantId": "off-field-electro",
+          "explanation": "Overload (Chevreuse) (strong) — falta 1 slot para você jogar este time. Julgado contra a variante \"Sub-DPS de electro off-field (Oz)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 0.9166666666666666,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "acceptable",
+              "credit": 0.6908333333333333,
+              "summary": "Fora do alvo: enerRech_ 105.8 (alvo 120); critDMG_/critRate_ = 13.32 (faixa 1.5–2.5).",
+              "why": "o burst dela custa 40 de energia, barato, e Oz golpeando sozinho fora de campo já gera partícula própria; 120% é o piso confortável, não um teto rígido como em burst de 80 crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 15402, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.753968253968254,
+              "summary": "19 de 42 rolls (45%) nas stats prioritárias: critRate_, critDMG_, atk_, enerRech_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000090",
+              "required": 160,
+              "actual": 174.2
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000032",
+      "slug": "bennett",
+      "level": 90,
+      "constellation": 6,
+      "observed": {
+        "hp": 18175,
+        "atk": 343,
+        "def": 856,
+        "eleMas": 21,
+        "critRate_": 20.2,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 138.5,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000032"
+          ],
+          "variantId": "buffer-er",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Buffer de ATQ (ER alto)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0.3333333333333333,
+              "summary": "Main-stat fora do alvo: sands vazio; circlet vazio."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.7694444444444445,
+              "summary": "Fora do alvo: enerRech_ 138.5 (alvo 180).",
+              "why": "o buff de ATQ vem do campo do burst; sem 180% de ER o campo fica com buraco entre rotações e o time inteiro perde o buff"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 11417 não está na ficha; a de rank 1 é 11501."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "0 de 9 rolls (0%) nas stats prioritárias: enerRech_, hp_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000032",
+              "required": 180,
+              "actual": 138.5
+            }
+          ]
+        },
+        {
+          "archetypeId": "national",
+          "archetypeLabel": "National",
+          "strength": "meta",
+          "rankedBy": "targets",
+          "members": [
+            "10000023",
+            "10000032",
+            "10000025",
+            "10000043"
+          ],
+          "variantId": "buffer-er",
+          "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra a variante \"Buffer de ATQ (ER alto)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0.3333333333333333,
+              "summary": "Main-stat fora do alvo: sands vazio; circlet vazio."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.7694444444444445,
+              "summary": "Fora do alvo: enerRech_ 138.5 (alvo 180).",
+              "why": "o buff de ATQ vem do campo do burst; sem 180% de ER o campo fica com buraco entre rotações e o time inteiro perde o buff"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 11417 não está na ficha; a de rank 1 é 11501."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "0 de 9 rolls (0%) nas stats prioritárias: enerRech_, hp_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000023",
+              "required": 200,
+              "actual": 154.3
+            },
+            {
+              "of": "10000032",
+              "required": 180,
+              "actual": 138.5
+            },
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "mono-geo",
+          "archetypeLabel": "Mono Geo",
+          "strength": "niche",
+          "rankedBy": "strength",
+          "members": [
+            "10000034",
+            "10000055",
+            null,
+            "10000032"
+          ],
+          "variantId": "buffer-er",
+          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra \"Buffer de ATQ (ER alto)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: nenhum bônus de conjunto ativo."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0.3333333333333333,
+              "summary": "Main-stat fora do alvo: sands vazio; circlet vazio."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.7694444444444445,
+              "summary": "Fora do alvo: enerRech_ 138.5 (alvo 180).",
+              "why": "o buff de ATQ vem do campo do burst; sem 180% de ER o campo fica com buraco entre rotações e o time inteiro perde o buff"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 11417 não está na ficha; a de rank 1 é 11501."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "0 de 9 rolls (0%) nas stats prioritárias: enerRech_, hp_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000034",
+              "required": 130,
+              "actual": 100
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            },
+            {
+              "of": "10000032",
+              "required": 180,
+              "actual": 138.5
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000034",
+      "slug": "noelle",
+      "level": 50,
+      "constellation": 6,
+      "observed": {
+        "hp": 8265,
+        "atk": 314,
+        "def": 839,
+        "eleMas": 88,
+        "critRate_": 25.1,
+        "critDMG_": 66.3,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "geo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000034"
+          ],
+          "variantId": "def-carry",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Main-DPS de DEF (geo, escudo próprio)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: 2pc de 15001 + 2pc de 10005."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "acceptable",
+              "credit": 0.6346153846153846,
+              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 130); critDMG_/critRate_ = 2.64 (faixa 1.5–2.5).",
+              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 12302 não está na ficha; a de rank 1 é 12402."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0.43859649122807015,
+              "summary": "5 de 19 rolls (26%) nas stats prioritárias: critRate_, critDMG_, def_, enerRech_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000034",
+              "required": 130,
+              "actual": 100
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "mono-geo",
+          "archetypeLabel": "Mono Geo",
+          "strength": "niche",
+          "rankedBy": "strength",
+          "members": [
+            "10000034",
+            "10000055",
+            null,
+            "10000043"
+          ],
+          "variantId": "def-carry",
+          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra a variante \"Main-DPS de DEF (geo, escudo próprio)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: 2pc de 15001 + 2pc de 10005."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "acceptable",
+              "credit": 0.6346153846153846,
+              "summary": "Fora do alvo: enerRech_ 100.0 (alvo 130); critDMG_/critRate_ = 2.64 (faixa 1.5–2.5).",
+              "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto"
+            },
+            {
+              "check": "weapon",
+              "status": "off-target",
+              "credit": 0.5,
+              "summary": "Arma 12302 não está na ficha; a de rank 1 é 12402."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0.43859649122807015,
+              "summary": "5 de 19 rolls (26%) nas stats prioritárias: critRate_, critDMG_, def_, enerRech_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000034",
+              "required": 130,
+              "actual": 100
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000035",
+      "slug": "qiqi",
+      "level": 90,
+      "constellation": 3,
+      "observed": {
+        "hp": 21857,
+        "atk": 1966,
+        "def": 922,
+        "eleMas": 157,
+        "critRate_": 31.1,
+        "critDMG_": 70.2,
+        "heal_": 45.9,
+        "enerRech_": 205.3,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000036",
+      "slug": "chongyun",
+      "level": 62,
+      "constellation": 1,
+      "observed": {
+        "hp": 13801,
+        "atk": 676,
+        "def": 613,
+        "eleMas": 97,
+        "critRate_": 7.7,
+        "critDMG_": 134.4,
+        "heal_": 0,
+        "enerRech_": 131.7,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000039",
+      "slug": "diona",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 802,
+        "atk": 41,
+        "def": 50,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000041",
+      "slug": "mona",
+      "level": 40,
+      "constellation": 3,
+      "observed": {
+        "hp": 6111,
+        "atk": 253,
+        "def": 408,
+        "eleMas": 54,
+        "critRate_": 8.9,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 116.8,
+        "shield_": 0,
+        "hydro_dmg_": 46.6,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000043",
+      "slug": "sucrose",
+      "level": 90,
+      "constellation": 6,
+      "observed": {
+        "hp": 16818,
+        "atk": 1294,
+        "def": 841,
+        "eleMas": 852,
+        "critRate_": 26.8,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 141.5,
+        "shield_": 0,
+        "anemo_dmg_": 39,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000043"
+          ],
+          "variantId": "em-driver",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.9421875,
+              "summary": "Fora do alvo: enerRech_ 141.5 (alvo 160).",
+              "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação"
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 14403, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.7936507936507936,
+              "summary": "20 de 42 rolls (48%) nas stats prioritárias: eleMas, enerRech_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        },
+        {
+          "archetypeId": "national",
+          "archetypeLabel": "National",
+          "strength": "meta",
+          "rankedBy": "targets",
+          "members": [
+            "10000023",
+            "10000032",
+            "10000025",
+            "10000043"
+          ],
+          "variantId": "em-driver",
+          "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.9421875,
+              "summary": "Fora do alvo: enerRech_ 141.5 (alvo 160).",
+              "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação"
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 14403, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.7936507936507936,
+              "summary": "20 de 42 rolls (48%) nas stats prioritárias: eleMas, enerRech_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000023",
+              "required": 200,
+              "actual": 154.3
+            },
+            {
+              "of": "10000032",
+              "required": 180,
+              "actual": 138.5
+            },
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "freeze",
+          "archetypeLabel": "Freeze",
+          "strength": "strong",
+          "rankedBy": "strength",
+          "members": [
+            "10000025",
+            "10000015",
+            null,
+            "10000043"
+          ],
+          "variantId": "em-driver",
+          "explanation": "Freeze (strong) — falta 1 slot para você jogar este time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.9421875,
+              "summary": "Fora do alvo: enerRech_ 141.5 (alvo 160).",
+              "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação"
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 14403, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.7936507936507936,
+              "summary": "20 de 42 rolls (48%) nas stats prioritárias: eleMas, enerRech_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        },
+        {
+          "archetypeId": "mono-geo",
+          "archetypeLabel": "Mono Geo",
+          "strength": "niche",
+          "rankedBy": "strength",
+          "members": [
+            "10000034",
+            "10000055",
+            null,
+            "10000043"
+          ],
+          "variantId": "em-driver",
+          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "blocking",
+              "credit": 0.9421875,
+              "summary": "Fora do alvo: enerRech_ 141.5 (alvo 160).",
+              "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação"
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 14403, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.7936507936507936,
+              "summary": "20 de 42 rolls (48%) nas stats prioritárias: eleMas, enerRech_, atk_."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000034",
+              "required": 130,
+              "actual": 100
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000044",
+      "slug": "xinyan",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 939,
+        "atk": 44,
+        "def": 67,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000048",
+      "slug": "yanfei",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 784,
+        "atk": 43,
+        "def": 49,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000050",
+      "slug": "thoma",
+      "level": 20,
+      "constellation": 0,
+      "observed": {
+        "hp": 2872,
+        "atk": 79,
+        "def": 209,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000053",
+      "slug": "sayu",
+      "level": 20,
+      "constellation": 1,
+      "observed": {
+        "hp": 3296,
+        "atk": 91,
+        "def": 207,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000055",
+      "slug": "gorou",
+      "level": 90,
+      "constellation": 6,
+      "observed": {
+        "hp": 15802,
+        "atk": 805,
+        "def": 934,
+        "eleMas": 100,
+        "critRate_": 5,
+        "critDMG_": 56.2,
+        "heal_": 0,
+        "enerRech_": 217.3,
+        "shield_": 0,
+        "geo_dmg_": 24,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 7,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000055"
+          ],
+          "variantId": "geo-support",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Suporte geo (buff de DEF/RES, ER alto)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0.3333333333333333,
+              "summary": "Main-stat fora do alvo: goblet com electro_dmg_ (a ficha pede def_); circlet com atk_ (a ficha pede def_)."
+            },
+            {
+              "check": "targets",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Alvos cumpridos: enerRech_ 217.3 (alvo 180)."
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 15401, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0.31746031746031744,
+              "summary": "4 de 21 rolls (19%) nas stats prioritárias: enerRech_, def_, critRate_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "mono-geo",
+          "archetypeLabel": "Mono Geo",
+          "strength": "niche",
+          "rankedBy": "strength",
+          "members": [
+            "10000034",
+            "10000055",
+            null,
+            "10000043"
+          ],
+          "variantId": "geo-support",
+          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra a variante \"Suporte geo (buff de DEF/RES, ER alto)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Conjunto 4pc rank 1 da ficha."
+            },
+            {
+              "check": "mainStats",
+              "status": "off-target",
+              "credit": 0.3333333333333333,
+              "summary": "Main-stat fora do alvo: goblet com electro_dmg_ (a ficha pede def_); circlet com atk_ (a ficha pede def_)."
+            },
+            {
+              "check": "targets",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Alvos cumpridos: enerRech_ 217.3 (alvo 180)."
+            },
+            {
+              "check": "weapon",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Arma 15401, rank 1 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "off-target",
+              "credit": 0.31746031746031744,
+              "summary": "4 de 21 rolls (19%) nas stats prioritárias: enerRech_, def_, critRate_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000034",
+              "required": 130,
+              "actual": 100
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            },
+            {
+              "of": "10000043",
+              "required": 160,
+              "actual": 141.5
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000061",
+      "slug": "kirara",
+      "level": 20,
+      "constellation": 6,
+      "observed": {
+        "hp": 3386,
+        "atk": 85,
+        "def": 152,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "dendro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000067",
+      "slug": "collei",
+      "level": 20,
+      "constellation": 0,
+      "observed": {
+        "hp": 2721,
+        "atk": 79,
+        "def": 167,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "dendro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000068",
+      "slug": "dori",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 1039,
+        "atk": 42,
+        "def": 61,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000069",
+      "slug": "tighnari",
+      "level": 50,
+      "constellation": 1,
+      "observed": {
+        "hp": 7717,
+        "atk": 456,
+        "def": 394,
+        "eleMas": 113,
+        "critRate_": 28.4,
+        "critDMG_": 65.5,
+        "heal_": 0,
+        "enerRech_": 105.2,
+        "shield_": 0,
+        "dendro_dmg_": 14.2,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem time curado que inclua este personagem."
+    },
+    {
+      "key": "10000072",
+      "slug": "candace",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 912,
+        "atk": 41,
+        "def": 57,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "hydro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000077",
+      "slug": "yaoyao",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 1030,
+        "atk": 41,
+        "def": 63,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "dendro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000079",
+      "slug": "dehya",
+      "level": 20,
+      "constellation": 0,
+      "observed": {
+        "hp": 4212,
+        "atk": 95,
+        "def": 169,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000080",
+      "slug": "mika",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 1049,
+        "atk": 42,
+        "def": 60,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000083",
+      "slug": "lynette",
+      "level": 20,
+      "constellation": 3,
+      "observed": {
+        "hp": 3447,
+        "atk": 88,
+        "def": 198,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000085",
+      "slug": "freminet",
+      "level": 20,
+      "constellation": 3,
+      "observed": {
+        "hp": 3356,
+        "atk": 94,
+        "def": 197,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000088",
+      "slug": "charlotte",
+      "level": 20,
+      "constellation": 3,
+      "observed": {
+        "hp": 2993,
+        "atk": 71,
+        "def": 152,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000090",
+      "slug": "chevreuse",
+      "level": 80,
+      "constellation": 2,
+      "observed": {
+        "hp": 41582,
+        "atk": 986,
+        "def": 608,
+        "eleMas": 134,
+        "critRate_": 5,
+        "critDMG_": 98.9,
+        "heal_": 0,
+        "enerRech_": 174.2,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [
+        {
+          "archetypeId": "hyperbloom",
+          "archetypeLabel": "Hyperbloom",
+          "strength": "meta",
+          "rankedBy": "strength",
+          "members": [
+            "10000067",
+            "10000025",
+            "10000031",
+            "10000090"
+          ],
+          "variantId": "overload-support",
+          "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Suporte de overload (HP alto)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: 2pc de 15017 + 2pc de 15003."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Alvos cumpridos: enerRech_ 174.2 (alvo 160)."
+            },
+            {
+              "check": "weapon",
+              "status": "acceptable",
+              "credit": 0.85,
+              "summary": "Arma 13303, rank 2 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.813953488372093,
+              "summary": "21 de 43 rolls (49%) nas stats prioritárias: hp_, enerRech_, def_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000025",
+              "required": 180,
+              "actual": 100
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            },
+            {
+              "of": "10000090",
+              "required": 160,
+              "actual": 174.2
+            }
+          ]
+        }
+      ],
+      "blockedTeams": [
+        {
+          "archetypeId": "overload-chevreuse",
+          "archetypeLabel": "Overload (Chevreuse)",
+          "strength": "strong",
+          "rankedBy": "strength",
+          "members": [
+            "10000090",
+            "10000031",
+            null,
+            "10000111"
+          ],
+          "variantId": "overload-support",
+          "explanation": "Overload (Chevreuse) (strong) — falta 1 slot para você jogar este time. Julgado contra a variante \"Suporte de overload (HP alto)\", que este time exige.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: 2pc de 15017 + 2pc de 15003."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Alvos cumpridos: enerRech_ 174.2 (alvo 160)."
+            },
+            {
+              "check": "weapon",
+              "status": "acceptable",
+              "credit": 0.85,
+              "summary": "Arma 13303, rank 2 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.813953488372093,
+              "summary": "21 de 43 rolls (49%) nas stats prioritárias: hp_, enerRech_, def_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000090",
+              "required": 160,
+              "actual": 174.2
+            },
+            {
+              "of": "10000031",
+              "required": 120,
+              "actual": 105.8
+            }
+          ]
+        },
+        {
+          "archetypeId": "mono-geo",
+          "archetypeLabel": "Mono Geo",
+          "strength": "niche",
+          "rankedBy": "strength",
+          "members": [
+            "10000034",
+            "10000055",
+            null,
+            "10000090"
+          ],
+          "variantId": "overload-support",
+          "explanation": "Mono Geo (niche) — falta 1 slot para você jogar este time. Julgado contra \"Suporte de overload (HP alto)\", a única variante da ficha.",
+          "findings": [
+            {
+              "check": "set",
+              "status": "off-target",
+              "credit": 0,
+              "summary": "Conjunto fora da ficha: 2pc de 15017 + 2pc de 15003."
+            },
+            {
+              "check": "mainStats",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Main-stats conforme a ficha."
+            },
+            {
+              "check": "targets",
+              "status": "on-target",
+              "credit": 1,
+              "summary": "Alvos cumpridos: enerRech_ 174.2 (alvo 160)."
+            },
+            {
+              "check": "weapon",
+              "status": "acceptable",
+              "credit": 0.85,
+              "summary": "Arma 13303, rank 2 da ficha."
+            },
+            {
+              "check": "substats",
+              "status": "acceptable",
+              "credit": 0.813953488372093,
+              "summary": "21 de 43 rolls (49%) nas stats prioritárias: hp_, enerRech_, def_.",
+              "caveat": "Há peça de raridade abaixo de 5★: a contagem de rolls é exata, mas a qualidade de cada roll é estimada (não existe tabela de tier verificada para 3★/4★)."
+            }
+          ],
+          "energy": [
+            {
+              "of": "10000034",
+              "required": 130,
+              "actual": 100
+            },
+            {
+              "of": "10000055",
+              "required": 180,
+              "actual": 217.3
+            },
+            {
+              "of": "10000090",
+              "required": 160,
+              "actual": 174.2
+            }
+          ]
+        }
+      ],
+      "acquisitions": []
+    },
+    {
+      "key": "10000092",
+      "slug": "gaming",
+      "level": 20,
+      "constellation": 2,
+      "observed": {
+        "hp": 3175,
+        "atk": 107,
+        "def": 195,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000096",
+      "slug": "arlecchino",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 1020,
+        "atk": 74,
+        "def": 60,
+        "eleMas": 0,
+        "critRate_": 9.8,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000097",
+      "slug": "sethos",
+      "level": 20,
+      "constellation": 6,
+      "observed": {
+        "hp": 2721,
+        "atk": 247,
+        "def": 156,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 134.3,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000100",
+      "slug": "kachina",
+      "level": 20,
+      "constellation": 0,
+      "observed": {
+        "hp": 3281,
+        "atk": 83,
+        "def": 220,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "geo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000105",
+      "slug": "ororon",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 775,
+        "atk": 44,
+        "def": 49,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000108",
+      "slug": "lan-yan",
+      "level": 20,
+      "constellation": 1,
+      "observed": {
+        "hp": 2568,
+        "atk": 363,
+        "def": 125,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000109",
+      "slug": "yumemizuki-mizuki",
+      "level": 40,
+      "constellation": 0,
+      "observed": {
+        "hp": 5120,
+        "atk": 110,
+        "def": 304,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000110",
+      "slug": "iansan",
+      "level": 80,
+      "constellation": 1,
+      "observed": {
+        "hp": 17710,
+        "atk": 2153,
+        "def": 621,
+        "eleMas": 84,
+        "critRate_": 15.9,
+        "critDMG_": 101.3,
+        "heal_": 0,
+        "enerRech_": 197.2,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000111",
+      "slug": "varesa",
+      "level": 90,
+      "constellation": 0,
+      "observed": {
+        "hp": 19495,
+        "atk": 1762,
+        "def": 969,
+        "eleMas": 98,
+        "critRate_": 72,
+        "critDMG_": 198.4,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "electro_dmg_": 46.6,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000113",
+      "slug": "ifa",
+      "level": 40,
+      "constellation": 6,
+      "observed": {
+        "hp": 4198,
+        "atk": 98,
+        "def": 252,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000115",
+      "slug": "dahlia",
+      "level": 1,
+      "constellation": 0,
+      "observed": {
+        "hp": 1049,
+        "atk": 39,
+        "def": 47,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "hydro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000117",
+      "slug": "10000117",
+      "level": 20,
+      "constellation": 0,
+      "observed": {
+        "hp": 2342,
+        "atk": 69,
+        "def": 147,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000118",
+      "slug": "10000118",
+      "level": 20,
+      "constellation": 0,
+      "observed": {
+        "hp": 2342,
+        "atk": 69,
+        "def": 147,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000119",
+      "slug": "lauma",
+      "level": 90,
+      "constellation": 0,
+      "observed": {
+        "hp": 18318,
+        "atk": 1501,
+        "def": 974,
+        "eleMas": 767,
+        "critRate_": 5,
+        "critDMG_": 88.1,
+        "heal_": 0,
+        "enerRech_": 166.9,
+        "shield_": 0,
+        "dendro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000121",
+      "slug": "aino",
+      "level": 80,
+      "constellation": 6,
+      "observed": {
+        "hp": 17375,
+        "atk": 1183,
+        "def": 805,
+        "eleMas": 259,
+        "critRate_": 47,
+        "critDMG_": 111.4,
+        "heal_": 0,
+        "enerRech_": 181.3,
+        "shield_": 0,
+        "hydro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000123",
+      "slug": "durin",
+      "level": 90,
+      "constellation": 0,
+      "observed": {
+        "hp": 18733,
+        "atk": 2545,
+        "def": 1140,
+        "eleMas": 61,
+        "critRate_": 67.2,
+        "critDMG_": 180.1,
+        "heal_": 0,
+        "enerRech_": 104.5,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000124",
+      "slug": "jahoda",
+      "level": 20,
+      "constellation": 3,
+      "observed": {
+        "hp": 2682,
+        "atk": 85,
+        "def": 161,
+        "eleMas": 0,
+        "critRate_": 5,
+        "critDMG_": 50,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000125",
+      "slug": "columbina",
+      "level": 90,
+      "constellation": 3,
+      "observed": {
+        "hp": 37314,
+        "atk": 1060,
+        "def": 741,
+        "eleMas": 183,
+        "critRate_": 55.3,
+        "critDMG_": 191.8,
+        "heal_": 0,
+        "enerRech_": 151.8,
+        "shield_": 0,
+        "hydro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000126",
+      "slug": "zibai",
+      "level": 90,
+      "constellation": 1,
+      "observed": {
+        "hp": 17699,
+        "atk": 1135,
+        "def": 2890,
+        "eleMas": 178,
+        "critRate_": 33.8,
+        "critDMG_": 203.6,
+        "heal_": 0,
+        "enerRech_": 105.8,
+        "shield_": 0,
+        "geo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000127",
+      "slug": "illuga",
+      "level": 90,
+      "constellation": 6,
+      "observed": {
+        "hp": 18296,
+        "atk": 1134,
+        "def": 2013,
+        "eleMas": 652,
+        "critRate_": 17.8,
+        "critDMG_": 56.2,
+        "heal_": 0,
+        "enerRech_": 161.5,
+        "shield_": 0,
+        "geo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000128",
+      "slug": "varka",
+      "level": 90,
+      "constellation": 0,
+      "observed": {
+        "hp": 19115,
+        "atk": 2712,
+        "def": 1054,
+        "eleMas": 68,
+        "critRate_": 54,
+        "critDMG_": 184,
+        "heal_": 0,
+        "enerRech_": 104.5,
+        "shield_": 0,
+        "anemo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000130",
+      "slug": "linnea",
+      "level": 90,
+      "constellation": 1,
+      "observed": {
+        "hp": 18692,
+        "atk": 1136,
+        "def": 2459,
+        "eleMas": 80,
+        "critRate_": 67,
+        "critDMG_": 212.8,
+        "heal_": 0,
+        "enerRech_": 104.5,
+        "shield_": 0,
+        "geo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000131",
+      "slug": "nicole",
+      "level": 90,
+      "constellation": 0,
+      "observed": {
+        "hp": 17090,
+        "atk": 3902,
+        "def": 803,
+        "eleMas": 33,
+        "critRate_": 12,
+        "critDMG_": 102.1,
+        "heal_": 0,
+        "enerRech_": 147.9,
+        "shield_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000132",
+      "slug": "prune",
+      "level": 50,
+      "constellation": 5,
+      "observed": {
+        "hp": 10958,
+        "atk": 333,
+        "def": 360,
+        "eleMas": 63,
+        "critRate_": 15.1,
+        "critDMG_": 55.4,
+        "heal_": 0,
+        "enerRech_": 122.7,
+        "shield_": 0,
+        "anemo_dmg_": 15,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000133",
+      "slug": "sandrone",
+      "level": 90,
+      "constellation": 0,
+      "observed": {
+        "hp": 19884,
+        "atk": 2781,
+        "def": 922,
+        "eleMas": 112,
+        "critRate_": 78.6,
+        "critDMG_": 178.8,
+        "heal_": 0,
+        "enerRech_": 100,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000148",
+      "slug": "alyosha",
+      "level": 89,
+      "constellation": 6,
+      "observed": {
+        "hp": 19359,
+        "atk": 1887,
+        "def": 889,
+        "eleMas": 23,
+        "critRate_": 51.9,
+        "critDMG_": 69.4,
+        "heal_": 0,
+        "enerRech_": 243.2,
+        "shield_": 0,
+        "electro_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "cryo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    },
+    {
+      "key": "10000150",
+      "slug": "odette",
+      "level": 80,
+      "constellation": 0,
+      "observed": {
+        "hp": 17835,
+        "atk": 2534,
+        "def": 971,
+        "eleMas": 33,
+        "critRate_": 49.6,
+        "critDMG_": 199.3,
+        "heal_": 0,
+        "enerRech_": 125.3,
+        "shield_": 0,
+        "cryo_dmg_": 0,
+        "pyro_dmg_": 0,
+        "hydro_dmg_": 0,
+        "dendro_dmg_": 0,
+        "electro_dmg_": 0,
+        "anemo_dmg_": 0,
+        "geo_dmg_": 0,
+        "physical_dmg_": 0
+      },
+      "playableTeams": [],
+      "blockedTeams": [],
+      "acquisitions": [],
+      "note": "Ainda sem ficha curada para este personagem — só os fatos abaixo."
+    }
+  ]
+}

@@ -18,7 +18,9 @@
   "dependencies": {
     "@buer/cookies": "workspace:*",
     "@buer/core": "workspace:*",
-    "@buer/hoyolab": "workspace:*"
+    "@buer/engine": "workspace:*",
+    "@buer/hoyolab": "workspace:*",
+    "@buer/meta": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",
