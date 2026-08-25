@@ -485,12 +485,12 @@ git commit -m "feat(core): extractObservedStats + ids FightProp agregados (2000/
 
 ## Task 3: Pacote `@buer/meta` — tipos, resolução de slug, integridade
 
-O pacote de dado curado. Nasce com duas fichas e um arquétipo reais — o bastante para as tarefas seguintes terem contra o que testar. A primeira leva completa vem na Task 11.
+O pacote de dado curado. Nasce com três fichas e um arquétipo reais — o bastante para as tarefas seguintes terem contra o que testar. A primeira leva completa vem na Task 11.
 
 **Files:**
 - Create: `packages/meta/package.json`, `packages/meta/tsconfig.json`
 - Create: `packages/meta/src/{types,resolve,validate,load,index}.ts`
-- Create: `packages/meta/data/characters/{xiangling,bennett}.json`
+- Create: `packages/meta/data/characters/{xiangling,bennett,sucrose}.json`
 - Create: `packages/meta/data/archetypes/national.json`
 - Create: `packages/meta/data/scoring.json`
 - Test: `packages/meta/test/integrity.test.ts`
@@ -1233,7 +1233,7 @@ export { validateMeta } from './validate.js';
 export { loadMeta, readRawMeta } from './load.js';
 ```
 
-- [ ] **Step 8: Escrever os pesos e as duas fichas iniciais**
+- [ ] **Step 8: Escrever os pesos e as três fichas iniciais**
 
 `packages/meta/data/scoring.json`:
 
@@ -1359,6 +1359,54 @@ export { loadMeta, readRawMeta } from './load.js';
 }
 ```
 
+`packages/meta/data/characters/sucrose.json` — **é ela que fecha o slot flex do arquétipo abaixo**, por isso nasce aqui e não na Task 11: sem uma ficha de anemo declarando `driver`/`debuffer`, o National fica eternamente "bloqueado por um slot" e os testes de matching da Task 8 não teriam o que verificar.
+
+```json
+{
+  "schemaVersion": 1,
+  "character": "sucrose",
+  "variants": [
+    {
+      "id": "em-driver",
+      "label": "Driver de maestria",
+      "roles": ["driver", "debuffer", "buffer"],
+      "scalesOn": "eleMas",
+      "sets": [
+        { "kind": "4pc", "sets": ["viridescent-venerer"], "rank": 1 },
+        { "kind": "4pc", "sets": ["instructor"], "rank": 2, "condition": "sem Viridescent farmado; troca redução de RES por maestria de time" }
+      ],
+      "mainStats": {
+        "sands": ["eleMas", "enerRech_"],
+        "goblet": ["eleMas"],
+        "circlet": ["eleMas"]
+      },
+      "substats": ["eleMas", "enerRech_", "atk_"],
+      "weapons": [
+        { "weapon": "sacrificial-fragments", "rank": 1 },
+        { "weapon": "thrilling-tales-of-dragon-slayers", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "eleMas", "value": 700, "hard": false, "why": "a passiva converte 20% da maestria dela em maestria para o time; abaixo de ~700 o buff que ela dá aos outros deixa de compensar o slot" },
+        { "kind": "min", "stat": "enerRech_", "value": 160, "hard": true, "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação" }
+      ]
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}
+```
+
+**Confirme os slugs antes de escrever** — o validador rejeita slug inexistente, mas conferir antes é mais rápido:
+
+```bash
+node -e "const w=require('./packages/gi-data/data/weapons.json'),s=require('./packages/gi-data/data/artifact-sets.json');const f=(o,x)=>Object.values(o).some(v=>v.slug===x);for(const x of ['viridescent-venerer'])console.log('set',x,f(s,x));for(const x of ['sacrificial-fragments','thrilling-tales-of-dragon-slayers'])console.log('arma',x,f(w,x))"
+```
+
 `packages/meta/data/archetypes/national.json`:
 
 ```json
@@ -1406,7 +1454,7 @@ Expected: PASS (7 testes). Se o teste "o banco commitado é íntegro" falhar, a 
 
 ```bash
 git add packages/meta pnpm-lock.yaml
-git commit -m "feat(meta): pacote de dado curado — tipos, resolução de slug, integridade, 2 fichas + 1 arquétipo"
+git commit -m "feat(meta): pacote de dado curado — tipos, resolução de slug, integridade, 3 fichas + 1 arquétipo"
 ```
 
 ---
@@ -1436,6 +1484,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import type { CharacterKey } from '@buer/core';
+import { loadArtifactSets } from '@buer/gi-data';
 import { rosterFromHoyolab, equippedBuild } from '../src/roster/from-hoyolab.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -1477,7 +1526,10 @@ describe('rosterFromHoyolab', () => {
 
   it('cada peça de artefato tem fingerprint, dono e substats com contagem de rolls', () => {
     const roster = rosterFromHoyolab(raw, OPTS);
-    expect(roster.artifacts.length).toBeGreaterThan(200);
+    // Contagem EXATA, verificada na fixture: 156 peças em 32 dos 63
+    // personagens (os outros 31 estão sem artefato nenhum). Exato e não
+    // "maior que N" de propósito: prova que nenhuma peça é descartada.
+    expect(roster.artifacts.length).toBe(156);
     for (const piece of roster.artifacts) {
       expect(piece.fingerprint).toMatch(/\S/);
       expect(piece.equippedBy).not.toBeNull();
@@ -1486,6 +1538,38 @@ describe('rosterFromHoyolab', () => {
         expect(sub.tiers.length).toBeGreaterThanOrEqual(1);
       }
     }
+  });
+
+  it('traduz o set.id do HoYoLAB para a chave do catálogo do gi-data', () => {
+    const sets = loadArtifactSets();
+    const roster = rosterFromHoyolab(raw, OPTS);
+    // O payload traz `set.id` de 7 dígitos (2150031); o catálogo usa 5
+    // (15003). Sem a tradução, TODA verificação de conjunto daria zero em
+    // silêncio. Os 29 sets distintos da conta real têm que resolver.
+    const unknown = [...new Set(roster.artifacts.map((p) => p.setKey))].filter((k) => !sets[Number(k)]);
+    expect(unknown).toEqual([]);
+    expect(roster.artifacts.some((p) => sets[Number(p.setKey)]!.slug === 'wanderer-s-troupe')).toBe(true);
+  });
+
+  it('lança em set.id fora do catálogo em vez de inventar chave', () => {
+    const bogus = {
+      detail: {
+        list: [
+          {
+            base: { id: 10000023, element: 'Pyro', level: 90, actived_constellation_num: 0 },
+            weapon: { id: 13401, level: 90, promote_level: 6, affix_level: 1 },
+            relics: [
+              {
+                pos: 1, rarity: 5, level: 20, set: { id: 9999999 },
+                main_property: { property_type: 2, value: '4780' }, sub_property_list: [],
+              },
+            ],
+            skills: [],
+          },
+        ],
+      },
+    };
+    expect(() => rosterFromHoyolab(bogus, OPTS)).toThrow(/9999999/);
   });
 
   it('preenche observedStats por personagem', () => {
@@ -1535,11 +1619,41 @@ Criar `packages/engine/src/roster/from-hoyolab.ts`:
 ```ts
 import {
   artifactFingerprint, charKey, extractObservedStats, propKey, reconstructTiers,
-  type CharacterKey, type Element, type ObservedStats, type StatKey,
+  type ArtifactSetKey, type CharacterKey, type Element, type ObservedStats, type StatKey,
 } from '@buer/core';
+import { loadArtifactSets } from '@buer/gi-data';
 import type {
   ArtifactPiece, ArtifactSlot, Build, CharacterInstance, Roster, Substat, WeaponInstance,
 } from '../interfaces.js';
+
+const ARTIFACT_SETS = loadArtifactSets();
+
+/**
+ * `set.id` do HoYoLAB -> chave do catálogo do gi-data.
+ *
+ * São numerações DIFERENTES e a diferença é silenciosa: o payload traz
+ * `2150031` onde o catálogo tem `15003`. Sem traduzir, `setKey` nunca casa
+ * com nada que uma ficha declare, e a verificação de conjunto dá crédito
+ * zero para toda build — errado, e sem sintoma.
+ *
+ * A relação, verificada nos 29 sets distintos da conta real de calibração
+ * (29/29, todos de 7 dígitos, prefixo `2` e sufixo `1`):
+ *   hoyolabId = 2_000_000 + giDataId * 10 + 1
+ * de onde `giDataId = Math.floor((hoyolabId - 2_000_000) / 10)`.
+ *
+ * LANÇA para id que não resolve no catálogo, em vez de propagar uma chave
+ * inventada: é a mesma disciplina de fail-loud do `sync.ts` do gi-data, e é
+ * o que faz um set de patch novo aparecer como erro em vez de virar
+ * "conjunto fora da ficha" para todos os usuários.
+ */
+export function artifactSetKeyFromHoyolab(hoyolabSetId: number): ArtifactSetKey {
+  const candidate = Math.floor((hoyolabSetId - 2_000_000) / 10);
+  if (ARTIFACT_SETS[candidate]) return String(candidate) as ArtifactSetKey;
+  throw new Error(
+    `set de artefato ${hoyolabSetId} não resolve no catálogo do gi-data ` +
+      `(tentou ${candidate}); rode 'pnpm --filter @buer/gi-data sync' se for set de patch novo`,
+  );
+}
 
 const SLOT_BY_POS: Readonly<Record<number, ArtifactSlot>> = {
   1: 'flower', 2: 'plume', 3: 'sands', 4: 'goblet', 5: 'circlet',
@@ -1618,7 +1732,7 @@ function piecesOf(entry: Record<string, unknown>, owner: CharacterKey): Artifact
 
     return {
       fingerprint: artifactFingerprint(base),
-      setKey: String(base.set) as ArtifactPiece['setKey'],
+      setKey: artifactSetKeyFromHoyolab(base.set),
       slot: SLOT_BY_POS[base.slot]!,
       rarity,
       level: base.lvl,
@@ -4066,9 +4180,14 @@ describe('CuratedRosterAdvisor', () => {
     expect(candidate!.explanation.summary).toContain('National');
   });
 
-  it('não sugere nada quando todos os times já são jogáveis', async () => {
+  it('não sugere nada para um arquétipo que já é jogável', async () => {
     const advice = await advisor.adviseFor(XIANGLING, full);
-    expect(advice.candidates).toHaveLength(0);
+    // Escopado ao National de propósito: a Task 11 acrescenta arquétipos em
+    // que Xiangling pode hospedar um slot flex de pyro, e um
+    // `toHaveLength(0)` global passaria a quebrar por crescimento do banco,
+    // não por regressão do conselheiro.
+    const unlocked = advice.candidates.flatMap((c) => c.unlocks.map((u) => u.archetype.id));
+    expect(unlocked).not.toContain('national');
   });
 
   it('improves fica VAZIO na Fase 2 — não se afirma quanto rende (spec §8.4)', async () => {
@@ -4368,7 +4487,7 @@ git commit -m "feat(engine): CuratedRosterAdvisor — aquisição derivada de ar
 O motor está pronto e tem duas fichas. Esta tarefa é **autoria de conteúdo**, não de código: escrever à mão o suficiente para cobrir os personagens investidos da conta de calibração. É o que a §13 da spec manda fazer **antes** de soltar o pipeline em lote nos 120 — escrever as primeiras à mão é o que ensina qual deve ser o prompt do pipeline.
 
 **Files:**
-- Create: `packages/meta/data/characters/{xingqiu,sucrose,fischl,chevreuse,gorou,noelle,razor,tighnari}.json`
+- Create: `packages/meta/data/characters/{xingqiu,fischl,chevreuse,gorou,noelle,razor,tighnari}.json`
 - Create: `packages/meta/data/archetypes/{hyperbloom,freeze,overload-chevreuse,mono-geo}.json`
 - Test: `packages/engine/test/coverage.test.ts`
 
@@ -4489,53 +4608,7 @@ Criar `packages/meta/data/characters/xingqiu.json`:
 }
 ```
 
-Criar `packages/meta/data/characters/sucrose.json` — é ela que fecha o slot flex do National:
-
-```json
-{
-  "schemaVersion": 1,
-  "character": "sucrose",
-  "variants": [
-    {
-      "id": "em-driver",
-      "label": "Driver de maestria",
-      "roles": ["driver", "debuffer", "buffer"],
-      "scalesOn": "eleMas",
-      "sets": [
-        { "kind": "4pc", "sets": ["viridescent-venerer"], "rank": 1 },
-        { "kind": "4pc", "sets": ["instructor"], "rank": 2, "condition": "sem Viridescent farmado; troca redução de RES por maestria de time" }
-      ],
-      "mainStats": {
-        "sands": ["eleMas", "enerRech_"],
-        "goblet": ["eleMas"],
-        "circlet": ["eleMas"]
-      },
-      "substats": ["eleMas", "enerRech_", "atk_"],
-      "weapons": [
-        { "weapon": "sacrificial-fragments", "rank": 1 },
-        { "weapon": "thrilling-tales-of-dragon-slayers", "rank": 2 }
-      ],
-      "targets": [
-        { "kind": "min", "stat": "eleMas", "value": 700, "hard": false, "why": "a passiva converte 20% da maestria dela em maestria para o time; abaixo de ~700 o buff que ela dá aos outros deixa de compensar o slot" },
-        { "kind": "min", "stat": "enerRech_", "value": 160, "hard": true, "why": "a redução de RES de 4pc Viridescent vem do swirl do burst; sem ER o campo não fica de pé toda rotação" }
-      ]
-    }
-  ],
-  "provenance": {
-    "authoredBy": "human",
-    "sources": [],
-    "authoredAt": "2026-08-24",
-    "validatedForVersion": "7.0",
-    "confidence": "medium"
-  }
-}
-```
-
-**Antes de escrever, confirme os slugs** — o validador rejeita slug inexistente, mas é mais rápido conferir antes:
-
-```bash
-node -e "const w=require('./packages/gi-data/data/weapons.json'),s=require('./packages/gi-data/data/artifact-sets.json');const f=(o,x)=>Object.values(o).some(v=>v.slug===x);for(const x of ['viridescent-venerer'])console.log('set',x,f(s,x));for(const x of ['sacrificial-fragments','thrilling-tales-of-dragon-slayers'])console.log('arma',x,f(w,x))"
-```
+A ficha da Sucrose já foi criada na Task 3 (ela fecha o slot flex do National). Não recrie.
 
 - [ ] **Step 4: Escrever as seis fichas restantes**
 
