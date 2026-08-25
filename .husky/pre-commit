@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+if git diff --cached --name-only -z -- . ':!.husky' | xargs -0 grep -lE '(ltoken_v2|cookie_token_v2)=v2_[A-Za-z0-9%_-]{20,}' 2>/dev/null; then
+  echo "ERRO: possível cookie do HoYoLAB no diff. Aborte e remova o segredo." >&2
+  exit 1
+fi

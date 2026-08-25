@@ -1,0 +1,22 @@
+{
+  "name": "@buer/engine",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "typescript": "^5.6",
+    "vitest": "^2"
+  },
+  "dependencies": {
+    "@buer/core": "workspace:*"
+  }
+}

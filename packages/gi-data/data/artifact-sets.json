@@ -1,0 +1,327 @@
+{
+  "10001": {
+    "slug": "resolution-of-sojourner",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10002": {
+    "slug": "brave-heart",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10003": {
+    "slug": "defender-s-will",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10004": {
+    "slug": "tiny-miracle",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "10005": {
+    "slug": "berserker",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10006": {
+    "slug": "martial-artist",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "10007": {
+    "slug": "instructor",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10008": {
+    "slug": "gambler",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "10009": {
+    "slug": "the-exile",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10010": {
+    "slug": "adventurer",
+    "maxRarity": 4,
+    "twopcNumeric": true
+  },
+  "10011": {
+    "slug": "lucky-dog",
+    "maxRarity": 4,
+    "twopcNumeric": true
+  },
+  "10012": {
+    "slug": "scholar",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "10013": {
+    "slug": "traveling-doctor",
+    "maxRarity": 4,
+    "twopcNumeric": true
+  },
+  "14001": {
+    "slug": "blizzard-strayer",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "14002": {
+    "slug": "thundersoother",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "14003": {
+    "slug": "lavawalker",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "14004": {
+    "slug": "maiden-beloved",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15001": {
+    "slug": "gladiator-s-finale",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15002": {
+    "slug": "viridescent-venerer",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15003": {
+    "slug": "wanderer-s-troupe",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15004": {
+    "slug": "glacier-and-snowfield",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15005": {
+    "slug": "thundering-fury",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15006": {
+    "slug": "crimson-witch-of-flames",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15007": {
+    "slug": "noblesse-oblige",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15008": {
+    "slug": "bloodstained-chivalry",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15009": {
+    "slug": "prayers-for-illumination",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15010": {
+    "slug": "prayers-for-destiny",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15011": {
+    "slug": "prayers-for-wisdom",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15012": {
+    "slug": "prayers-to-the-firmament",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15013": {
+    "slug": "prayers-to-springtime",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15014": {
+    "slug": "archaic-petra",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15015": {
+    "slug": "retracing-bolide",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15016": {
+    "slug": "heart-of-depth",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15017": {
+    "slug": "tenacity-of-the-millelith",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15018": {
+    "slug": "pale-flame",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15019": {
+    "slug": "shimenawa-s-reminiscence",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15020": {
+    "slug": "emblem-of-severed-fate",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15021": {
+    "slug": "husk-of-opulent-dreams",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15022": {
+    "slug": "ocean-hued-clam",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15023": {
+    "slug": "vermillion-hereafter",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15024": {
+    "slug": "echoes-of-an-offering",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15025": {
+    "slug": "deepwood-memories",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15026": {
+    "slug": "gilded-dreams",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15027": {
+    "slug": "desert-pavilion-chronicle",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15028": {
+    "slug": "flower-of-paradise-lost",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15029": {
+    "slug": "nymph-s-dream",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15030": {
+    "slug": "vourukasha-s-glow",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15031": {
+    "slug": "marechaussee-hunter",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15032": {
+    "slug": "golden-troupe",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15033": {
+    "slug": "song-of-days-past",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15034": {
+    "slug": "nighttime-whispers-in-the-echoing-woods",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15035": {
+    "slug": "fragment-of-harmonic-whimsy",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15036": {
+    "slug": "unfinished-reverie",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15037": {
+    "slug": "scroll-of-the-hero-of-cinder-city",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15038": {
+    "slug": "obsidian-codex",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15039": {
+    "slug": "long-night-s-oath",
+    "maxRarity": 5,
+    "twopcNumeric": false
+  },
+  "15040": {
+    "slug": "finale-of-the-deep-galleries",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15041": {
+    "slug": "night-of-the-sky-s-unveiling",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15042": {
+    "slug": "silken-moon-s-serenade",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15043": {
+    "slug": "aubade-of-morningstar-and-moon",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15044": {
+    "slug": "a-day-carved-from-rising-winds",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15045": {
+    "slug": "celestial-gift",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15046": {
+    "slug": "disenchantment-in-deep-shadow",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15047": {
+    "slug": "scarlet-proof",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  },
+  "15048": {
+    "slug": "heart-of-the-furnace",
+    "maxRarity": 5,
+    "twopcNumeric": true
+  }
+}

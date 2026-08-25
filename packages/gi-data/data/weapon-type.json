@@ -1,0 +1,7 @@
+{
+  "1": { "gameCode": "WEAPON_SWORD_ONE_HAND", "enkaInt": 1, "hoyolabInt": 1, "goodKey": "sword" },
+  "2": { "gameCode": "WEAPON_CLAYMORE", "enkaInt": 2, "hoyolabInt": 11, "goodKey": "claymore" },
+  "3": { "gameCode": "WEAPON_BOW", "enkaInt": 3, "hoyolabInt": 12, "goodKey": "bow" },
+  "4": { "gameCode": "WEAPON_POLE", "enkaInt": 4, "hoyolabInt": 13, "goodKey": "polearm" },
+  "5": { "gameCode": "WEAPON_CATALYST", "enkaInt": 5, "hoyolabInt": 10, "goodKey": "catalyst" }
+}

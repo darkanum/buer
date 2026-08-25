@@ -1,0 +1,15 @@
+{
+  "retcode": 0,
+  "message": "OK",
+  "data": {
+    "list": [
+      {
+        "game_biz": "hk4e_global",
+        "region": "os_asia",
+        "game_uid": "800000000",
+        "nickname": "Traveler",
+        "level": 60
+      }
+    ]
+  }
+}

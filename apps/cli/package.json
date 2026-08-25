@@ -1,0 +1,29 @@
+{
+  "name": "@buer/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": {
+    "buer": "./dist/index.js"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start:dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@buer/cookies": "workspace:*",
+    "@buer/core": "workspace:*",
+    "@buer/hoyolab": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.6",
+    "vitest": "^2"
+  }
+}

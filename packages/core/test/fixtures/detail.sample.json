@@ -1,0 +1,33 @@
+{ "list": [
+  { "base": {"id":10000089,"element":"Hydro","level":90,"promote_level":6,"actived_constellation_num":0,"fetter":10},
+    "weapon": {"id":13509,"level":90,"promote_level":6,"affix_level":1},
+    "relics": [
+      { "pos":1,"set":{"id":15025},"level":20,"rarity":5,
+        "main_property":{"property_type":5,"value":"4780"},
+        "sub_property_list":[
+          {"property_type":20,"value":"2.7%","times":0},
+          {"property_type":22,"value":"11.7%","times":1},
+          {"property_type":23,"value":"4.5%","times":0},
+          {"property_type":2,"value":"209","times":0} ] },
+      { "pos":4,"set":{"id":15025},"level":20,"rarity":5,
+        "main_property":{"property_type":42,"value":"46.6%"},
+        "sub_property_list":[
+          {"property_type":20,"value":"6.6%","times":1},
+          {"property_type":22,"value":"5.4%","times":0},
+          {"property_type":8,"value":"16","times":0} ] }
+    ],
+    "skills": [
+      {"skill_id":10097,"level_current":10,"skill_type":1},
+      {"skill_id":10098,"level_current":9,"skill_type":1},
+      {"skill_id":100541,"level_current":10,"skill_type":1},
+      {"skill_id":100542,"level_current":1,"skill_type":2} ],
+    "constellations": [] },
+  { "base": {"id":10000046,"element":"Pyro","level":90,"promote_level":6,"actived_constellation_num":1,"fetter":10},
+    "weapon": {"id":13502,"level":90,"promote_level":6,"affix_level":1},
+    "relics": [
+      { "pos":3,"set":{"id":15009},"level":20,"rarity":5,
+        "main_property":{"property_type":2,"value":"311"},
+        "sub_property_list":[ {"property_type":22,"value":"5.4%","times":0} ] } ],
+    "skills": [ {"skill_id":10351,"level":8,"skill_type":1} ],
+    "constellations": [] }
+] }
