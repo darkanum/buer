@@ -1,7 +1,20 @@
 import { loadSlotMain, loadProperty } from '@buer/gi-data';
 import { isRoleTag } from '@buer/core';
-import type { RawMeta } from './types.js';
+import type { RawCharacterProfile, RawTeamArchetype } from './types.js';
 import { resolveCharacter, resolveSet, resolveWeapon } from './resolve.js';
+
+/**
+ * O que `validateMeta` de fato precisa ler. `RawMeta` (o formato dos arquivos
+ * autorados) declara `profiles`/`archetypes` mutáveis porque é o que se lê e
+ * escreve em disco — mas o pipeline de pesquisa de times monta arquétipos
+ * como `readonly RawTeamArchetype[]` (Task 7: um rascunho não devia poder ser
+ * mutado por quem só está validando). `RawMeta` continua aceito, sem
+ * conversão: um array mutável é sempre atribuível a um parâmetro `readonly`.
+ */
+interface ValidatableMeta {
+  readonly profiles: readonly RawCharacterProfile[];
+  readonly archetypes: readonly RawTeamArchetype[];
+}
 
 const SCALES_ON = new Set(['atk', 'hp', 'def', 'eleMas']);
 const AUTHORED_BY = new Set(['human', 'researched', 'researched-reviewed']);
@@ -67,7 +80,7 @@ function checkTargetStatKeys(
  * em português — vazia significa íntegro. Coleta TUDO em vez de lançar no
  * primeiro erro: quem está autorando 120 fichas quer a lista inteira.
  */
-export function validateMeta(raw: RawMeta): string[] {
+export function validateMeta(raw: ValidatableMeta): string[] {
   const problems: string[] = [];
   const legal = legalMainStats();
   const legalStats = legalStatKeys();
