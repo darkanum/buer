@@ -92,11 +92,16 @@ export async function main(argv: string[]): Promise<void> {
         login: flagBoolean(flags, 'login'),
         cookie: flagString(flags, 'cookie'),
         json: flagBoolean(flags, 'json'),
+        uid: flagString(flags, 'uid'),
+        region: flagString(flags, 'region'),
+        listAccounts: flagBoolean(flags, 'list-accounts'),
       };
       const result = await runSync(createSyncDeps(), syncFlags);
       if (syncFlags.json) {
         console.log(JSON.stringify(result));
-      } else {
+      } else if (!syncFlags.listAccounts) {
+        // `--list-accounts` already printed the account list itself
+        // (runSync) and skipped extraction — nothing else to summarize.
         console.log(
           `Sincronizado: ${result.characters} personagens, ${result.changed} com mudanças, enviado=${result.sent}.`,
         );

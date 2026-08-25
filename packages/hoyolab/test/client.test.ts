@@ -163,3 +163,160 @@ describe('HoyolabClient', () => {
     expect(detailReqBody.character_ids).toEqual(expectedIds);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Seleção de conta (multi-conta) — `roles-multi` tem DUAS contas Genshin
+// hk4e_global: uid=700000001/os_asia ("Alt") e uid=800000000/os_usa
+// ("Traveler"), imitando uma conta HoYoLAB real com um alt em os_asia e a
+// conta principal em os_usa (o bug original: getGameRole() pegava sempre a
+// primeira, o alt vazio, em vez da conta que o usuário queria).
+// ---------------------------------------------------------------------------
+describe('HoyolabClient — seleção de conta (multi-conta)', () => {
+  it('sem seletor + múltiplas contas: getGameRole lança listando as duas contas', async () => {
+    const c = new HoyolabClient({
+      cookies: { ltoken_v2: 'x', ltuid_v2: '1' },
+      fetch: mockFetch({ getUserGameRolesByCookie: fx('roles-multi') }),
+    });
+    await expect(c.getGameRole()).rejects.toThrow(HoyolabError);
+    try {
+      await c.getGameRole();
+      throw new Error('deveria ter lançado');
+    } catch (err) {
+      expect(err).toBeInstanceOf(HoyolabError);
+      const e = err as HoyolabError;
+      expect(e.kind).toBe('multiple-accounts');
+      expect(e.message).toContain('uid=700000001');
+      expect(e.message).toContain('os_asia');
+      expect(e.message).toContain('uid=800000000');
+      expect(e.message).toContain('os_usa');
+      // nunca deve incluir o cookie na mensagem de erro
+      expect(e.message).not.toMatch(/ltoken_v2=x/);
+    }
+  });
+
+  it('--region os_usa seleciona a conta os_usa (encadeada até os bodies de list/detail)', async () => {
+    const calls: { url: string; reqBody: string | undefined }[] = [];
+    const responses: Record<string, unknown> = {
+      getUserGameRolesByCookie: fx('roles-multi'),
+      'character/list': fx('list'),
+      'character/detail': fx('detail'),
+    };
+    const recordingFetch = (async (url: any, init: any) => {
+      const key = Object.keys(responses).find((k) => String(url).includes(k))!;
+      calls.push({ url: String(url), reqBody: init?.body });
+      return new Response(JSON.stringify(responses[key]), { status: 200 });
+    }) as any;
+
+    const c = new HoyolabClient({ cookies: { ltoken_v2: 'x', ltuid_v2: '1' }, fetch: recordingFetch });
+    const role = await c.getGameRole({ region: 'os_usa' });
+    expect(role).toEqual({ gameUid: '800000000', region: 'os_usa', nickname: 'Traveler' });
+
+    const all = await c.fetchAll({ region: 'os_usa' });
+    expect(all.account.gameUid).toBe('800000000');
+    expect(all.account.region).toBe('os_usa');
+
+    const listCall = calls.find((call) => call.url.includes('character/list'));
+    const detailCall = calls.find((call) => call.url.includes('character/detail'));
+    expect(JSON.parse(listCall!.reqBody as string)).toMatchObject({ role_id: '800000000', server: 'os_usa' });
+    expect(JSON.parse(detailCall!.reqBody as string)).toMatchObject({ role_id: '800000000', server: 'os_usa' });
+  });
+
+  it('--uid 700000001 seleciona a conta os_asia (o alt), mesmo havendo uma conta os_usa', async () => {
+    const calls: { url: string; reqBody: string | undefined }[] = [];
+    const responses: Record<string, unknown> = {
+      getUserGameRolesByCookie: fx('roles-multi'),
+      'character/list': fx('list'),
+      'character/detail': fx('detail'),
+    };
+    const recordingFetch = (async (url: any, init: any) => {
+      const key = Object.keys(responses).find((k) => String(url).includes(k))!;
+      calls.push({ url: String(url), reqBody: init?.body });
+      return new Response(JSON.stringify(responses[key]), { status: 200 });
+    }) as any;
+
+    const c = new HoyolabClient({ cookies: { ltoken_v2: 'x', ltuid_v2: '1' }, fetch: recordingFetch });
+    const role = await c.getGameRole({ uid: '700000001' });
+    expect(role).toEqual({ gameUid: '700000001', region: 'os_asia', nickname: 'Alt' });
+
+    const all = await c.fetchAll({ uid: '700000001' });
+    expect(all.account.gameUid).toBe('700000001');
+    expect(all.account.region).toBe('os_asia');
+
+    const listCall = calls.find((call) => call.url.includes('character/list'));
+    expect(JSON.parse(listCall!.reqBody as string)).toMatchObject({ role_id: '700000001', server: 'os_asia' });
+  });
+
+  it('--uid inexistente lança HoyolabError listando as contas disponíveis', async () => {
+    const c = new HoyolabClient({
+      cookies: { ltoken_v2: 'x', ltuid_v2: '1' },
+      fetch: mockFetch({ getUserGameRolesByCookie: fx('roles-multi') }),
+    });
+    await expect(c.getGameRole({ uid: '999' })).rejects.toMatchObject({ kind: 'multiple-accounts' });
+    try {
+      await c.getGameRole({ uid: '999' });
+      throw new Error('deveria ter lançado');
+    } catch (err) {
+      const e = err as HoyolabError;
+      expect(e.message).toContain('uid=700000001');
+      expect(e.message).toContain('uid=800000000');
+    }
+  });
+
+  it('--region sem correspondência lança HoyolabError listando as contas disponíveis', async () => {
+    const c = new HoyolabClient({
+      cookies: { ltoken_v2: 'x', ltuid_v2: '1' },
+      fetch: mockFetch({ getUserGameRolesByCookie: fx('roles-multi') }),
+    });
+    await expect(c.getGameRole({ region: 'os_euro' })).rejects.toMatchObject({ kind: 'multiple-accounts' });
+  });
+
+  it('--region com múltiplas contas na mesma região lança pedindo --uid', async () => {
+    const c = new HoyolabClient({
+      cookies: { ltoken_v2: 'x', ltuid_v2: '1' },
+      fetch: (async () =>
+        new Response(
+          JSON.stringify({
+            retcode: 0,
+            message: 'OK',
+            data: {
+              list: [
+                { game_biz: 'hk4e_global', region: 'os_asia', game_uid: '700000001', nickname: 'Alt' },
+                { game_biz: 'hk4e_global', region: 'os_asia', game_uid: '700000002', nickname: 'Alt2' },
+              ],
+            },
+          }),
+        )) as any,
+    });
+    await expect(c.getGameRole({ region: 'os_asia' })).rejects.toMatchObject({ kind: 'multiple-accounts' });
+    try {
+      await c.getGameRole({ region: 'os_asia' });
+      throw new Error('deveria ter lançado');
+    } catch (err) {
+      const e = err as HoyolabError;
+      expect(e.message).toContain('--uid');
+      expect(e.message).toContain('uid=700000001');
+      expect(e.message).toContain('uid=700000002');
+    }
+  });
+
+  it('conta única + sem seletor: continua funcionando (usa a única conta)', async () => {
+    const c = new HoyolabClient({
+      cookies: { ltoken_v2: 'x', ltuid_v2: '1' },
+      fetch: mockFetch({ getUserGameRolesByCookie: fx('roles') }),
+    });
+    const role = await c.getGameRole();
+    expect(role).toEqual({ gameUid: '800000000', region: 'os_asia', nickname: 'Traveler' });
+  });
+
+  it('listGameRoles() devolve todas as contas Genshin vinculadas ao cookie', async () => {
+    const c = new HoyolabClient({
+      cookies: { ltoken_v2: 'x', ltuid_v2: '1' },
+      fetch: mockFetch({ getUserGameRolesByCookie: fx('roles-multi') }),
+    });
+    const roles = await c.listGameRoles();
+    expect(roles).toEqual([
+      { gameUid: '700000001', region: 'os_asia', nickname: 'Alt' },
+      { gameUid: '800000000', region: 'os_usa', nickname: 'Traveler' },
+    ]);
+  });
+});

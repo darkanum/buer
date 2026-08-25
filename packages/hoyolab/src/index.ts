@@ -6,6 +6,7 @@ export type {
   HoyolabCookies,
   HoyolabClientOptions,
   GameRole,
+  GameRoleSelector,
   ListCharactersResult,
   FetchAllResult,
   HoyolabErrorKind,

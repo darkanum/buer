@@ -5,6 +5,7 @@ import {
   classifyRetcode,
   type HoyolabClientOptions,
   type GameRole,
+  type GameRoleSelector,
   type ListCharactersResult,
   type FetchAllResult,
   type Sleep,
@@ -27,6 +28,14 @@ interface EnvelopeLike {
   retcode?: number;
   message?: string;
   data?: unknown;
+}
+
+/** Uma entrada crua de `getUserGameRolesByCookie.data.list`. */
+interface RawRole {
+  game_biz: string;
+  region: string;
+  game_uid: string;
+  nickname?: string | null;
 }
 
 export class HoyolabClient {
@@ -103,17 +112,83 @@ export class HoyolabClient {
   }
 
   /** GET getUserGameRolesByCookie → filtra game_biz==='hk4e_global'. */
-  async getGameRole(): Promise<GameRole> {
+  private async fetchGenshinRoles(): Promise<RawRole[]> {
     const url = `${this.accountBase}/binding/api/getUserGameRolesByCookie?game_biz=hk4e_global`;
     const data = (await this.requestJson(url, { method: 'GET', headers: this.headers() })) as
-      | { list?: Array<{ game_biz: string; region: string; game_uid: string; nickname?: string | null }> }
+      | { list?: RawRole[] }
       | undefined;
+    return (data?.list ?? []).filter((r) => r.game_biz === 'hk4e_global');
+  }
 
-    const role = data?.list?.find((r) => r.game_biz === 'hk4e_global');
-    if (!role) {
+  /** `uid=<uid> region=<region> nickname=<nickname>` por conta — nunca inclui o Cookie. */
+  private static describeRoles(roles: RawRole[]): string {
+    return roles.map((r) => `uid=${r.game_uid} region=${r.region} nickname=${r.nickname ?? ''}`).join('; ');
+  }
+
+  private static toGameRole(r: RawRole): GameRole {
+    return { gameUid: String(r.game_uid), region: r.region, nickname: r.nickname ?? null };
+  }
+
+  /** Lista todas as contas Genshin (hk4e_global) vinculadas a este cookie — para `--list-accounts`. */
+  async listGameRoles(): Promise<GameRole[]> {
+    const roles = await this.fetchGenshinRoles();
+    return roles.map(HoyolabClient.toGameRole);
+  }
+
+  /**
+   * Resolve QUAL conta Genshin usar, quando o cookie tem mais de uma
+   * (ex.: um alt em os_asia e a conta principal em os_usa). `selector.uid`
+   * tem prioridade sobre `selector.region`. Sem seletor: usa a única conta
+   * se houver apenas uma, senão lança 'multiple-accounts' listando todas.
+   */
+  async getGameRole(selector?: GameRoleSelector): Promise<GameRole> {
+    const roles = await this.fetchGenshinRoles();
+    if (roles.length === 0) {
       throw new HoyolabError('no-chronicle', 'no-role', 'nenhuma conta hk4e_global vinculada a este cookie');
     }
-    return { gameUid: String(role.game_uid), region: role.region, nickname: role.nickname ?? null };
+
+    if (selector?.uid) {
+      const match = roles.find((r) => String(r.game_uid) === selector.uid);
+      if (!match) {
+        throw new HoyolabError(
+          'multiple-accounts',
+          'unknown-uid',
+          `nenhuma conta com uid=${selector.uid} encontrada. Contas disponíveis: ${HoyolabClient.describeRoles(roles)}`,
+        );
+      }
+      return HoyolabClient.toGameRole(match);
+    }
+
+    if (selector?.region) {
+      const matches = roles.filter((r) => r.region === selector.region);
+      if (matches.length === 0) {
+        throw new HoyolabError(
+          'multiple-accounts',
+          'unknown-region',
+          `nenhuma conta na região ${selector.region}. Contas disponíveis: ${HoyolabClient.describeRoles(roles)}`,
+        );
+      }
+      if (matches.length > 1) {
+        throw new HoyolabError(
+          'multiple-accounts',
+          'ambiguous-region',
+          `múltiplas contas na região ${selector.region}: ${HoyolabClient.describeRoles(matches)}. ` +
+            `Escolha uma com --uid <uid>.`,
+        );
+      }
+      return HoyolabClient.toGameRole(matches[0]!);
+    }
+
+    if (roles.length > 1) {
+      throw new HoyolabError(
+        'multiple-accounts',
+        'multiple-accounts',
+        `múltiplas contas Genshin encontradas nesta conta HoYoLAB: ${HoyolabClient.describeRoles(roles)}. ` +
+          `Escolha uma com --uid <uid> ou --region <os_usa|os_euro|os_asia|os_cht>.`,
+      );
+    }
+
+    return HoyolabClient.toGameRole(roles[0]!);
   }
 
   /** POST genshin/api/character/list. */
@@ -140,9 +215,9 @@ export class HoyolabClient {
     });
   }
 
-  /** getGameRole → listCharacters → characterDetail, no formato que a CLI envia como `raw`. */
-  async fetchAll(): Promise<FetchAllResult> {
-    const role = await this.getGameRole();
+  /** getGameRole(selector) → listCharacters → characterDetail, no formato que a CLI envia como `raw`. */
+  async fetchAll(selector?: GameRoleSelector): Promise<FetchAllResult> {
+    const role = await this.getGameRole(selector);
     const { ids, base } = await this.listCharacters(role);
     const detail = await this.characterDetail(role, ids);
     return {

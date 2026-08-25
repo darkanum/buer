@@ -46,6 +46,16 @@ export interface GameRole {
   nickname?: string | null;
 }
 
+/**
+ * Seletor opcional de conta, para quando `getUserGameRolesByCookie` devolve
+ * mais de uma conta hk4e_global (ex.: um alt em os_asia e a conta principal
+ * em os_usa). `uid` tem prioridade sobre `region` quando os dois são dados.
+ */
+export interface GameRoleSelector {
+  uid?: string;
+  region?: string;
+}
+
 export interface ListCharactersResult {
   ids: number[];
   base: unknown;
@@ -57,7 +67,7 @@ export interface FetchAllResult {
   account: { gameUid: string; region: string; nickname?: string | null };
 }
 
-export type HoyolabErrorKind = 'session' | 'ratelimit' | 'no-chronicle' | 'unknown';
+export type HoyolabErrorKind = 'session' | 'ratelimit' | 'no-chronicle' | 'unknown' | 'multiple-accounts';
 
 const RETCODE_KIND: Record<number, HoyolabErrorKind> = {
   10001: 'session',

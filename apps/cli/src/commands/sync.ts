@@ -7,7 +7,7 @@ import {
   type SessionProvider,
   type HoyolabSession,
 } from '@buer/cookies';
-import { HoyolabClient, DEFAULT_LANG, type FetchAllResult } from '@buer/hoyolab';
+import { HoyolabClient, DEFAULT_LANG, type FetchAllResult, type GameRole, type GameRoleSelector } from '@buer/hoyolab';
 import { IngestEnvelope, PROTOCOL_VERSION, normalize, type NormalizedSnapshot } from '@buer/core';
 import { readConfig as readConfigReal, type Config } from '../config.js';
 import { postIngest as postIngestReal, saveFailedPayload, type PostIngestResult } from '../api.js';
@@ -40,11 +40,33 @@ export interface SyncFlags {
   cookie?: string;
   /** Print machine-readable JSON instead of a human-readable summary. */
   json?: boolean;
+  /**
+   * Select a game account by `game_uid` when the HoYoLAB cookie has more
+   * than one hk4e_global account. Takes priority over `region` when both
+   * are given.
+   */
+  uid?: string;
+  /**
+   * Select a game account by region (`os_usa`|`os_euro`|`os_asia`|`os_cht`)
+   * when the cookie has more than one hk4e_global account. Ignored when
+   * `uid` is also given.
+   */
+  region?: string;
+  /**
+   * List every Genshin (hk4e_global) account bound to this HoYoLAB cookie
+   * — uid/region/nickname — and exit WITHOUT fetching characters. Lets the
+   * user discover the `--uid`/`--region` to pass on a real sync.
+   */
+  listAccounts?: boolean;
 }
+
+/** The four HoYoLAB server regions Genshin supports. */
+export const VALID_REGIONS = ['os_usa', 'os_euro', 'os_asia', 'os_cht'] as const;
 
 /** Minimal shape of a HoYoLAB client, as far as `runSync` needs it — matches `HoyolabClient`. */
 export interface SyncClient {
-  fetchAll(): Promise<FetchAllResult>;
+  fetchAll(selector?: GameRoleSelector): Promise<FetchAllResult>;
+  listGameRoles(): Promise<GameRole[]>;
 }
 
 /**
@@ -74,6 +96,13 @@ export interface SyncResult {
    * as an error (old behavior, unchanged).
    */
   normalized?: boolean;
+  /**
+   * Present only when `--list-accounts` was given: every hk4e_global
+   * account bound to the HoYoLAB cookie, in `listGameRoles()` order. When
+   * this is set, `characters`/`changed`/`sent` are meaningless zeros/false
+   * — no extraction was attempted.
+   */
+  accounts?: GameRole[];
 }
 
 export interface BuildProvidersOptions {
@@ -123,10 +152,32 @@ export function buildProviders(flags: SyncFlags, opts: BuildProvidersOptions = {
  * so it's already the actionable message the caller should see.
  */
 export async function runSync(deps: SyncDeps, flags: SyncFlags = {}): Promise<SyncResult> {
+  if (flags.region && !(VALID_REGIONS as readonly string[]).includes(flags.region)) {
+    throw new Error(`região inválida: "${flags.region}". Suportadas: ${VALID_REGIONS.join(', ')}.`);
+  }
+
   const providers = buildProviders(flags);
   const session = await deps.getSession({ providers });
   const client = deps.makeClient(session);
-  const raw = await client.fetchAll();
+
+  // `--list-accounts`: discover every hk4e_global account bound to this
+  // cookie (uid/region/nickname) and stop — no character extraction, no
+  // upload. This is how a multi-account user finds the `--uid`/`--region`
+  // to pass on the real `sync`.
+  if (flags.listAccounts) {
+    const accounts = await client.listGameRoles();
+    if (accounts.length === 0) {
+      console.log('Nenhuma conta Genshin (hk4e_global) vinculada a este cookie.');
+    } else {
+      console.log('Contas Genshin encontradas:');
+      for (const a of accounts) {
+        console.log(`  uid=${a.gameUid} region=${a.region} nickname=${a.nickname ?? ''}`);
+      }
+    }
+    return { characters: 0, changed: 0, sent: false, accounts };
+  }
+
+  const raw = await client.fetchAll({ uid: flags.uid, region: flags.region });
 
   // Dump the raw payload FIRST, independent of normalize() — this is what
   // lets a real extraction survive even though normalize() isn't ready for

@@ -153,3 +153,57 @@ describe('runSync --raw-out', () => {
     expect(failDeps.postIngest).not.toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Seleção de conta (--region/--uid) e --list-accounts
+// ---------------------------------------------------------------------------
+
+describe('runSync — seleção de conta e --list-accounts', () => {
+  it('rejeita --region inválido antes de tentar sessão/fetch', async () => {
+    const getSession = vi.fn();
+    const badRegionDeps = {
+      getSession,
+      makeClient: () => ({ fetchAll: vi.fn(), listGameRoles: vi.fn() }),
+      postIngest: vi.fn(),
+      readConfig: () => ({ apiToken: 'buer_live_x', apiBaseUrl: 'http://x' }),
+    };
+    await expect(runSync(badRegionDeps as any, { region: 'os_brazil' })).rejects.toThrow(/região inválida/);
+    expect(getSession).not.toHaveBeenCalled();
+  });
+
+  it('repassa --uid/--region para client.fetchAll()', async () => {
+    const fetchAll = vi.fn(async () => ({
+      list: { list: [] },
+      detail: { list: [] },
+      account: { gameUid: '800000000', region: 'os_usa', nickname: 'Traveler' },
+    }));
+    const selDeps = {
+      getSession: async () => ({ ltoken_v2: 'x', ltuid_v2: '1' }),
+      makeClient: () => ({ fetchAll, listGameRoles: vi.fn() }),
+      postIngest: vi.fn(async () => ({ changedChars: 0 })),
+      readConfig: () => ({ apiToken: 'buer_live_x', apiBaseUrl: 'http://x' }),
+    };
+    await runSync(selDeps as any, { uid: '800000000', region: 'os_usa', dryRun: true });
+    expect(fetchAll).toHaveBeenCalledWith({ uid: '800000000', region: 'os_usa' });
+  });
+
+  it('--list-accounts chama listGameRoles(), devolve accounts e NUNCA chama fetchAll/postIngest', async () => {
+    const roles = [
+      { gameUid: '700000001', region: 'os_asia', nickname: 'Alt' },
+      { gameUid: '800000000', region: 'os_usa', nickname: 'Traveler' },
+    ];
+    const fetchAll = vi.fn();
+    const postIngest = vi.fn();
+    const listDeps = {
+      getSession: async () => ({ ltoken_v2: 'x', ltuid_v2: '1' }),
+      makeClient: () => ({ fetchAll, listGameRoles: async () => roles }),
+      postIngest,
+      readConfig: () => ({ apiToken: 'buer_live_x', apiBaseUrl: 'http://x' }),
+    };
+    const r = await runSync(listDeps as any, { listAccounts: true });
+    expect(r.accounts).toEqual(roles);
+    expect(r.sent).toBe(false);
+    expect(fetchAll).not.toHaveBeenCalled();
+    expect(postIngest).not.toHaveBeenCalled();
+  });
+});
