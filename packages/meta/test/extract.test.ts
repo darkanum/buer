@@ -109,9 +109,32 @@ describe('extractClaims', () => {
       },
     };
     const out = await extractClaims('xiangling', 'texto da pesquisa', { client });
-    expect(out.character).toBe('xiangling');
-    expect(out.claims).toHaveLength(2);
-    expect(out.claims[0]!.sets).toEqual(['emblem-of-severed-fate']);
+    expect(out.claims.character).toBe('xiangling');
+    expect(out.claims.claims).toHaveLength(2);
+    expect(out.claims.claims[0]!.sets).toEqual(['emblem-of-severed-fate']);
+  });
+
+  it('devolve o uso de tokens da chamada, para o lote não perder a segunda metade do custo', async () => {
+    const client = {
+      async parse() {
+        return {
+          parsed_output: { claims: [] },
+          usage: { input_tokens: 321, output_tokens: 45 },
+        };
+      },
+    };
+    const out = await extractClaims('xiangling', 'texto', { client });
+    expect(out.usage).toEqual({ inputTokens: 321, outputTokens: 45 });
+  });
+
+  it('resposta sem usage não lança — conta zero em vez de propagar undefined', async () => {
+    const client = {
+      async parse() {
+        return { parsed_output: { claims: [] } };
+      },
+    };
+    const out = await extractClaims('xiangling', 'texto', { client });
+    expect(out.usage).toEqual({ inputTokens: 0, outputTokens: 0 });
   });
 
   it('saída não parseável lança com mensagem em português, em vez de devolver vazio', async () => {
@@ -141,6 +164,6 @@ describe('extractClaims', () => {
     // A fonte que resolveu tudo não gera relato nenhum.
     expect(reports).toEqual([{ source: 'game8', names: ['Conjunto Que Não Existe'] }]);
     // E o claim correspondente continua sem o campo — descarte de verdade, não só relato.
-    expect(out.claims[1]!.sets).toBeUndefined();
+    expect(out.claims.claims[1]!.sets).toBeUndefined();
   });
 });

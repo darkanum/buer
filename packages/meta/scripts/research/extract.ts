@@ -156,7 +156,11 @@ export function normalizeClaim(
 }
 
 export interface ExtractClient {
-  parse(params: unknown): Promise<{ parsed_output: unknown }>;
+  parse(params: unknown): Promise<{
+    parsed_output: unknown;
+    /** `ParsedMessage` do SDK estende `Message`, que sempre traz `usage`. Opcional aqui só para o dublê de teste não precisar simular o objeto inteiro. */
+    usage?: { input_tokens?: number; output_tokens?: number };
+  }>;
 }
 
 export interface ExtractDeps {
@@ -171,11 +175,23 @@ export interface ExtractDeps {
   readonly onUnresolved?: (source: SourceId, names: readonly string[]) => void;
 }
 
+export interface ExtractResult {
+  readonly claims: CharacterClaims;
+  readonly usage: { readonly inputTokens: number; readonly outputTokens: number };
+}
+
+/**
+ * A extração é a SEGUNDA chamada de API do pipeline — a busca web (Task 3) é a
+ * primeira. Devolver só `CharacterClaims` e descartar `response.usage` faria o
+ * lote (Task 6) contar tokens de uma chamada só, cobrando a metade do custo
+ * real. `usage` viaja junto do resultado por isso, não porque a extração
+ * precise dele para nada.
+ */
 export async function extractClaims(
   slug: string,
   researchText: string,
   deps: ExtractDeps,
-): Promise<CharacterClaims> {
+): Promise<ExtractResult> {
   const response = await deps.client.parse({
     model: deps.model ?? MODEL,
     max_tokens: 16000,
@@ -202,12 +218,20 @@ export async function extractClaims(
   }
 
   const catalogs = buildCatalogs();
-  return {
+  const claims: CharacterClaims = {
     character: slug,
     claims: parsed.data.claims.map((raw) => {
       const { claim, unresolved } = normalizeClaim(raw, catalogs);
       if (unresolved.length > 0) deps.onUnresolved?.(raw.source, unresolved);
       return claim;
     }),
+  };
+
+  return {
+    claims,
+    usage: {
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+    },
   };
 }

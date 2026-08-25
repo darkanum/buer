@@ -41,7 +41,13 @@ function deps(targets: string[], over: Partial<Parameters<typeof runBatch>[0]> =
       authoredAt: '2026-08-25',
       existing: emptyMeta,
       research: async (slug: string) => ({ text: `pesquisa de ${slug}`, urls: [], usage }),
-      extract: async (slug: string) => claimsFor(slug, slug !== 'incompleto'),
+      // Uso zerado por padrão: os testes que já somam `r.usage` a partir só
+      // da pesquisa continuam válidos sem reescrever a conta. O teste
+      // dedicado a somar as DUAS chamadas usa valores explícitos.
+      extract: async (slug: string) => ({
+        claims: claimsFor(slug, slug !== 'incompleto'),
+        usage: { inputTokens: 0, outputTokens: 0 },
+      }),
       write: (draft: { profile: { character: string } | null }) => {
         written.push(draft.profile!.character);
       },
@@ -66,6 +72,28 @@ describe('parseArgs', () => {
     const f = parseArgs([]);
     expect(f.all).toBe(false);
     expect(f.only).toEqual([]);
+  });
+
+  it('--limit sem valor nenhum é erro de uso, não NaN silencioso', () => {
+    const f = parseArgs(['--all', '--limit']);
+    expect(f.limit).toBeUndefined();
+    expect(f.error).toBeDefined();
+  });
+
+  it('--limit com valor não numérico é erro de uso, não NaN silencioso', () => {
+    const f = parseArgs(['--all', '--limit', 'abc']);
+    expect(f.limit).toBeUndefined();
+    expect(f.error).toBeDefined();
+  });
+
+  it('--limit sem valor não engole a flag seguinte — --dry-run continua true', () => {
+    // O bug que isto pega: sem essa guarda, "--limit --dry-run" consumiria
+    // "--dry-run" como SE FOSSE o valor de --limit, e a flag que existe para
+    // não gastar dinheiro sumiria em silêncio.
+    const f = parseArgs(['--all', '--limit', '--dry-run']);
+    expect(f.dryRun).toBe(true);
+    expect(f.limit).toBeUndefined();
+    expect(f.error).toBeDefined();
   });
 });
 
@@ -109,6 +137,18 @@ describe('runBatch', () => {
     const r = await runBatch(d);
     expect(r.usage.inputTokens).toBe(200);
     expect(r.estimatedCostUsd).toBeGreaterThan(0);
+  });
+
+  it('soma o uso das DUAS chamadas de API por alvo — pesquisa E extração, não só a primeira', async () => {
+    const { deps: d } = deps(['xiangling'], {
+      research: async () => ({ text: 'ok', urls: [], usage: { inputTokens: 100, outputTokens: 200 } }),
+      extract: async (slug: string) => ({
+        claims: claimsFor(slug, true),
+        usage: { inputTokens: 50, outputTokens: 25 },
+      }),
+    });
+    const r = await runBatch(d);
+    expect(r.usage).toEqual({ inputTokens: 150, outputTokens: 225 });
   });
 
   it('o relatório nomeia escritos, recusados e falhados', async () => {
