@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "character": "chevreuse",
+  "variants": [
+    {
+      "id": "overload-support",
+      "label": "Suporte de overload (HP alto)",
+      "roles": ["buffer", "healer", "debuffer"],
+      "scalesOn": "hp",
+      "sets": [
+        { "kind": "4pc", "sets": ["tenacity-of-the-millelith"], "rank": 1, "condition": "prioridade quando o time quer o buff de ATQ e a resistência a interrupção que o conjunto dá ao acertar a habilidade" },
+        { "kind": "4pc", "sets": ["noblesse-oblige"], "rank": 2, "condition": "sem Tenacity farmado; troca o buff de ATQ por dano de burst mais alto" }
+      ],
+      "mainStats": {
+        "sands": ["hp_", "enerRech_"],
+        "goblet": ["hp_"],
+        "circlet": ["hp_", "heal_"]
+      },
+      "substats": ["hp_", "enerRech_", "def_"],
+      "weapons": [
+        { "weapon": "favonius-lance", "rank": 1 },
+        { "weapon": "black-tassel", "rank": 2 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 160, "hard": false, "why": "ela precisa reaplicar a marca de overheat da habilidade com frequência e ainda soltar o burst de cura/buff a cada janela de dano; abaixo de 160% de ER essas duas coisas começam a se atropelar entre rotações" },
+        { "kind": "min", "stat": "hp_", "value": 40, "hard": false, "why": "tanto a cura quanto o buff de dano dela escalam com HP total; abaixo de ~40% de HP em substats+main-stats o buff que ela dá ao time fica pequeno demais para justificar o slot" }
+      ],
+      "notes": "Confiança baixa nos números exatos do kit (custo de energia e magnitude do buff) — a curadoria aqui é mais conservadora que as outras fichas porque Chevreuse tem um kit menos familiar; ver ressalva no relatório da Task 11."
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

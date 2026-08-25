@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "character": "noelle",
+  "variants": [
+    {
+      "id": "def-carry",
+      "label": "Main-DPS de DEF (geo, escudo próprio)",
+      "roles": ["main-dps", "shielder", "healer"],
+      "scalesOn": "def",
+      "sets": [
+        { "kind": "4pc", "sets": ["retracing-bolide"], "rank": 1, "condition": "enquanto o próprio escudo da habilidade estiver ativo, o que é quase sempre nesta build — o conjunto dá bônus de dano de ataque normal/carregado" },
+        { "kind": "4pc", "sets": ["husk-of-opulent-dreams"], "rank": 2, "condition": "sem Retracing Bolide farmado; troca o bônus condicionado ao escudo por acúmulo de DEF/dano geo" }
+      ],
+      "mainStats": {
+        "sands": ["def_", "enerRech_"],
+        "goblet": ["def_"],
+        "circlet": ["critRate_", "critDMG_"]
+      },
+      "substats": ["critRate_", "critDMG_", "def_", "enerRech_"],
+      "weapons": [
+        { "weapon": "the-bell", "rank": 1 },
+        { "weapon": "whiteblind", "rank": 2 },
+        { "weapon": "serpent-spine", "rank": 3 }
+      ],
+      "targets": [
+        { "kind": "min", "stat": "enerRech_", "value": 130, "hard": false, "why": "o burst custa 80 de energia, mas como main-dps ela ataca em campo o tempo todo e gera partícula própria; 130% já sustenta a rotação sem precisar de bateria externa" },
+        { "kind": "ratio", "numerator": "critDMG_", "denominator": "critRate_", "min": 1.5, "max": 2.5, "why": "crit muito desbalanceado desperdiça substats: cada ponto do lado excedente rende menos que o mesmo roll no lado curto" }
+      ],
+      "notes": "DEF% em TODOS os slots possíveis é o que importa — ATQ dela é irrelevante, o burst converte DEF em ATQ efetivo."
+    }
+  ],
+  "provenance": {
+    "authoredBy": "human",
+    "sources": [],
+    "authoredAt": "2026-08-24",
+    "validatedForVersion": "7.0",
+    "confidence": "medium"
+  }
+}

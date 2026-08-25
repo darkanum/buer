@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "freeze",
+  "label": "Freeze",
+  "gameVersionAdded": "1.0",
+  "strength": "strong",
+  "tags": ["abyss", "overworld"],
+  "sources": [],
+  "slots": [
+    {
+      "role": ["sub-dps", "enabler"],
+      "requires": { "kind": "character", "anyOf": ["xingqiu"] },
+      "variant": "sub-dps-er",
+      "substitutable": false
+    },
+    {
+      "role": ["sub-dps"],
+      "requires": { "kind": "character", "anyOf": ["kaeya", "diona", "rosaria", "freminet", "shenhe", "layla"] },
+      "substitutable": false
+    },
+    {
+      "role": ["main-dps"],
+      "requires": { "kind": "element", "element": "cryo", "withRole": ["main-dps"] },
+      "substitutable": true
+    },
+    {
+      "role": ["driver", "debuffer"],
+      "requires": { "kind": "element", "element": "anemo", "withRole": ["driver", "debuffer"] },
+      "substitutable": true
+    }
+  ]
+}

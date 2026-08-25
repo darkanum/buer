@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "hyperbloom",
+  "label": "Hyperbloom",
+  "gameVersionAdded": "3.0",
+  "strength": "meta",
+  "tags": ["abyss", "overworld", "f2p"],
+  "sources": [],
+  "slots": [
+    {
+      "role": ["enabler"],
+      "requires": { "kind": "character", "anyOf": ["nahida", "baizhu", "collei", "yaoyao", "kirara"] },
+      "substitutable": false
+    },
+    {
+      "role": ["sub-dps", "enabler"],
+      "requires": { "kind": "character", "anyOf": ["xingqiu"] },
+      "variant": "sub-dps-er",
+      "substitutable": false
+    },
+    {
+      "role": ["sub-dps"],
+      "requires": { "kind": "element", "element": "electro", "withRole": ["sub-dps"] },
+      "substitutable": true
+    },
+    {
+      "role": ["buffer", "healer"],
+      "requires": { "kind": "character", "anyOf": [] },
+      "substitutable": true
+    }
+  ]
+}

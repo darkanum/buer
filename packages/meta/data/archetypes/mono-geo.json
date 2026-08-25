@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "mono-geo",
+  "label": "Mono Geo",
+  "gameVersionAdded": "1.5",
+  "strength": "niche",
+  "tags": ["overworld", "f2p"],
+  "sources": [],
+  "slots": [
+    {
+      "role": ["main-dps", "shielder", "healer"],
+      "requires": { "kind": "character", "anyOf": ["noelle"] },
+      "variant": "def-carry",
+      "substitutable": false
+    },
+    {
+      "role": ["buffer"],
+      "requires": { "kind": "character", "anyOf": ["gorou"] },
+      "variant": "geo-support",
+      "substitutable": false
+    },
+    {
+      "role": ["sub-dps"],
+      "requires": { "kind": "element", "element": "geo", "withRole": ["sub-dps"] },
+      "substitutable": true
+    },
+    {
+      "role": ["buffer"],
+      "requires": { "kind": "character", "anyOf": [] },
+      "substitutable": true
+    }
+  ]
+}
