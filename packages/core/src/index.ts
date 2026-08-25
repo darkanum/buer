@@ -16,4 +16,5 @@ export { normalize } from './normalize.js';
 
 export { scrubRaw } from './scrub.js';
 
+export { extractObservedStats } from './observed.js';
 export * from './domain.js';
