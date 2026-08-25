@@ -7,6 +7,7 @@ import type { StatResolver } from '../stat-resolver.js';
 import { equippedBuild } from '../roster/from-hoyolab.js';
 import { assess } from '../curated/scoring.js';
 import { selectVariant } from '../curated/variant.js';
+import { defaultKeyNames, type KeyNames } from '../curated/names.js';
 import { matchArchetype, rolesOf, type ArchetypeMatch } from './matching.js';
 import { reactionsFor, resonanceFor } from './rules.js';
 
@@ -25,6 +26,8 @@ export interface TeamsForResult {
 export interface CuratedTeamEvaluatorOptions {
   readonly bank: MetaBank;
   readonly resolver: StatResolver;
+  /** Chave -> nome legível. O default é o catálogo do gi-data (spec §11). */
+  readonly names?: KeyNames;
 }
 
 const STRENGTH_ORDER: Readonly<Record<TeamArchetypeData['strength'], number>> = {
@@ -131,6 +134,7 @@ export class CuratedTeamEvaluator {
 
   private async assessTeam(match: ArchetypeMatch, roster: Roster): Promise<TeamAssessment> {
     const { bank, resolver } = this.opts;
+    const names = this.opts.names ?? defaultKeyNames;
     const outcomes: SlotOutcome[] = [];
     // Violações de alvo hard, com os números REALMENTE medidos — nunca um
     // array vazio por omissão quando `assess()` já devolveu o dado (spec:
@@ -154,7 +158,7 @@ export class CuratedTeamEvaluator {
         outcomes.push({
           slotIndex, character: key, variantLabel: null, variantId: null,
           meetsHardTargets: false, requiredEr: null, actualEr: null, coveredRoles: [],
-          line: `Slot ${slotIndex + 1}: ${String(key)} — sem ficha curada, build não julgada.`,
+          line: `Slot ${slotIndex + 1}: ${names.character(key)} — sem ficha curada, build não julgada.`,
         });
         continue;
       }
@@ -170,7 +174,7 @@ export class CuratedTeamEvaluator {
       for (const override of slot.targetOverrides ?? []) overridden.set(targetId(override), override);
       const targets = [...overridden.values()];
 
-      const result = assess(build, { ...choice.variant, targets }, stats, bank.scoring);
+      const result = assess(build, { ...choice.variant, targets }, stats, bank.scoring, names);
       const erTarget = targets.find((t) => t.kind === 'min' && t.stat === 'enerRech_');
 
       // Todo `violated` chega com `kind: 'min'` (só alvo `min` é `hard` em
@@ -196,7 +200,7 @@ export class CuratedTeamEvaluator {
         actualEr: stats?.enerRech_ ?? null,
         coveredRoles: choice.coveredSlotRoles,
         line:
-          `Slot ${slotIndex + 1} (${slot.role.join('/')}): ${String(key)} — ` +
+          `Slot ${slotIndex + 1} (${slot.role.join('/')}): ${names.character(key)} — ` +
           `${choice.explanation} ${result.blocked ? 'Há alvo obrigatório fora do lugar.' : 'Alvos obrigatórios cumpridos.'}`,
       });
     }
@@ -262,7 +266,7 @@ export class CuratedTeamEvaluator {
         ...outcomes.map((o) => ({ claim: o.line })),
         ...unverifiedEr.map((o) => ({
           claim:
-            `Recarga de Energia de ${String(o.character)} não pôde ser verificada — ` +
+            `Recarga de Energia de ${names.character(o.character!)} não pôde ser verificada — ` +
             'a captura não trouxe esse dado para esta build.',
         })),
       ],

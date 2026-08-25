@@ -1,6 +1,7 @@
 import type { BuildVariant } from '@buer/meta';
 import type { ArtifactSetKey } from '@buer/core';
 import type { Build } from '../../interfaces.js';
+import type { KeyNames } from '../names.js';
 import { statusFor, type Finding } from '../findings.js';
 
 /** setKey -> quantas peças equipadas. */
@@ -18,7 +19,7 @@ function creditForRank(rank: number): number {
   return Math.max(0.25, 1 - 0.25 * (rank - 1));
 }
 
-export function checkSet(build: Build, variant: BuildVariant): Finding {
+export function checkSet(build: Build, variant: BuildVariant, names: KeyNames): Finding {
   if (variant.sets.length === 0) {
     return { check: 'set', status: 'on-target', credit: 1, summary: 'A ficha não fixa conjunto.' };
   }
@@ -45,7 +46,7 @@ export function checkSet(build: Build, variant: BuildVariant): Finding {
     const describe =
       equipped.length === 0
         ? 'nenhum bônus de conjunto ativo'
-        : equipped.map(([key, n]) => `${n}pc de ${key}`).join(' + ');
+        : equipped.map(([key, n]) => `${n}pc de ${names.set(key)}`).join(' + ');
     return {
       check: 'set',
       status: 'off-target',

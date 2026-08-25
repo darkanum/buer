@@ -1,5 +1,6 @@
 import type { BuildVariant } from '@buer/meta';
 import type { Build } from '../../interfaces.js';
+import type { KeyNames } from '../names.js';
 import { statusFor, type Finding } from '../findings.js';
 
 /** rank 1 -> 1.0, 2 -> 0.85, 3 -> 0.7; nunca abaixo de 0.4. */
@@ -14,7 +15,7 @@ function creditForRank(rank: number): number {
  */
 const CREDIT_UNLISTED = 0.5;
 
-export function checkWeapon(build: Build, variant: BuildVariant): Finding {
+export function checkWeapon(build: Build, variant: BuildVariant, names: KeyNames): Finding {
   if (variant.weapons.length === 0) {
     return { check: 'weapon', status: 'on-target', credit: 1, summary: 'A ficha não fixa arma.' };
   }
@@ -28,7 +29,7 @@ export function checkWeapon(build: Build, variant: BuildVariant): Finding {
       check: 'weapon',
       status: statusFor(CREDIT_UNLISTED),
       credit: CREDIT_UNLISTED,
-      summary: `Arma ${equipped.key} não está na ficha; a de rank 1 é ${best.weapon}.`,
+      summary: `Arma ${names.weapon(equipped.key)} não está na ficha; a de rank 1 é ${names.weapon(best.weapon)}.`,
     };
   }
 
@@ -41,7 +42,8 @@ export function checkWeapon(build: Build, variant: BuildVariant): Finding {
     status: statusFor(credit),
     credit,
     summary: needsRefine
-      ? `Arma ${equipped.key} (rank ${option.rank}) em R${equipped.refinement}; a ficha pede R${option.minRefinement}.`
-      : `Arma ${equipped.key}, rank ${option.rank} da ficha.`,
+      ? `Arma ${names.weapon(equipped.key)} (rank ${option.rank}) em R${equipped.refinement}; ` +
+        `a ficha pede R${option.minRefinement}.`
+      : `Arma ${names.weapon(equipped.key)}, rank ${option.rank} da ficha.`,
   };
 }

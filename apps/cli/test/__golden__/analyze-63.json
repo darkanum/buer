@@ -259,13 +259,19 @@
           "strength": "meta",
           "rankedBy": "strength",
           "members": [
-            "10000023",
-            "10000032",
-            "10000025",
-            "10000043"
+            "xiangling",
+            "bennett",
+            "xingqiu",
+            "sucrose"
           ],
           "variantId": "national-er",
           "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra a variante \"National (ER alto)\", que este time exige.",
+          "reasons": [
+            "Slot 1 (sub-dps): xiangling — Julgado contra a variante \"National (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 2 (buffer/healer): bennett — Julgado contra a variante \"Buffer de ATQ (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps/enabler): xingqiu — Julgado contra \"Sub-DPS de hydro (ER alto)\", a única variante da ficha. Há alvo obrigatório fora do lugar.",
+            "Slot 4 (driver/debuffer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -290,7 +296,7 @@
               "check": "weapon",
               "status": "off-target",
               "credit": 0.5,
-              "summary": "Arma 13509 não está na ficha; a de rank 1 é 13415."
+              "summary": "Arma engulfing-lightning não está na ficha; a de rank 1 é the-catch."
             },
             {
               "check": "substats",
@@ -302,22 +308,22 @@
           ],
           "energy": [
             {
-              "of": "10000023",
+              "of": "xiangling",
               "required": 200,
               "actual": 154.3
             },
             {
-              "of": "10000032",
+              "of": "bennett",
               "required": 180,
               "actual": 138.5
             },
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -397,13 +403,19 @@
           "strength": "meta",
           "rankedBy": "strength",
           "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000043"
+            "collei",
+            "xingqiu",
+            "fischl",
+            "sucrose"
           ],
           "variantId": "sub-dps-er",
           "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige.",
+          "reasons": [
+            "Slot 1: collei — sem ficha curada, build não julgada.",
+            "Slot 2 (sub-dps/enabler): xingqiu — Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps): fischl — Julgado contra \"Sub-DPS de electro off-field (Oz)\", a única variante da ficha. Alvos obrigatórios cumpridos.",
+            "Slot 4 (buffer/healer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -428,7 +440,7 @@
               "check": "weapon",
               "status": "off-target",
               "credit": 0.5,
-              "summary": "Arma 11402 não está na ficha; a de rank 1 é 11403."
+              "summary": "Arma the-flute não está na ficha; a de rank 1 é sacrificial-sword."
             },
             {
               "check": "substats",
@@ -439,17 +451,17 @@
           ],
           "energy": [
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000031",
+              "of": "fischl",
               "required": 120,
               "actual": 105.8
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -461,13 +473,19 @@
           "strength": "meta",
           "rankedBy": "targets",
           "members": [
-            "10000023",
-            "10000032",
-            "10000025",
-            "10000043"
+            "xiangling",
+            "bennett",
+            "xingqiu",
+            "sucrose"
           ],
           "variantId": "sub-dps-er",
           "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra \"Sub-DPS de hydro (ER alto)\", a única variante da ficha.",
+          "reasons": [
+            "Slot 1 (sub-dps): xiangling — Julgado contra a variante \"National (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 2 (buffer/healer): bennett — Julgado contra a variante \"Buffer de ATQ (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps/enabler): xingqiu — Julgado contra \"Sub-DPS de hydro (ER alto)\", a única variante da ficha. Há alvo obrigatório fora do lugar.",
+            "Slot 4 (driver/debuffer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -492,7 +510,7 @@
               "check": "weapon",
               "status": "off-target",
               "credit": 0.5,
-              "summary": "Arma 11402 não está na ficha; a de rank 1 é 11403."
+              "summary": "Arma the-flute não está na ficha; a de rank 1 é sacrificial-sword."
             },
             {
               "check": "substats",
@@ -503,22 +521,22 @@
           ],
           "energy": [
             {
-              "of": "10000023",
+              "of": "xiangling",
               "required": 200,
               "actual": 154.3
             },
             {
-              "of": "10000032",
+              "of": "bennett",
               "required": 180,
               "actual": 138.5
             },
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -532,13 +550,19 @@
           "strength": "strong",
           "rankedBy": "strength",
           "members": [
-            "10000025",
-            "10000015",
+            "xingqiu",
+            "kaeya",
             null,
-            "10000043"
+            "sucrose"
           ],
           "variantId": "sub-dps-er",
           "explanation": "Freeze (strong) — falta 1 slot para você jogar este time. Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige.",
+          "reasons": [
+            "Slot 1 (sub-dps/enabler): xingqiu — Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 2: kaeya — sem ficha curada, build não julgada.",
+            "Slot 3 (main-dps): vazio — nenhum personagem seu ocupa este papel.",
+            "Slot 4 (driver/debuffer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -563,7 +587,7 @@
               "check": "weapon",
               "status": "off-target",
               "credit": 0.5,
-              "summary": "Arma 11402 não está na ficha; a de rank 1 é 11403."
+              "summary": "Arma the-flute não está na ficha; a de rank 1 é sacrificial-sword."
             },
             {
               "check": "substats",
@@ -574,12 +598,12 @@
           ],
           "energy": [
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -658,13 +682,19 @@
           "strength": "meta",
           "rankedBy": "strength",
           "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000043"
+            "collei",
+            "xingqiu",
+            "fischl",
+            "sucrose"
           ],
           "variantId": "off-field-electro",
           "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Sub-DPS de electro off-field (Oz)\", a única variante da ficha.",
+          "reasons": [
+            "Slot 1: collei — sem ficha curada, build não julgada.",
+            "Slot 2 (sub-dps/enabler): xingqiu — Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps): fischl — Julgado contra \"Sub-DPS de electro off-field (Oz)\", a única variante da ficha. Alvos obrigatórios cumpridos.",
+            "Slot 4 (buffer/healer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -689,7 +719,7 @@
               "check": "weapon",
               "status": "on-target",
               "credit": 1,
-              "summary": "Arma 15402, rank 1 da ficha."
+              "summary": "Arma the-stringless, rank 1 da ficha."
             },
             {
               "check": "substats",
@@ -700,17 +730,17 @@
           ],
           "energy": [
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000031",
+              "of": "fischl",
               "required": 120,
               "actual": 105.8
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -724,13 +754,19 @@
           "strength": "strong",
           "rankedBy": "strength",
           "members": [
-            "10000090",
-            "10000031",
+            "chevreuse",
+            "fischl",
             null,
-            "10000111"
+            "varesa"
           ],
           "variantId": "off-field-electro",
           "explanation": "Overload (Chevreuse) (strong) — falta 1 slot para você jogar este time. Julgado contra a variante \"Sub-DPS de electro off-field (Oz)\", que este time exige.",
+          "reasons": [
+            "Slot 1 (buffer/healer/debuffer): chevreuse — Julgado contra a variante \"Suporte de overload (HP alto)\", que este time exige. Alvos obrigatórios cumpridos.",
+            "Slot 2 (sub-dps): fischl — Julgado contra a variante \"Sub-DPS de electro off-field (Oz)\", que este time exige. Alvos obrigatórios cumpridos.",
+            "Slot 3 (main-dps): vazio — nenhum personagem seu ocupa este papel.",
+            "Slot 4: varesa — sem ficha curada, build não julgada."
+          ],
           "findings": [
             {
               "check": "set",
@@ -755,7 +791,7 @@
               "check": "weapon",
               "status": "on-target",
               "credit": 1,
-              "summary": "Arma 15402, rank 1 da ficha."
+              "summary": "Arma the-stringless, rank 1 da ficha."
             },
             {
               "check": "substats",
@@ -766,12 +802,12 @@
           ],
           "energy": [
             {
-              "of": "10000090",
+              "of": "chevreuse",
               "required": 160,
               "actual": 174.2
             },
             {
-              "of": "10000031",
+              "of": "fischl",
               "required": 120,
               "actual": 105.8
             }
@@ -820,13 +856,19 @@
           "strength": "meta",
           "rankedBy": "strength",
           "members": [
-            "10000023",
-            "10000032",
-            "10000025",
-            "10000043"
+            "xiangling",
+            "bennett",
+            "xingqiu",
+            "sucrose"
           ],
           "variantId": "buffer-er",
           "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra a variante \"Buffer de ATQ (ER alto)\", que este time exige.",
+          "reasons": [
+            "Slot 1 (sub-dps): xiangling — Julgado contra a variante \"National (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 2 (buffer/healer): bennett — Julgado contra a variante \"Buffer de ATQ (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps/enabler): xingqiu — Julgado contra \"Sub-DPS de hydro (ER alto)\", a única variante da ficha. Há alvo obrigatório fora do lugar.",
+            "Slot 4 (driver/debuffer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -851,7 +893,7 @@
               "check": "weapon",
               "status": "off-target",
               "credit": 0.5,
-              "summary": "Arma 11417 não está na ficha; a de rank 1 é 11501."
+              "summary": "Arma sapwood-blade não está na ficha; a de rank 1 é aquila-favonia."
             },
             {
               "check": "substats",
@@ -862,22 +904,22 @@
           ],
           "energy": [
             {
-              "of": "10000023",
+              "of": "xiangling",
               "required": 200,
               "actual": 154.3
             },
             {
-              "of": "10000032",
+              "of": "bennett",
               "required": 180,
               "actual": 138.5
             },
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -1077,13 +1119,19 @@
           "strength": "meta",
           "rankedBy": "strength",
           "members": [
-            "10000067",
-            "10000025",
-            "10000031",
-            "10000043"
+            "collei",
+            "xingqiu",
+            "fischl",
+            "sucrose"
           ],
           "variantId": "em-driver",
           "explanation": "Hyperbloom (meta) — você tem todos os personagens deste time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "reasons": [
+            "Slot 1: collei — sem ficha curada, build não julgada.",
+            "Slot 2 (sub-dps/enabler): xingqiu — Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps): fischl — Julgado contra \"Sub-DPS de electro off-field (Oz)\", a única variante da ficha. Alvos obrigatórios cumpridos.",
+            "Slot 4 (buffer/healer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -1108,7 +1156,7 @@
               "check": "weapon",
               "status": "on-target",
               "credit": 1,
-              "summary": "Arma 14403, rank 1 da ficha."
+              "summary": "Arma sacrificial-fragments, rank 1 da ficha."
             },
             {
               "check": "substats",
@@ -1119,17 +1167,17 @@
           ],
           "energy": [
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000031",
+              "of": "fischl",
               "required": 120,
               "actual": 105.8
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -1141,13 +1189,19 @@
           "strength": "meta",
           "rankedBy": "targets",
           "members": [
-            "10000023",
-            "10000032",
-            "10000025",
-            "10000043"
+            "xiangling",
+            "bennett",
+            "xingqiu",
+            "sucrose"
           ],
           "variantId": "em-driver",
           "explanation": "National (meta) — você tem todos os personagens deste time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "reasons": [
+            "Slot 1 (sub-dps): xiangling — Julgado contra a variante \"National (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 2 (buffer/healer): bennett — Julgado contra a variante \"Buffer de ATQ (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 3 (sub-dps/enabler): xingqiu — Julgado contra \"Sub-DPS de hydro (ER alto)\", a única variante da ficha. Há alvo obrigatório fora do lugar.",
+            "Slot 4 (driver/debuffer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -1172,7 +1226,7 @@
               "check": "weapon",
               "status": "on-target",
               "credit": 1,
-              "summary": "Arma 14403, rank 1 da ficha."
+              "summary": "Arma sacrificial-fragments, rank 1 da ficha."
             },
             {
               "check": "substats",
@@ -1183,22 +1237,22 @@
           ],
           "energy": [
             {
-              "of": "10000023",
+              "of": "xiangling",
               "required": 200,
               "actual": 154.3
             },
             {
-              "of": "10000032",
+              "of": "bennett",
               "required": 180,
               "actual": 138.5
             },
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -1212,13 +1266,19 @@
           "strength": "strong",
           "rankedBy": "strength",
           "members": [
-            "10000025",
-            "10000015",
+            "xingqiu",
+            "kaeya",
             null,
-            "10000043"
+            "sucrose"
           ],
           "variantId": "em-driver",
           "explanation": "Freeze (strong) — falta 1 slot para você jogar este time. Julgado contra \"Driver de maestria\", a única variante da ficha.",
+          "reasons": [
+            "Slot 1 (sub-dps/enabler): xingqiu — Julgado contra a variante \"Sub-DPS de hydro (ER alto)\", que este time exige. Há alvo obrigatório fora do lugar.",
+            "Slot 2: kaeya — sem ficha curada, build não julgada.",
+            "Slot 3 (main-dps): vazio — nenhum personagem seu ocupa este papel.",
+            "Slot 4 (driver/debuffer): sucrose — Julgado contra \"Driver de maestria\", a única variante da ficha. Há alvo obrigatório fora do lugar."
+          ],
           "findings": [
             {
               "check": "set",
@@ -1243,7 +1303,7 @@
               "check": "weapon",
               "status": "on-target",
               "credit": 1,
-              "summary": "Arma 14403, rank 1 da ficha."
+              "summary": "Arma sacrificial-fragments, rank 1 da ficha."
             },
             {
               "check": "substats",
@@ -1254,12 +1314,12 @@
           ],
           "energy": [
             {
-              "of": "10000025",
+              "of": "xingqiu",
               "required": 180,
               "actual": 100
             },
             {
-              "of": "10000043",
+              "of": "sucrose",
               "required": 160,
               "actual": 141.5
             }
@@ -1805,19 +1865,25 @@
           "strength": "strong",
           "rankedBy": "strength",
           "members": [
-            "10000090",
-            "10000031",
+            "chevreuse",
+            "fischl",
             null,
-            "10000111"
+            "varesa"
           ],
           "variantId": "overload-support",
           "explanation": "Overload (Chevreuse) (strong) — falta 1 slot para você jogar este time. Julgado contra a variante \"Suporte de overload (HP alto)\", que este time exige.",
+          "reasons": [
+            "Slot 1 (buffer/healer/debuffer): chevreuse — Julgado contra a variante \"Suporte de overload (HP alto)\", que este time exige. Alvos obrigatórios cumpridos.",
+            "Slot 2 (sub-dps): fischl — Julgado contra a variante \"Sub-DPS de electro off-field (Oz)\", que este time exige. Alvos obrigatórios cumpridos.",
+            "Slot 3 (main-dps): vazio — nenhum personagem seu ocupa este papel.",
+            "Slot 4: varesa — sem ficha curada, build não julgada."
+          ],
           "findings": [
             {
               "check": "set",
               "status": "off-target",
               "credit": 0,
-              "summary": "Conjunto fora da ficha: 2pc de 15017 + 2pc de 15003."
+              "summary": "Conjunto fora da ficha: 2pc de tenacity-of-the-millelith + 2pc de wanderer-s-troupe."
             },
             {
               "check": "mainStats",
@@ -1835,7 +1901,7 @@
               "check": "weapon",
               "status": "acceptable",
               "credit": 0.85,
-              "summary": "Arma 13303, rank 2 da ficha."
+              "summary": "Arma black-tassel, rank 2 da ficha."
             },
             {
               "check": "substats",
@@ -1847,12 +1913,12 @@
           ],
           "energy": [
             {
-              "of": "10000090",
+              "of": "chevreuse",
               "required": 160,
               "actual": 174.2
             },
             {
-              "of": "10000031",
+              "of": "fischl",
               "required": 120,
               "actual": 105.8
             }

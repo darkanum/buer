@@ -41,6 +41,12 @@ export function resolveSet(slug: string): ArtifactSetKey | null {
 const SLUG_BY_CHARACTER_ID: ReadonlyMap<string, string> = new Map(
   [...CHARACTER_BY_SLUG].map(([slug, id]) => [id, slug]),
 );
+const SLUG_BY_WEAPON_ID: ReadonlyMap<string, string> = new Map(
+  [...WEAPON_BY_SLUG].map(([slug, id]) => [id, slug]),
+);
+const SLUG_BY_SET_ID: ReadonlyMap<string, string> = new Map(
+  [...SET_BY_SLUG].map(([slug, id]) => [id, slug]),
+);
 
 /**
  * O caminho inverso: CharacterKey -> slug legível, para a saída de CLI e
@@ -54,4 +60,14 @@ export function slugForCharacter(key: CharacterKey): string | null {
   const slug = SLUG_BY_CHARACTER_ID.get(id);
   if (!slug) return null;
   return element ? `${slug}:${element}` : slug;
+}
+
+/** WeaponKey -> slug legível. `null` para arma que o catálogo não conhece. */
+export function slugForWeapon(key: WeaponKey): string | null {
+  return SLUG_BY_WEAPON_ID.get(String(key)) ?? null;
+}
+
+/** ArtifactSetKey -> slug legível. `null` para conjunto que o catálogo não conhece. */
+export function slugForSet(key: ArtifactSetKey): string | null {
+  return SLUG_BY_SET_ID.get(String(key)) ?? null;
 }

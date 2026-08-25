@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { loadMeta, resolveCharacter, slugForCharacter } from '@buer/meta';
-import type { CharacterKey } from '@buer/core';
+import { loadMeta, resolveCharacter, slugForCharacter, slugForWeapon } from '@buer/meta';
+import type { CharacterKey, WeaponKey } from '@buer/core';
 import {
   CuratedRosterAdvisor, CuratedTeamEvaluator, ObservedStatResolver,
   equippedBuild, rosterFromHoyolab, assess, selectVariant,
@@ -22,9 +22,18 @@ export interface TeamReport {
   readonly archetypeLabel: string;
   readonly strength: string;
   readonly rankedBy: string;
+  /** Slugs legíveis, na ordem dos slots do arquétipo; `null` = slot vazio. */
   readonly members: readonly (string | null)[];
   readonly variantId: string | null;
   readonly explanation: string;
+  /**
+   * As linhas por slot que a spec §7.3 exige explicitamente: quem foi para
+   * cada slot e por quê, e contra qual variante cada personagem está sendo
+   * julgado. `CuratedTeamEvaluator` já as produzia em
+   * `assessment.explanation.reasons` e o relatório as descartava inteiras —
+   * chegavam à tela só as que falavam de ER não verificado.
+   */
+  readonly reasons: readonly string[];
   readonly findings: readonly Finding[];
   readonly energy: readonly { readonly of: string; readonly required: number; readonly actual: number }[];
 }
@@ -77,19 +86,26 @@ function keyForSlug(slug: string): CharacterKey {
   return key;
 }
 
+/** Chave -> slug legível, com a chave crua como fallback honesto. */
+const charName = (key: CharacterKey): string => slugForCharacter(key) ?? String(key);
+const weaponName = (key: WeaponKey): string => slugForWeapon(key) ?? String(key);
+
 /**
  * Serializa um eixo de investimento com o DONO incluído — não só o `kind`.
  * `constellation`/`talent`/`refinement` sempre carregam `of`/`weapon` (Task
  * 10): omitir isso aqui apagaria de quem é o salto que o relatório afirma
  * (achado desta task — contrato de produto: nenhum rótulo sem origem).
+ *
+ * O dono sai pelo SLUG: "newCharacter:10000030" não diz a ninguém que a
+ * sugestão é o Zhongli (spec §11 — o entregável é texto para humano ler).
  */
 function axisLabel(axis: InvestmentAxis): string {
   switch (axis.kind) {
-    case 'newCharacter': return `newCharacter:${String(axis.character)}`;
-    case 'newWeapon': return `newWeapon:${String(axis.weapon)}`;
-    case 'constellation': return `constellation:${String(axis.of)}`;
-    case 'talent': return `talent:${String(axis.of)}`;
-    case 'refinement': return `refinement:${String(axis.weapon)}`;
+    case 'newCharacter': return `newCharacter:${charName(axis.character)}`;
+    case 'newWeapon': return `newWeapon:${weaponName(axis.weapon)}`;
+    case 'constellation': return `constellation:${charName(axis.of)}`;
+    case 'talent': return `talent:${charName(axis.of)}`;
+    case 'refinement': return `refinement:${weaponName(axis.weapon)}`;
     case 'artifact': return 'artifact';
   }
 }
@@ -122,18 +138,16 @@ export async function runAnalyze(flags: AnalyzeFlags): Promise<AnalyzeResult> {
       const slotIndex = option.match.fills.findIndex((f) => f === key);
       const slot = slotIndex >= 0 ? option.match.archetype.slots[slotIndex] : undefined;
 
-      // Slot de ER não medido some da lista `energy` (Task 9: ausência nunca
-      // vira zero fabricado) — a única explicação de POR QUE ele não está
-      // ali vive em `explanation.reasons`, não em `.summary`. Sem isto, a
-      // linha "não pôde ser verificada" nunca chegava à tela: o número
-      // desaparecia, mas o motivo do desaparecimento desaparecia com ele.
-      const unverifiedEnergyNotes = option.assessment.explanation.reasons
-        .map((r) => r.claim)
-        .filter((claim) => claim.includes('não pôde ser verificada'));
+      // Todas as linhas por slot, não só as de ER não medido: é o que a spec
+      // §7.3 pede nominalmente (quem foi para cada slot, contra qual variante
+      // está sendo julgado) e o que a linha "não pôde ser verificada" — a
+      // única explicação de por que um slot some da lista `energy` (Task 9) —
+      // precisa para chegar à tela.
+      const reasons = option.assessment.explanation.reasons.map((r) => r.claim);
 
       let findings: readonly Finding[] = [];
       let variantId: string | null = null;
-      let explanation = [option.assessment.explanation.summary, ...unverifiedEnergyNotes].join(' ');
+      let explanation = option.assessment.explanation.summary;
 
       if (profile && build) {
         const choice = selectVariant(profile, build, stats, bank.scoring, {
@@ -142,7 +156,7 @@ export async function runAnalyze(flags: AnalyzeFlags): Promise<AnalyzeResult> {
           ...(slot?.variant === undefined ? {} : { fromArchetype: slot.variant }),
         });
         variantId = choice.variant.id;
-        explanation = [option.assessment.explanation.summary, choice.explanation, ...unverifiedEnergyNotes].join(' ');
+        explanation = [option.assessment.explanation.summary, choice.explanation].join(' ');
         findings = assess(build, choice.variant, stats, bank.scoring).findings;
       }
 
@@ -151,12 +165,13 @@ export async function runAnalyze(flags: AnalyzeFlags): Promise<AnalyzeResult> {
         archetypeLabel: option.match.archetype.label,
         strength: option.match.archetype.strength,
         rankedBy: option.rankedBy,
-        members: option.match.fills.map((f) => (f === null ? null : String(f))),
+        members: option.match.fills.map((f) => (f === null ? null : charName(f))),
         variantId,
         explanation,
+        reasons,
         findings,
         energy: option.assessment.energyFeasibility.map((e) => ({
-          of: String(e.of), required: e.required, actual: e.actual,
+          of: charName(e.of), required: e.required, actual: e.actual,
         })),
       };
     };

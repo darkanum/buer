@@ -1,5 +1,6 @@
 import { parseCharKey, type CharacterKey, type Element, type RoleTag } from '@buer/core';
 import { loadCharacters } from '@buer/gi-data';
+import { slugForCharacter } from '@buer/meta';
 import type { MetaBank, TeamArchetypeData } from '@buer/meta';
 import type {
   AcquisitionAdvice, AcquisitionCandidate, AdvisorPreferences, CoverageGap,
@@ -127,7 +128,10 @@ export class CuratedRosterAdvisor implements RosterAdvisor {
         // `redundancyFor`.
         const candidates = [...bank.profiles.values()]
           .filter((p) => elementOf(p.character) === element && p.variants.some((v) => v.roles.some((r) => roles.includes(r))))
-          .map((p) => String(p.character));
+          // Slug, não id: esta lista é lida por gente (spec §11). O fallback
+          // para a chave crua é deliberado — personagem de patch novo que o
+          // catálogo ainda não conhece aparece pelo id, que é verdade.
+          .map((p) => slugForCharacter(p.character) ?? String(p.character));
         const gap = {
           description:
             `Falta um personagem de ${element} que cumpra ${roles.join(' ou ')}. ` +

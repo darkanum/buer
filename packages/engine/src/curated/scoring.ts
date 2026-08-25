@@ -2,6 +2,7 @@ import type { ObservedStats } from '@buer/core';
 import type { BuildVariant, ScoringWeights } from '@buer/meta';
 import type { Build } from '../interfaces.js';
 import type { CheckId, Finding } from './findings.js';
+import { defaultKeyNames, type KeyNames } from './names.js';
 import { checkSet } from './checks/set.js';
 import { checkMainStats } from './checks/main-stats.js';
 import { checkTargets } from './checks/targets.js';
@@ -32,14 +33,19 @@ export function assess(
   variant: BuildVariant,
   stats: ObservedStats | null,
   weights: ScoringWeights,
+  // Tradutor de chave -> nome legível, injetado (curated/names.ts). O default
+  // é o catálogo do gi-data porque a saída é para humano ler; quem testa
+  // troca por um dublê. As cinco verificações continuam puras: elas recebem
+  // o tradutor, não abrem catálogo nenhum.
+  names: KeyNames = defaultKeyNames,
 ): CuratedAssessment {
   const targets = checkTargets(stats, variant.targets);
 
   const findings: Finding[] = [
-    checkSet(build, variant),
+    checkSet(build, variant, names),
     checkMainStats(build, variant),
     targets.finding,
-    checkWeapon(build, variant),
+    checkWeapon(build, variant, names),
     checkSubstats(build, variant),
   ];
 

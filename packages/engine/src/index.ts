@@ -18,6 +18,8 @@ export type { VariantChoice, SelectVariantOptions } from './curated/variant.js';
 export { CuratedBuildEvaluator } from './curated/evaluator.js';
 export type { CuratedBuildEvaluatorOptions } from './curated/evaluator.js';
 export { statusFor } from './curated/findings.js';
+export { defaultKeyNames } from './curated/names.js';
+export type { KeyNames } from './curated/names.js';
 export type { Finding, FindingStatus, CheckId } from './curated/findings.js';
 export { DefaultEvaluatorRegistry } from './registry.js';
 export { reactionsFor, resonanceFor } from './team/rules.js';

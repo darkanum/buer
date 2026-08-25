@@ -49,6 +49,53 @@ describe('runAnalyze --character', () => {
     expect(entry.playableTeams[0]!.findings.length).toBe(5);
   });
 
+  // ---------------------------------------------------------------------
+  // Achado 3 da revisão final: o relatório é texto para humano ler (spec
+  // §11, §7.3) e saía com id numérico onde deveria haver nome.
+  // ---------------------------------------------------------------------
+
+  it('o relatório nomeia personagens, armas e conjuntos por slug — nunca por id numérico', async () => {
+    const result = await runAnalyze({ from: FIXTURE, account: true });
+    const text = renderReport(result);
+
+    for (const entry of result.characters) {
+      for (const team of [...entry.playableTeams, ...entry.blockedTeams]) {
+        for (const member of team.members) {
+          if (member !== null) expect(member, `membro de ${team.archetypeId}`).not.toMatch(/^\d+$/);
+        }
+        for (const energy of team.energy) expect(energy.of).not.toMatch(/^\d+$/);
+      }
+      for (const a of entry.acquisitions) expect(a.axis).not.toMatch(/:\d+$/);
+    }
+
+    // Nenhum id de arma ou de conjunto sobra dentro de um achado: estes SEMPRE
+    // têm nome no catálogo, então um id ali é a falha original deste achado.
+    for (const entry of result.characters) {
+      for (const team of [...entry.playableTeams, ...entry.blockedTeams]) {
+        for (const finding of team.findings) {
+          expect(finding.summary, `achado ${finding.check}`).not.toMatch(/\b\d{5,}\b/);
+        }
+      }
+    }
+
+    // Na tela inteira, o único id tolerado é o de personagem que o catálogo do
+    // gi-data ainda não conhece (patch novo): ali a chave crua é a verdade, e
+    // inventar um nome seria o defeito oposto. O relatório já os identifica —
+    // são exatamente aqueles cujo `slug` caiu de volta para o `key`.
+    const unresolved = new Set(result.characters.filter((c) => c.slug === c.key).map((c) => c.key));
+    for (const id of new Set(text.match(/\b1000\d{4}\b/g) ?? [])) {
+      expect([...unresolved], `id ${id} na tela sem nenhum nome ao lado`).toContain(id);
+    }
+  });
+
+  it('as linhas por slot (spec §7.3) chegam ao relatório', async () => {
+    const result = await runAnalyze({ from: FIXTURE, character: 'xiangling' });
+    const team = result.characters[0]!.playableTeams[0]!;
+    expect(team.reasons.length).toBeGreaterThan(0);
+    expect(team.reasons.join(' ')).toMatch(/Slot 1/);
+    expect(renderReport(result)).toMatch(/Slot 1/);
+  });
+
   it('personagem sem ficha devolve os FATOS e diz que não há veredito', async () => {
     const result = await runAnalyze({ from: FIXTURE, character: 'barbara' });
     const entry = result.characters[0]!;
@@ -98,16 +145,18 @@ describe('degradação — ER não medido (spec §6.5, Task 9)', () => {
 
       // A lista `energy` nunca fabrica um zero: o slot do Bennett
       // simplesmente não aparece nela (Task 9).
-      expect(national!.energy.some((e) => e.of === '10000032')).toBe(false);
+      expect(national!.energy.some((e) => e.of === 'bennett')).toBe(false);
 
       // Mas o MOTIVO de ele não aparecer tem que sobreviver até a tela —
-      // é exatamente o achado Important desta revisão: sem isto, a
+      // é exatamente o achado Important daquela revisão: sem isto, a
       // ausência ficava silenciosa (número some, motivo some com ele).
-      expect(national!.explanation).toMatch(/não pôde ser verificada/);
+      // Ele viaja em `reasons`, junto das demais linhas por slot da spec §7.3.
+      expect(national!.reasons.some((r) => /não pôde ser verificada/.test(r))).toBe(true);
 
       const text = renderReport(result);
       expect(text).toMatch(/não pôde ser verificada/);
-      expect(text).toMatch(/10000032/);
+      // E pelo NOME, não pelo id (Achado 3 da revisão final).
+      expect(text).toMatch(/bennett/);
     } finally {
       rmSync(path.dirname(file), { recursive: true, force: true });
     }

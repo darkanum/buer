@@ -6,6 +6,18 @@ import { checkMainStats } from '../../src/curated/checks/main-stats.js';
 import { checkTargets } from '../../src/curated/checks/targets.js';
 import { checkWeapon } from '../../src/curated/checks/weapon.js';
 import { checkSubstats } from '../../src/curated/checks/substats.js';
+import type { KeyNames } from '../../src/curated/names.js';
+
+/**
+ * Dublê do tradutor de chaves. As verificações são PURAS: recebem o tradutor
+ * como parâmetro e nunca abrem catálogo — é o que este dublê comprova, e é o
+ * que impede o relatório de voltar a imprimir "Arma 13509".
+ */
+const names: KeyNames = {
+  character: (key) => `personagem-${String(key)}`,
+  weapon: (key) => `arma-${String(key)}`,
+  set: (key) => `conjunto-${String(key)}`,
+};
 
 function piece(over: Partial<ArtifactPiece>): ArtifactPiece {
   return {
@@ -47,7 +59,7 @@ const variant = {
 
 describe('checkSet', () => {
   it('4pc do set rank 1 é on-target com crédito cheio', () => {
-    const f = checkSet(build(), variant);
+    const f = checkSet(build(), variant, names);
     expect(f.status).toBe('on-target');
     expect(f.credit).toBe(1);
   });
@@ -62,7 +74,7 @@ describe('checkSet', () => {
         circlet: piece({ slot: 'circlet', setKey: 'B' as never }),
       },
     } as Partial<Build>);
-    const f = checkSet(b, variant);
+    const f = checkSet(b, variant, names);
     expect(f.credit).toBeLessThan(1);
     expect(f.status).not.toBe('blocking');
   });
@@ -77,7 +89,7 @@ describe('checkSet', () => {
         circlet: piece({ slot: 'circlet', setKey: 'C' as never }),
       },
     } as Partial<Build>);
-    const f = checkSet(b, variant);
+    const f = checkSet(b, variant, names);
     expect(f.credit).toBeGreaterThan(0);
     expect(f.summary).toContain('2+2');
   });
@@ -92,14 +104,16 @@ describe('checkSet', () => {
         circlet: piece({ slot: 'circlet', setKey: 'Z' as never }),
       },
     } as Partial<Build>);
-    const f = checkSet(b, variant);
+    const f = checkSet(b, variant, names);
     expect(f.credit).toBe(0);
     expect(f.status).toBe('off-target');
+    // O conjunto equipado sai pelo NOME, nunca pela chave crua (Achado 3).
+    expect(f.summary).toContain('conjunto-Z');
   });
 
   it('variante sem preferência de conjunto é on-target com crédito cheio', () => {
     const v = { ...variant, sets: [] } as unknown as BuildVariant;
-    const f = checkSet(build(), v);
+    const f = checkSet(build(), v, names);
     expect(f.status).toBe('on-target');
     expect(f.credit).toBe(1);
   });
@@ -179,20 +193,23 @@ describe('checkTargets', () => {
 describe('checkWeapon', () => {
   it('arma rank 1 com refino suficiente é crédito cheio', () => {
     const b = build({ weapon: { key: 'W1', level: 90, ascension: 6, refinement: 5, equippedBy: 'c' } } as Partial<Build>);
-    expect(checkWeapon(b, variant).credit).toBe(1);
+    expect(checkWeapon(b, variant, names).credit).toBe(1);
   });
 
   it('refino abaixo do mínimo reduz crédito e diz o refino exigido', () => {
-    const f = checkWeapon(build(), variant); // refinement 1, minRefinement 5
+    const f = checkWeapon(build(), variant, names); // refinement 1, minRefinement 5
     expect(f.credit).toBeLessThan(1);
     expect(f.summary).toContain('R5');
   });
 
   it('arma fora da lista não zera nem bloqueia — é conselho, não erro', () => {
     const b = build({ weapon: { key: 'W9', level: 90, ascension: 6, refinement: 1, equippedBy: 'c' } } as Partial<Build>);
-    const f = checkWeapon(b, variant);
+    const f = checkWeapon(b, variant, names);
     expect(f.credit).toBeGreaterThan(0);
     expect(f.status).not.toBe('blocking');
+    // A equipada E a de rank 1 saem pelo NOME (Achado 3).
+    expect(f.summary).toContain('arma-W9');
+    expect(f.summary).toContain('arma-W1');
   });
 });
 

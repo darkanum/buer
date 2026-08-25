@@ -13,6 +13,11 @@ function renderTeam(team: TeamReport): string[] {
   lines.push(`    time: ${team.members.map((m) => m ?? '(vazio)').join(' + ')}`);
   lines.push(`    ${team.explanation}`);
 
+  // Quem foi para cada slot, por quê, e contra qual variante está sendo
+  // julgado (spec §7.3). O motor já escrevia estas linhas; até agora elas
+  // morriam antes da tela.
+  for (const reason of team.reasons) lines.push(`      · ${reason}`);
+
   for (const energy of team.energy) {
     const ok = energy.actual >= energy.required ? 'ok' : 'CURTO';
     lines.push(`    energia ${energy.of}: ER ${energy.actual.toFixed(1)} / ${energy.required} (${ok})`);
