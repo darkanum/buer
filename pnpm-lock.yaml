@@ -188,6 +188,12 @@ importers:
       '@buer/core':
         specifier: workspace:*
         version: link:../core
+      '@buer/gi-data':
+        specifier: workspace:*
+        version: link:../gi-data
+      '@buer/meta':
+        specifier: workspace:*
+        version: link:../meta
     devDependencies:
       '@types/node':
         specifier: ^22.20.1
