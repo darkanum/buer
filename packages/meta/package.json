@@ -10,7 +10,8 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json",
-    "meta:gaps": "tsx scripts/gaps.ts"
+    "meta:gaps": "tsx scripts/gaps.ts",
+    "meta:research:characters": "tsx scripts/research-characters.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
