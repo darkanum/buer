@@ -124,6 +124,37 @@ describe('reconcileCharacter — campo de CONJUNTO não ordenado (`roles`): uni�
     expect(r.divergences).toEqual([]);
     expect(r.confidence).toBe('medium');
   });
+
+  // -------------------------------------------------------------------------
+  // Corroboração de `roles` conta FONTES DISTINTAS, nunca ocorrências.
+  //
+  // `RawClaimSchema` não exige unicidade dentro de `roles`, e `fold()` colapsa
+  // "Sub DPS" e "sub-dps" no mesmo `sub-dps`: uma fonte só listando o papel
+  // duas vezes é um caso alcançável, não hipotético. Contar ocorrências fazia
+  // essa ficha single-sourced sair `medium` — e `corroborated` é metade da
+  // regra de confiança que chega ao usuário.
+  // -------------------------------------------------------------------------
+
+  it('UMA fonte repetindo o mesmo papel NÃO corrobora — a ficha continua single-sourced (low)', () => {
+    const r = reconcileCharacter({
+      character: 'x',
+      claims: [claim({ source: 'icy-veins', url: 'u', roles: ['sub-dps', 'sub-dps'] })],
+    });
+    expect(r.agreed.roles).toEqual(['sub-dps']);
+    expect(r.confidence).toBe('low');
+  });
+
+  it('DUAS fontes citando o mesmo papel continuam corroborando (medium)', () => {
+    const r = reconcileCharacter({
+      character: 'x',
+      claims: [
+        claim({ source: 'icy-veins', url: 'u1', roles: ['sub-dps'] }),
+        claim({ source: 'game8', url: 'u2', roles: ['sub-dps'] }),
+      ],
+    });
+    expect(r.agreed.roles).toEqual(['sub-dps']);
+    expect(r.confidence).toBe('medium');
+  });
 });
 
 describe('reconcileCharacter — campos de VALOR ÚNICO: aqui divergir é contradição', () => {

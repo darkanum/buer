@@ -97,22 +97,37 @@ function mergeRanked(field: string, votes: readonly Vote[]): Outcome {
   };
 }
 
-/** Lista não ordenada (papéis): união, ordenada só para ser determinística. */
+/**
+ * Lista não ordenada (papéis): união, ordenada só para ser determinística.
+ *
+ * A corroboração conta FONTES DISTINTAS, exatamente como `mergeRanked`, e
+ * nunca ocorrências: `RawClaimSchema` não exige unicidade dentro da lista e
+ * `fold()` colapsa "Sub DPS" e "sub-dps" no mesmo `sub-dps`, então uma fonte
+ * só listando o mesmo papel duas vezes é caso alcançável. Contar ocorrências
+ * fazia essa ficha single-sourced sair `medium` — violando o invariante que
+ * este próprio arquivo declara logo abaixo ("sem nada corroborado por duas
+ * fontes, a ficha é single-sourced, o que também é `low`") e entregando ao
+ * usuário, via `curated/evaluator.ts`, uma confiança que ninguém confirmou.
+ */
 function mergeSet(field: string, votes: readonly Vote[]): Outcome {
   if (votes.length === 0) return { value: undefined, divergence: undefined, corroborated: false };
 
-  const counts = new Map<string, number>();
+  const sourcesByItem = new Map<string, Set<string>>();
   for (const vote of votes) {
-    for (const item of vote.value as readonly string[]) counts.set(item, (counts.get(item) ?? 0) + 1);
+    for (const item of vote.value as readonly string[]) {
+      const entry = sourcesByItem.get(item) ?? new Set<string>();
+      entry.add(vote.source);
+      sourcesByItem.set(item, entry);
+    }
   }
 
   const first = JSON.stringify(votes[0]!.value);
   const identical = votes.every((v) => JSON.stringify(v.value) === first);
 
   return {
-    value: [...counts.keys()].sort(),
+    value: [...sourcesByItem.keys()].sort(),
     divergence: identical ? undefined : { field, kind: 'alternatives', bySource: bySourceOf(votes) },
-    corroborated: [...counts.values()].some((n) => n >= 2),
+    corroborated: [...sourcesByItem.values()].some((s) => s.size >= 2),
   };
 }
 
