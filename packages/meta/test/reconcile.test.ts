@@ -86,6 +86,46 @@ describe('reconcileCharacter — campos de LISTA: união e ranking, nunca descar
   });
 });
 
+describe('reconcileCharacter — campo de CONJUNTO não ordenado (`roles`): união alfabética, sem ranking por posição ou frequência', () => {
+  it('fontes com o mesmo conjunto de papéis produz a união, sem divergência, e conta como corroborado (confiança medium)', () => {
+    const r = reconcileCharacter(three(
+      { roles: ['dps'] }, { roles: ['dps'] }, { roles: ['dps'] },
+    ));
+    expect(r.agreed.roles).toEqual(['dps']);
+    expect(r.divergences).toEqual([]);
+    expect(r.confidence).toBe('medium');
+  });
+
+  it('fontes com papéis DIFERENTES: união de todos, ordenada alfabeticamente, divergência `alternatives` que não derruba a confiança', () => {
+    const r = reconcileCharacter(three(
+      { roles: ['dps'] }, { roles: ['dps'] }, { roles: ['support'] },
+    ));
+    expect(r.agreed.roles).toEqual(['dps', 'support']);
+    const d = r.divergences.find((x) => x.field === 'roles')!;
+    expect(d.kind).toBe('alternatives');
+    // duas fontes concordam em 'dps' — corroborado, e não há contradição
+    // (que só existe para campo escalar) — logo a confiança não é derrubada
+    expect(r.confidence).toBe('medium');
+  });
+
+  it('papel citado por duas fontes e papel citado por uma só entram os dois, e a ordem continua alfabética — NÃO por frequência', () => {
+    const r = reconcileCharacter(three(
+      { roles: ['support'] }, { roles: ['support'] }, { roles: ['dps'] },
+    ));
+    // 'support' tem o dobro de citações de 'dps', mas a ordem alfabética
+    // ('dps' < 'support') vence: é o que distingue mergeSet de mergeRanked,
+    // que ordenaria 'support' primeiro por ter mais apoio.
+    expect(r.agreed.roles).toEqual(['dps', 'support']);
+  });
+
+  it('fonte que não cobre `roles` não vota nem diverge', () => {
+    const r = reconcileCharacter(three({ roles: ['dps'] }, { roles: ['dps'] }, {}));
+    expect(r.agreed.roles).toEqual(['dps']);
+    expect(r.divergences).toEqual([]);
+    expect(r.confidence).toBe('medium');
+  });
+});
+
 describe('reconcileCharacter — campos de VALOR ÚNICO: aqui divergir é contradição', () => {
   it('maioria simples decide o limiar de ER', () => {
     const r = reconcileCharacter(three(
@@ -141,12 +181,35 @@ describe('reconcileCharacter — confiança e proveniência', () => {
     ]);
   });
 
-  it('nunca produz confidence high — isso exige humano', () => {
-    const r = reconcileCharacter(three(
-      { sets: ['x'], erThreshold: 200, substats: ['critRate_'] },
-      { sets: ['x'], erThreshold: 200, substats: ['critRate_'] },
-      { sets: ['x'], erThreshold: 200, substats: ['critRate_'] },
-    ));
-    expect(r.confidence).not.toBe('high');
+  it('é determinístico independente da ordem das fontes no array — lista com alternativas e escalar em conflito', () => {
+    // Mesmos três claims que exercitam os dois caminhos: `sets` diverge como
+    // `alternatives` (união+ranking) e `erThreshold` diverge como `conflict`
+    // (maioria escalar). O que muda entre r1 e r2 é só a ORDEM em que as
+    // fontes aparecem no array — a reconciliação não pode depender disso.
+    const icyVeins = claim({ source: 'icy-veins', url: 'https://icy-veins.com/x', sets: ['a-set', 'b-set'], erThreshold: 200 });
+    const game8 = claim({ source: 'game8', url: 'https://game8.co/x', sets: ['b-set', 'a-set'], erThreshold: 200 });
+    const genshinBuilds = claim({ source: 'genshin-builds', url: 'https://genshin-builds.com/x', sets: ['c-set'], erThreshold: 160 });
+
+    const r1 = reconcileCharacter({ character: 'xiangling', claims: [icyVeins, game8, genshinBuilds] });
+    const r2 = reconcileCharacter({ character: 'xiangling', claims: [game8, icyVeins, genshinBuilds] });
+
+    // prova que o teste atravessa os dois caminhos, não só compara dois vazios
+    expect(r1.agreed.sets).toEqual(['a-set', 'b-set', 'c-set']);
+    expect(r1.confidence).toBe('low');
+    expect(r1.divergences).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: 'sets', kind: 'alternatives' }),
+        expect.objectContaining({ field: 'erThreshold', kind: 'conflict' }),
+      ]),
+    );
+
+    expect(r2.agreed).toEqual(r1.agreed);
+    expect(r2.confidence).toBe(r1.confidence);
+    expect(r2.divergences.map((d) => ({ field: d.field, kind: d.kind })))
+      .toEqual(r1.divergences.map((d) => ({ field: d.field, kind: d.kind })));
+
+    // `sources` é a única saída que legitimamente segue a ordem de entrada
+    expect(r1.sources).toEqual(['https://icy-veins.com/x', 'https://game8.co/x', 'https://genshin-builds.com/x']);
+    expect(r2.sources).toEqual(['https://game8.co/x', 'https://icy-veins.com/x', 'https://genshin-builds.com/x']);
   });
 });
