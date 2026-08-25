@@ -93,6 +93,30 @@ Ordenado por impacto de produto:
 8. **A §9 da spec (`FarmPlan`, `EquipPlan`, troca por dominância) não foi implementada** — lacuna consciente registrada no plano. Ausência limpa: só os dois tipos declarados, nenhum código pela metade.
 9. **Cobertura do banco:** 10 fichas cobrem 10 dos 120 personagens do catálogo. Na conta de calibração, 5 dos 63 personagens têm time jogável. É o gargalo real do produto, e é o que o **pipeline de autoria assistida (plano separado, §10 da spec)** existe para resolver.
 
+### Cobertura conhecida-faltante (informada pelo dono da conta, 2026-08-25)
+
+Rodando `analyze --account` na conta real, o relatório afirmou "falta um personagem de cryo/pyro que cumpra main-dps" para lacunas de arquétipo. **O dono da conta tem os três times abaixo completos e montáveis hoje, com carry no nível 90.** Não falta ficha; faltam três arquétipos inteiros, mais as fichas dos 11 personagens envolvidos.
+
+| Time | Composição | Estrutura elemental (verificada no dado) |
+|---|---|---|
+| **Sandrone** (carry, cryo, L90 C0) | + `odette` (cryo L80 C0) / `alyosha` (electro L89 C6) / `fischl` (electro L90 C6) + `qiqi` (cryo L90 C3) | cryo carry com electro — supercondução, ressonância cryo |
+| **Linnea** (carry, geo, L90 C1) | + `zibai` (geo L90 C1) + `columbina` (hydro L90 C3) + `illuga` (geo L90 C6) | 3 geo + 1 hydro — ressonância geo |
+| **Durin** (carry, pyro, L90 C0) | + `varka` (anemo L90 C0) + `nicole` (pyro L90 C0) + `prune` (anemo L50 C5) | 2 pyro + 2 anemo — ressonância pyro, swirl duplo |
+
+Elemento, raridade, tipo de arma, nível e constelação foram verificados contra o catálogo do `gi-data` e a extração real. **Papéis e alvos de build não foram autorados** — nenhum dos 11 personagens tem ficha, e escrevê-las de memória produziria exatamente o defeito que a §14.3 da spec descreve. É trabalho do pipeline de autoria (abaixo).
+
+Consequência de produto enquanto isso não existe: a lacuna reportada é sobre o **banco de fichas**, não sobre o roster, e a frase atual não deixa isso claro o bastante — ver item 1 dos pendentes.
+
+### Fontes para a curadoria (decidido 2026-08-25)
+
+O pipeline de autoria deve pesquisar e **citar** fontes de referência da comunidade, preenchendo `MetaProvenance.sources` com URLs. Preferência do dono do projeto, nesta ordem:
+
+1. **Icy Veins** — guias de build por personagem
+2. **Game8** — builds, times e prioridade de talento
+3. **genshin-builds** — dado estruturado de build e times
+
+Isso é **pesquisa com citação**, não scraping: a saída é uma ficha autorada, revisável, com as URLs em `sources`, e é o que finalmente faz `confidence: "high"` ser alcançável (hoje todas as 10 fichas estão em `"medium"` com `sources: []`, porque nenhuma cita nada).
+
 ### Herdado da Fase 1, ainda aberto
 
 - `asc` (ascensão do personagem) vem sempre 0 — o payload não expõe `base.promote_level` do personagem. Não afeta a Fase 2 (usa stats observados); **afeta a Fase 3**, que precisa dele para calcular stats base.
