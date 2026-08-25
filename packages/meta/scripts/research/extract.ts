@@ -12,7 +12,7 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { loadArtifactSets, loadProperty, loadWeapons } from '@buer/gi-data';
 import { ROLE_TAGS } from '@buer/core';
 import { MODEL } from './client.js';
-import { SOURCE_IDS, type CharacterClaims, type SourceClaim } from './claims.js';
+import { SOURCE_IDS, type CharacterClaims, type SourceClaim, type SourceId } from './claims.js';
 
 const MainStatsSchema = z.object({
   sands: z.array(z.string()).optional(),
@@ -49,7 +49,7 @@ function fold(name: string): string {
   return name
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
@@ -162,6 +162,13 @@ export interface ExtractClient {
 export interface ExtractDeps {
   readonly client: ExtractClient;
   readonly model?: string;
+  /**
+   * Chamado uma vez por claim que teve nomes descartados por não resolverem
+   * no catálogo. Sem callback, o descarte acontece do mesmo jeito — só não é
+   * relatado a ninguém, e o lote perde rastro do que a pesquisa mencionou mas
+   * a ficha não pôde usar.
+   */
+  readonly onUnresolved?: (source: SourceId, names: readonly string[]) => void;
 }
 
 export async function extractClaims(
@@ -197,6 +204,10 @@ export async function extractClaims(
   const catalogs = buildCatalogs();
   return {
     character: slug,
-    claims: parsed.data.claims.map((raw) => normalizeClaim(raw, catalogs).claim),
+    claims: parsed.data.claims.map((raw) => {
+      const { claim, unresolved } = normalizeClaim(raw, catalogs);
+      if (unresolved.length > 0) deps.onUnresolved?.(raw.source, unresolved);
+      return claim;
+    }),
   };
 }
