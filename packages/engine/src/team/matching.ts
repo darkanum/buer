@@ -16,8 +16,13 @@ export interface MatchOptions {
   readonly require?: CharacterKey;
 }
 
-/** Todos os papéis que qualquer variante da ficha deste personagem declara. */
-function rolesOf(bank: MetaBank, key: CharacterKey): ReadonlySet<string> {
+/**
+ * Todos os papéis que qualquer variante da ficha deste personagem declara.
+ * Exportada para `team/evaluator.ts` reusar a MESMA regra de casamento por
+ * papel em `canHost` — duplicar a lógica é como um slot flex vira invisível
+ * pro personagem-alvo antes do matching sequer rodar (achado de revisão).
+ */
+export function rolesOf(bank: MetaBank, key: CharacterKey): ReadonlySet<string> {
   const profile = bank.profiles.get(key);
   const roles = new Set<string>();
   for (const variant of profile?.variants ?? []) for (const role of variant.roles) roles.add(role);

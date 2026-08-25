@@ -1,13 +1,13 @@
 import type { CharacterKey, Element, RoleTag } from '@buer/core';
 import type { MetaBank, TeamArchetypeData } from '@buer/meta';
 import type {
-  Explanation, Provenance, Roster, Score, TeamAssessment,
+  ConstraintViolation, Explanation, Provenance, Roster, Score, TeamAssessment,
 } from '../interfaces.js';
 import type { StatResolver } from '../stat-resolver.js';
 import { equippedBuild } from '../roster/from-hoyolab.js';
 import { assess } from '../curated/scoring.js';
 import { selectVariant } from '../curated/variant.js';
-import { matchArchetype, type ArchetypeMatch } from './matching.js';
+import { matchArchetype, rolesOf, type ArchetypeMatch } from './matching.js';
 import { reactionsFor, resonanceFor } from './rules.js';
 
 export interface TeamOption {
@@ -62,11 +62,19 @@ export class CuratedTeamEvaluator {
     for (const archetype of bank.archetypes) {
       if (archetype.gameVersionRetired !== undefined) continue;
 
-      const canHost = archetype.slots.some((slot) =>
-        slot.requires.kind === 'character'
-          ? slot.requires.anyOf.includes(subject)
-          : roster.characters.get(subject)?.element === slot.requires.element,
-      );
+      // Espelha `candidatesFor` (matching.ts): slot de personagem FLEX casa
+      // também por papel declarado na ficha, não só pelo `anyOf` nomeado —
+      // senão um arquétipo só alcançável por um slot desses é descartado
+      // aqui, antes de `matchArchetype` sequer rodar (achado de revisão).
+      const canHost = archetype.slots.some((slot) => {
+        if (slot.requires.kind === 'character') {
+          if (slot.requires.anyOf.includes(subject)) return true;
+          if (!slot.substitutable) return false;
+          const wanted = new Set<string>(slot.role);
+          return [...rolesOf(bank, subject)].some((r) => wanted.has(r));
+        }
+        return roster.characters.get(subject)?.element === slot.requires.element;
+      });
       if (!canHost) continue;
 
       const match = matchArchetype(archetype, roster, bank, { require: subject });
@@ -86,8 +94,11 @@ export class CuratedTeamEvaluator {
    * carrega qual critério o posicionou — nunca um número sem origem.
    */
   private rank(options: TeamOption[]): TeamOption[] {
-    const scoreOf = (o: TeamOption): number =>
-      o.assessment.energyFeasibility.filter((e) => e.actual >= e.required).length;
+    // `score.value` JÁ É "quantos slots cumprem os alvos duros" — computado
+    // uma vez em `assessTeam` como `outcomes.filter(o => o.meetsHardTargets)`.
+    // Uma métrica separada aqui (ex.: só ER) rotularia `rankedBy: 'targets'`
+    // com uma origem que não é a que decidiu de fato (achado de revisão).
+    const scoreOf = (o: TeamOption): number => o.assessment.score.value;
 
     return [...options]
       .map((option, declaredIndex) => ({ option, declaredIndex }))
@@ -114,6 +125,10 @@ export class CuratedTeamEvaluator {
   private async assessTeam(match: ArchetypeMatch, roster: Roster): Promise<TeamAssessment> {
     const { bank, resolver } = this.opts;
     const outcomes: SlotOutcome[] = [];
+    // Violações de alvo hard, com os números REALMENTE medidos — nunca um
+    // array vazio por omissão quando `assess()` já devolveu o dado (spec:
+    // nenhum número sem origem rastreável).
+    const violations: ConstraintViolation[] = [];
 
     for (const [slotIndex, key] of match.fills.entries()) {
       const slot = match.archetype.slots[slotIndex]!;
@@ -149,6 +164,19 @@ export class CuratedTeamEvaluator {
 
       const result = assess(build, { ...choice.variant, targets }, stats, bank.scoring);
       const erTarget = targets.find((t) => t.kind === 'min' && t.stat === 'enerRech_');
+
+      // Todo `violated` chega com `kind: 'min'` (só alvo `min` é `hard` em
+      // `checkTargets`) — o `Constraint` sintético não inventa nenhum campo,
+      // só reembala o que `assess()` já mediu.
+      for (const v of result.violated) {
+        if (v.target.kind !== 'min') continue;
+        violations.push({
+          constraint: { kind: 'stat', of: key, stat: v.target.stat, min: v.target.value, hard: true },
+          actual: v.actual,
+          required: v.required,
+          hard: true,
+        });
+      }
 
       outcomes.push({
         slotIndex,
@@ -199,9 +227,14 @@ export class CuratedTeamEvaluator {
     const score: Score = {
       value: outcomes.filter((o) => o.meetsHardTargets).length,
       unit: 'score',
-      violations: [],
+      violations,
       provenance,
     };
+
+    // Slot com alvo de ER que a captura não conseguiu medir: não fabricar
+    // "0% de ER" (Achado 1) — a ausência vira uma linha explícita, não um
+    // silêncio (que trocaria um defeito por outro).
+    const unverifiedEr = outcomes.filter((o) => o.character !== null && o.requiredEr !== null && o.actualEr === null);
 
     const explanation: Explanation = {
       summary:
@@ -209,7 +242,14 @@ export class CuratedTeamEvaluator {
         (match.status === 'playable'
           ? 'você tem todos os personagens deste time.'
           : `falta 1 slot para você jogar este time.`),
-      reasons: outcomes.map((o) => ({ claim: o.line })),
+      reasons: [
+        ...outcomes.map((o) => ({ claim: o.line })),
+        ...unverifiedEr.map((o) => ({
+          claim:
+            `Recarga de Energia de ${String(o.character)} não pôde ser verificada — ` +
+            'a captura não trouxe esse dado para esta build.',
+        })),
+      ],
       citations: [...match.archetype.sources],
     };
 
@@ -222,9 +262,11 @@ export class CuratedTeamEvaluator {
       reactions: reactionsFor(elements),
       resonance: resonanceFor(elements),
       roleCoverage,
+      // `actualEr === null` significa "não medido", nunca "mediu zero" — um
+      // slot assim não afirma nada em vez de fabricar 0% de ER (Achado 1).
       energyFeasibility: outcomes
-        .filter((o) => o.character !== null && o.requiredEr !== null)
-        .map((o) => ({ of: o.character!, required: o.requiredEr!, actual: o.actualEr ?? 0 })),
+        .filter((o) => o.character !== null && o.requiredEr !== null && o.actualEr !== null)
+        .map((o) => ({ of: o.character!, required: o.requiredEr!, actual: o.actualEr! })),
       score,
       explanation,
     };
